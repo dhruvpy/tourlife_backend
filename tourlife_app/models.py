@@ -104,6 +104,7 @@ class CabBook(models.Model):
 class Venue(models.Model):
     user = models.ForeignKey(User,related_name='venue_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='venue_gig',on_delete=models.CASCADE)
+    venue_name=models.CharField(max_length=100,null=True,blank=True)
     address=models.CharField(max_length=100,null=True,blank=True)
     direction=models.CharField(max_length=50,null=True,blank=True)
     website=models.CharField(max_length=100,null=True,blank=True)
@@ -116,6 +117,7 @@ class Venue(models.Model):
     dressing_room=models.CharField(max_length=100,null=True,blank=True)
     hospitality=models.BooleanField(default=False)
     hospitality_detail=models.CharField(max_length=100,null=True,blank=True)
+    hospitality_email=models.CharField(max_length=100,null=True,blank=True)
     catring=models.BooleanField(default=False)
     catring_detail=models.CharField(max_length=100,null=True,blank=True)
 
