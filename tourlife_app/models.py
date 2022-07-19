@@ -106,6 +106,8 @@ class CabBook(models.Model):
     # 1d416dd6f1f006195c0aa4bd9685b88d
 
 class Venue(models.Model):
+    user = models.ForeignKey(User,related_name='venue_user',on_delete=models.CASCADE)
+    gig = models.ForeignKey(Gigs,related_name='venue_gig',on_delete=models.CASCADE)
     address=models.CharField(max_length=100,null=True,blank=True)
     direction=models.CharField(max_length=50,null=True,blank=True)
     website=models.CharField(max_length=100,null=True,blank=True)
@@ -122,6 +124,9 @@ class Venue(models.Model):
     catring_detail=models.CharField(max_length=100,null=True,blank=True)
 
 class Hotel(models.Model):
+    user = models.ForeignKey(User,related_name='h_user',on_delete=models.CASCADE)
+    gig = models.ForeignKey(Gigs,related_name='h_gig',on_delete=models.CASCADE)
+    hotel_name = models.CharField(max_length=100,null=True,blank=True)
     address=models.CharField(max_length=100,null=True,blank=True)
     direction = models.CharField(max_length=100,null=True,blank=True)
     website =models.CharField(max_length=100,null=True,blank=True)

@@ -1546,6 +1546,8 @@ class allListView(ListAPIView):
    serializer_class_GigsSerializer = GigsSerializer
    serializer_class_FlightSerializer = FlightSerializer
    serializer_class_CabBookSerializer = CabBookSerializer
+   serializer_class_HotelListSerializer = HotelListSerializer
+   serializer_class_VenueListSerializer = VenueListSerializer
 
    def get(self, request, *args, **kwrgs):
       if request.method == 'GET':
@@ -1553,11 +1555,15 @@ class allListView(ListAPIView):
         gigs = Gigs.objects.all()
         flights = FlightBook.objects.all()
         cabs = CabBook.objects.all()
+        hotels = Hotel.objects.all()
+        venues = Venue.objects.all()
 
         seralizer1 = self.serializer_class_UserSerializer(users, many=True)
         seralizer2 = self.serializer_class_GigsSerializer(gigs, many=True)
         seralizer3 = self.serializer_class_FlightSerializer(flights, many=True)
         seralizer4 = self.serializer_class_CabBookSerializer(cabs, many=True)
+        seralizer5 = self.serializer_class_HotelListSerializer(hotels, many=True)
+        seralizer6 = self.serializer_class_VenueListSerializer(venues, many=True)
 
         final = []
         users = User.objects.all()
@@ -1606,6 +1612,8 @@ class allListView(ListAPIView):
         response = {
             'users':seralizer1.data,
             'gigs':seralizer2.data,
+            'hotels':seralizer5.data,
+            'venues':seralizer6.data,
             # 'flights':seralizer3.data,
             # 'cabs':seralizer4.data,
             "schedule" : final

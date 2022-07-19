@@ -145,6 +145,12 @@ class VenueSerializer(serializers.ModelSerializer):
         fields=["address","direction","website","number","indoor","covered","capacity","wather","credential_collection",
         "dressing_room","hospitality","hospitality_detail","catring","catring_detail"]
 
+class VenueListSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model=Venue
+        fields='__all__'
+
 class HotelSerializer(serializers.ModelSerializer):
     address=serializers.CharField(required=True)
     direction = serializers.CharField(required=True)
@@ -155,6 +161,12 @@ class HotelSerializer(serializers.ModelSerializer):
     class Meta:
         model=Hotel
         fields=["address","direction","website","number","wifi_paid_for","room_buyout"]
+
+class HotelListSerializer(serializers.ModelSerializer):
+   
+    class Meta:
+        model=Hotel
+        fields='__all__'
 
 class ContactSerializer(serializers.ModelSerializer):
     emergancy1_name = serializers.CharField(required=True)
