@@ -105,4 +105,59 @@ class CabBook(models.Model):
 
     # 1d416dd6f1f006195c0aa4bd9685b88d
 
+class Venue(models.Model):
+    address=models.CharField(max_length=100,null=True,blank=True)
+    direction=models.CharField(max_length=50,null=True,blank=True)
+    website=models.CharField(max_length=100,null=True,blank=True)
+    number=models.CharField(max_length=100,null=True,blank=True)
+    indoor=models.BooleanField(null=True,blank=True)
+    covered=models.BooleanField(null=True,blank=True)
+    capacity=models.IntegerField(null=True,blank=True)
+    wather=models.CharField(max_length=100,null=True,blank=True)
+    credential_collection=models.CharField(max_length=100,null=True,blank=True)
+    dressing_room=models.CharField(max_length=100,null=True,blank=True)
+    hospitality=models.BooleanField(default=False)
+    hospitality_detail=models.CharField(max_length=100,null=True,blank=True)
+    catring=models.BooleanField(default=False)
+    catring_detail=models.CharField(max_length=100,null=True,blank=True)
 
+class Hotel(models.Model):
+    address=models.CharField(max_length=100,null=True,blank=True)
+    direction = models.CharField(max_length=100,null=True,blank=True)
+    website =models.CharField(max_length=100,null=True,blank=True)
+    number =models.CharField(max_length=100,null=True,blank=True)
+    wifi_paid_for = models.BooleanField(null=True,blank=True)
+    room_buyout = models.CharField(max_length=100,null=True,blank=True)
+
+class Contacts(models.Model):
+    emergancy1_name = models.CharField(max_length=100,null=True,blank=True)
+    emergancy1_number = models.CharField(max_length=100,null=True,blank=True)
+    emergancy1_message = models.CharField(max_length=100,null=True,blank=True)
+    emergancy2_name = models.CharField(max_length=100,null=True,blank=True)
+    emergancy2_number = models.CharField(max_length=100,null=True,blank=True)
+    emergancy2_message = models.CharField(max_length=100,null=True,blank=True)
+    transport_cordinator_name = models.CharField(max_length=100,null=True,blank=True)
+    transport_cordinator_number = models.CharField(max_length=100,null=True,blank=True)
+    transport_cordinator_message = models.CharField(max_length=100,null=True,blank=True)
+    artist_liaison_name = models.CharField(max_length=100,null=True,blank=True)
+    artist_liaison_number = models.CharField(max_length=100,null=True,blank=True)
+    artist_liaison_message = models.CharField(max_length=100,null=True,blank=True)
+    manager_name = models.CharField(max_length=100,null=True,blank=True)
+    manager_email = models.CharField(max_length=100,null=True,blank=True)
+    manager_number = models.CharField(max_length=100,null=True,blank=True)
+    manager_message = models.CharField(max_length=100,null=True,blank=True)
+    tm_name = models.CharField(max_length=100,null=True,blank=True)
+    tm_email = models.CharField(max_length=100,null=True,blank=True)
+    tm_number = models.CharField(max_length=100,null=True,blank=True)
+    tm_message = models.CharField(max_length=100,null=True,blank=True)
+
+class Documents(models.Model):
+    boarding_passes = models.CharField(max_length=100)
+    flight_confirmation_ticket = models.CharField(max_length=100)
+    hotel_voucher = models.CharField(max_length=100)
+
+# class RunningOrder(models.Model):
+#     pass
+class GuestList(models.Model):
+    guestlist_detail=models.CharField(max_length=100,null=True,blank=True)
+    guestlist= models.BooleanField(null=True,blank=True)
