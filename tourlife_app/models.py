@@ -17,8 +17,8 @@ class User(AbstractUser):
     is_manager=models.BooleanField(default=False)
     is_artist=models.BooleanField(default=False)
     
-    # def __str__ (self):
-    #     return f"{self.first_name}"
+    def __str__ (self):
+        return f"{self.email}"
 class Usertoken(models.Model):
     user=models.ForeignKey(User,related_name='token',on_delete=models.CASCADE)
     token=models.CharField(max_length=500,null=True,blank=True)
@@ -41,7 +41,7 @@ class Gigs(models.Model):
     sound_check_time = models.TimeField(null=True,blank=True)
 
     def __str__ (self):
-        return f"{self.title}"
+        return f"{self.id}"
 
 SEMESTER_CHOICES = (
     ("FLIGHT", "FLIGHT"),
@@ -164,7 +164,7 @@ class SetTime(models.Model):
     user = models.ForeignKey(User,related_name='settime_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='settime_gig',on_delete=models.CASCADE)
     venue = models.ForeignKey(Venue,related_name='settime_gig',on_delete=models.CASCADE)
-    start=models.DateTimeField(null=True,blank=True)
-    finish=models.DateTimeField(null=True,blank=True)
+    depart_time=models.DateTimeField(null=True,blank=True)
+    arrival_time=models.DateTimeField(null=True,blank=True)
 
 

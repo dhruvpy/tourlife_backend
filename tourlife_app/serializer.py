@@ -68,10 +68,12 @@ class UserListSerializer(serializers.ModelSerializer):
     id=serializers.CharField(required=True)
     first_name=serializers.CharField(required=True)
     last_name=serializers.CharField(required=True)
+    # is_manager=serializers.CharField(required=True)
+
     
     class Meta:
         model=User
-        fields=["id","first_name","last_name"]
+        fields=["id","first_name","last_name","is_manager"]
 
 class DayScheduleSerializer(serializers.ModelSerializer):
     user=serializers.CharField(required=True)
