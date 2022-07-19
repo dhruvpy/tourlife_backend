@@ -9,7 +9,10 @@ admin.site.register(FlightBook)
 admin.site.register(CabBook)
 admin.site.register(Venue)
 admin.site.register(Hotel)
+admin.site.register(Documents)
+admin.site.register(Contacts)
 admin.site.register(GuestList)
+admin.site.register(SetTime)
 
 
 

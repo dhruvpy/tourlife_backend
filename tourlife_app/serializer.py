@@ -126,6 +126,9 @@ class CabBookSerializer(serializers.ModelSerializer):
         ,"driver_name","driver_number","wather"]
 
 class VenueSerializer(serializers.ModelSerializer):
+    user=serializers.CharField(required=True)
+    gig=serializers.CharField(required=True)
+
     address=serializers.CharField(required=True)
     direction=serializers.CharField(required=True)
     website=serializers.CharField(required=True)
@@ -142,7 +145,7 @@ class VenueSerializer(serializers.ModelSerializer):
     catring_detail=serializers.CharField(required=True)
     class Meta:
         model=Venue
-        fields=["address","direction","website","number","indoor","covered","capacity","wather","credential_collection",
+        fields=["user","gig","address","direction","website","number","indoor","covered","capacity","wather","credential_collection",
         "dressing_room","hospitality","hospitality_detail","catring","catring_detail"]
 
 class VenueListSerializer(serializers.ModelSerializer):
@@ -152,6 +155,9 @@ class VenueListSerializer(serializers.ModelSerializer):
         fields='__all__'
 
 class HotelSerializer(serializers.ModelSerializer):
+    user=serializers.CharField(required=True)
+    gig=serializers.CharField(required=True)
+    hotel_name=serializers.CharField(required=True)
     address=serializers.CharField(required=True)
     direction = serializers.CharField(required=True)
     website = serializers.CharField(required=True)
@@ -160,7 +166,7 @@ class HotelSerializer(serializers.ModelSerializer):
     room_buyout = serializers.CharField(required=True)
     class Meta:
         model=Hotel
-        fields=["address","direction","website","number","wifi_paid_for","room_buyout"]
+        fields=["user","gig","hotel_name","address","direction","website","number","wifi_paid_for","room_buyout"]
 
 class HotelListSerializer(serializers.ModelSerializer):
    
@@ -169,45 +175,37 @@ class HotelListSerializer(serializers.ModelSerializer):
         fields='__all__'
 
 class ContactSerializer(serializers.ModelSerializer):
-    emergancy1_name = serializers.CharField(required=True)
-    emergancy1_number = serializers.CharField(required=True)
-    emergancy1_message = serializers.CharField(required=True)
-    emergancy2_name = serializers.CharField(required=True)
-    emergancy2_number = serializers.CharField(required=True)
-    emergancy2_message = serializers.CharField(required=True)
-    transport_cordinator_name = serializers.CharField(required=True)
-    transport_cordinator_number = serializers.CharField(required=True)
-    transport_cordinator_message = serializers.CharField(required=True)
-    artist_liaison_name = serializers.CharField(required=True)
-    artist_liaison_number = serializers.CharField(required=True)
-    artist_liaison_message = serializers.CharField(required=True)
-    manager_name = serializers.CharField(required=True)
-    manager_email = serializers.CharField(required=True)
-    manager_number = serializers.CharField(required=True)
-    manager_message = serializers.CharField(required=True)
-    tm_name = serializers.CharField(required=True)
-    tm_email = serializers.CharField(required=True)
-    tm_number = serializers.CharField(required=True)
-    tm_message =serializers.CharField(required=True)
-
+    gig=serializers.CharField(required=True)
+    type=serializers.CharField(required=True)
+    name=serializers.CharField(required=True)
+    number=serializers.CharField(required=True)
+    email=serializers.CharField(required=True)
+    travelling_party=serializers.CharField(required=True)
     class Meta:
         model=Contacts
-        fields=["emergancy1_name","emergancy1_number","emergancy1_message","emergancy2_name","emergancy2_number","emergancy2_message"
-        ,"transport_cordinator_name","transport_cordinator_number","transport_cordinator_message","artist_liaison_name",
-        "artist_liaison_number","artist_liaison_message","manager_name","manager_email","manager_number","manager_message","tm_name"
-        ,"tm_email","tm_number","tm_message"]
+        fields=["gig","type","name","number","email","travelling_party"]
 
 class DocumentSerializer(serializers.ModelSerializer):
+    gig=serializers.CharField(required=True)
+
     boarding_passes = serializers.CharField(required=True)
     flight_confirmation_ticket = serializers.CharField(required=True)
     hotel_voucher = serializers.CharField(required=True)
     class Meta:
         model=Documents
-        fields=["boarding_passes","flight_confirmation_ticket","hotel_voucher"]
+        fields=["gig","boarding_passes","flight_confirmation_ticket","hotel_voucher"]
 
 class GuestListSerializer(serializers.ModelSerializer):
+    gig=serializers.CharField(required=True)
+
     guestlist_detail= serializers.CharField(required=True)
     guestlist=serializers.CharField(required=True)
     class Meta:
         model=GuestList
-        fields=["guestlist_detail","guestlist"]
+        fields=["gig","guestlist_detail","guestlist"]
+
+class SetTimeSerialiazer(serializers.ModelSerializer):
+
+    class Meta:
+        model=SetTime
+        fields= '__all__'

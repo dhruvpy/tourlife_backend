@@ -18,7 +18,7 @@ urlpatterns = [
 
      path('schedule_create',views.ScheduleCreateAPIView.as_view(),name='schedule_create'),
      path('schedule_update/<int:pk>',views.ScheduleUpdateAPIView.as_view(),name='schedule_update'),
-     path('schedule_list',views.ScheduleAPIView.as_view(),name='schedule_list'),
+     path('schedule_list',views.ScheduleListAPIView.as_view(),name='schedule_list'),
 
      path('schedule_delete/<int:pk>',views.ScheduleDeleteAPIView.as_view(),name='schedule_delete'),
 
@@ -58,7 +58,14 @@ urlpatterns = [
      path('guestlist_update/<int:pk>',views.GuestListUpdateAPIView.as_view(),name='guestlist_update'),
      path('guestlist_list',views.GuestListListAPIView.as_view(), name="guestlist_list"),
      path('guestlist_delete/<int:pk>',views.GuestListDeleteAPIView.as_view(),name='guestlist_delete'),
-     # path('users_list',views.UserListAPIView.as_view(),name='users_list'),
+
+     
+     path('settime_create',views.SetTimeCreateAPIView.as_view(),name='settime_create'),
+     path('settime_update/<int:pk>',views.SetTimeUpdateAPIView.as_view(),name='settime_update'),
+     path('settime_list',views.SetTimeListAPIView.as_view(), name="settime_list"),
+
+     
+     
      path('all_data',views.allListView.as_view(),name='all_data'),
      path('all_data2',views.AllDataAPIView.as_view(),name='all_data2'),
     

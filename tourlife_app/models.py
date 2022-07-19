@@ -17,11 +17,8 @@ class User(AbstractUser):
     is_manager=models.BooleanField(default=False)
     is_artist=models.BooleanField(default=False)
     
-    def __str__ (self):
-        return f"{self.first_name}"
-
-
-
+    # def __str__ (self):
+    #     return f"{self.first_name}"
 class Usertoken(models.Model):
     user=models.ForeignKey(User,related_name='token',on_delete=models.CASCADE)
     token=models.CharField(max_length=500,null=True,blank=True)
@@ -64,7 +61,6 @@ class DaySchedule(models.Model):
     def __str__ (self):
         return f"{self.descriptions}"
     
-
 class FlightBook(models.Model):
     user = models.ForeignKey(User,related_name='flight_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='flight_gig',on_delete=models.CASCADE)
@@ -134,29 +130,23 @@ class Hotel(models.Model):
     wifi_paid_for = models.BooleanField(null=True,blank=True)
     room_buyout = models.CharField(max_length=100,null=True,blank=True)
 
+CONTACT_CHOICES=(
+    ("EMERGANCY","EMERGANCY"),
+    ("TRANSPORT_CORDINATOR","TRANSPORT_CORDINATOR"),
+    ("ARTIST_LIAISON","ARTIST_LIAISON"),
+    ("MANAGER","MANAGER"),
+    ("TM","TM")
+)
 class Contacts(models.Model):
-    emergancy1_name = models.CharField(max_length=100,null=True,blank=True)
-    emergancy1_number = models.CharField(max_length=100,null=True,blank=True)
-    emergancy1_message = models.CharField(max_length=100,null=True,blank=True)
-    emergancy2_name = models.CharField(max_length=100,null=True,blank=True)
-    emergancy2_number = models.CharField(max_length=100,null=True,blank=True)
-    emergancy2_message = models.CharField(max_length=100,null=True,blank=True)
-    transport_cordinator_name = models.CharField(max_length=100,null=True,blank=True)
-    transport_cordinator_number = models.CharField(max_length=100,null=True,blank=True)
-    transport_cordinator_message = models.CharField(max_length=100,null=True,blank=True)
-    artist_liaison_name = models.CharField(max_length=100,null=True,blank=True)
-    artist_liaison_number = models.CharField(max_length=100,null=True,blank=True)
-    artist_liaison_message = models.CharField(max_length=100,null=True,blank=True)
-    manager_name = models.CharField(max_length=100,null=True,blank=True)
-    manager_email = models.CharField(max_length=100,null=True,blank=True)
-    manager_number = models.CharField(max_length=100,null=True,blank=True)
-    manager_message = models.CharField(max_length=100,null=True,blank=True)
-    tm_name = models.CharField(max_length=100,null=True,blank=True)
-    tm_email = models.CharField(max_length=100,null=True,blank=True)
-    tm_number = models.CharField(max_length=100,null=True,blank=True)
-    tm_message = models.CharField(max_length=100,null=True,blank=True)
+    gig = models.ForeignKey(Gigs,related_name='contact_gig',on_delete=models.CASCADE)
+    type= models.CharField(max_length=100,choices=CONTACT_CHOICES,null=True,blank=True)
+    name = models.CharField(max_length=100,null=True,blank=True)
+    number = models.CharField(max_length=100,null=True,blank=True)
+    email = models.CharField(max_length=100,null=True,blank=True)
+    travelling_party=models.BooleanField(null=True,blank=True)
 
 class Documents(models.Model):
+    gig = models.ForeignKey(Gigs,related_name='document_gig',on_delete=models.CASCADE)
     boarding_passes = models.CharField(max_length=100)
     flight_confirmation_ticket = models.CharField(max_length=100)
     hotel_voucher = models.CharField(max_length=100)
@@ -164,5 +154,15 @@ class Documents(models.Model):
 # class RunningOrder(models.Model):
 #     pass
 class GuestList(models.Model):
+    gig = models.ForeignKey(Gigs,related_name='guest_gig',on_delete=models.CASCADE)
     guestlist_detail=models.CharField(max_length=100,null=True,blank=True)
     guestlist= models.BooleanField(null=True,blank=True)
+
+class SetTime(models.Model):
+    user = models.ForeignKey(User,related_name='settime_user',on_delete=models.CASCADE)
+    gig = models.ForeignKey(Gigs,related_name='settime_gig',on_delete=models.CASCADE)
+    venue = models.ForeignKey(Venue,related_name='settime_gig',on_delete=models.CASCADE)
+    start=models.DateTimeField(null=True,blank=True)
+    finish=models.DateTimeField(null=True,blank=True)
+
+

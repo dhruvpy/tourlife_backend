@@ -25,7 +25,6 @@ class UserCreateAPIView(GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -39,12 +38,9 @@ class UserCreateAPIView(GenericAPIView):
         password = request.data["password"]
         mobile_no = request.data["mobile_no"]
         profile_image=request.data["profile_image"]
-        # print(request.FILES['profile_image'], "////////////////////////")
-        # profile_image = request.FILES.get("profile_image")
 
         user = User.objects.create(username=username, last_name=last_name, password=password, email=email, mobile_no=mobile_no,
                                 profile_image=profile_image)
-    
         response_data = {
             "id": user.id,
             "username": user.username,
@@ -53,7 +49,6 @@ class UserCreateAPIView(GenericAPIView):
             "email": user.email,
             "mobile_no": str(user.mobile_no),
             "profile_image": str(user.profile_image),
-
         }
         return Response(data={"status": status.HTTP_200_OK,
                             "message": 'add new user',
@@ -64,7 +59,6 @@ class UserUpdateAPIView(CreateAPIView):
     serializer_class=CreateUserSerializers
     def post(self,request,*args,**kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -80,7 +74,7 @@ class UserUpdateAPIView(CreateAPIView):
         id=self.kwargs["pk"]
 
         if not User.objects.filter(id=id).exists():
-            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "user is not exists"},
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "user {} is not exists".format(id)},
                             status=status.HTTP_400_BAD_REQUEST)
         user=User.objects.get(id=id)
         user.username=username
@@ -102,7 +96,6 @@ class UserUpdateAPIView(CreateAPIView):
             "mobile_no":user.mobile_no,
             "profile_image":str(user.profile_image)
         }
-
         return Response(data={"status": status.HTTP_200_OK,
                             "message": "user updated",
                             "results": {'data': response_data}},
@@ -122,7 +115,6 @@ class UserListAPIView(ListAPIView):
                                  "result": serializer.data},
                                 status=status.HTTP_200_OK)
 
-
 class UserDeleteAPIView(DestroyAPIView):
     serializer_class = CreateUserSerializers
 
@@ -138,19 +130,14 @@ class UserDeleteAPIView(DestroyAPIView):
 class LoginAPIView(GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = LoginUserSerializers
-
-
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.POST)
-
         if not serializer.is_valid():
             return Response(data={'status': status.HTTP_400_BAD_REQUEST, 'error':True, 'message':serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
         email = serializer.validated_data['email']
         password = serializer.validated_data['password']
-       
         user = User.objects.get(email=email,password=password)
-        print(user.email,'-------------------------')
 
         if user is not None:
             if not user.password == password:
@@ -158,16 +145,11 @@ class LoginAPIView(GenericAPIView):
         else:
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, 'error':True, 'message': "Invalid username or password"},status=status.HTTP_400_BAD_REQUEST)
 
-
         if user:
             payload={"email":user.email,"password":user.password}
 
             print(payload)
             jwt_token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
-            # jwt_token=jwt.encode(payload,settings.SECRET_KEY, algorithm ="HS256")
-            # jwt_token = jwt.JWT.encode(payload,settings.SECRET_KEY, algorithm ="HS256")
-
-            # UserToken.objects.create(user=user, token=jwt_token)
             return Response(data={"status": status.HTTP_200_OK,
                                 "error": False,
                                 "message": "User Login Successfully.",
@@ -196,15 +178,12 @@ class AdminLoginAPIView(GenericAPIView):
         if not user.is_manager==True:
             return Response(data={'status': status.HTTP_400_BAD_REQUEST, 'error':True, 
             'message':"is_manage is not allow"}, status=status.HTTP_400_BAD_REQUEST)
-            print(user.is_manager,"................")
-            print(user.email,'-------------------------')
 
         if user is not None:
             if not user.password == password:
                 return Response(data={"status": status.HTTP_400_BAD_REQUEST, 'error':True, 'message': "Invalid username or password"},status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, 'error':True, 'message': "Invalid username or password"},status=status.HTTP_400_BAD_REQUEST)
-
 
         if user:
             payload={"email":user.email,"password":user.password}
@@ -291,43 +270,44 @@ class GigsUpdateAPIView(CreateAPIView):
         sound_check_time=request.data["sound_check_time"]
 
         id=self.kwargs["pk"]
+        if not Gigs.objects.filter(id=id).exists():
+        # if not User.objects.filter(id=id).exists():
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "gigs {} is not exists".format(id)},
+                            status=status.HTTP_400_BAD_REQUEST)
+        gigs=Gigs.objects.get(id=id)
+        gigs.user=user
+        gigs.title=title
+        gigs.descriptions=descriptions
+        gigs.profile_pic=profile_pic
+        gigs.cover_image=cover_image
+        gigs.location=location
+        gigs.show=show
+        gigs.stage=stage
+        gigs.visa=visa
+        gigs.Equipment=Equipment
+        gigs.date= date
+        gigs.sound_check_time=sound_check_time
+        gigs.save()
 
-        if Gigs.objects.filter(id=id).exists():
-            gigs=Gigs.objects.get(id=id)
-            gigs.user=user
-            gigs.title=title
-            gigs.descriptions=descriptions
-            gigs.profile_pic=profile_pic
-            gigs.cover_image=cover_image
-            gigs.location=location
-            gigs.show=show
-            gigs.stage=stage
-            gigs.visa=visa
-            gigs.Equipment=Equipment
-            gigs.date= date
-            gigs.sound_check_time=sound_check_time
-            gigs.save()
-
-            response_data = {
-                "id": gigs.id,
-                "user":str(gigs.user),
-                "title":gigs.title,
-                "descriptions":gigs.descriptions,
-                "profile_pic":str(gigs.profile_pic),
-                "cover_image":str(gigs.cover_image),
-                "location":gigs.location,
-                "show":gigs.show,
-                "stage":gigs.stage,
-                "visa":gigs.visa,
-                "Equipment":gigs.Equipment,
-                "date":gigs.date,
-                "sound_check_time":gigs.sound_check_time
-            }
-
-            return Response(data={"status": status.HTTP_200_OK,
-                                "message": "gigs updated",
-                                "results": {'data': response_data}},
-                            status=status.HTTP_200_OK)
+        response_data = {
+            "id": gigs.id,
+            "user":str(gigs.user),
+            "title":gigs.title,
+            "descriptions":gigs.descriptions,
+            "profile_pic":str(gigs.profile_pic),
+            "cover_image":str(gigs.cover_image),
+            "location":gigs.location,
+            "show":gigs.show,
+            "stage":gigs.stage,
+            "visa":gigs.visa,
+            "Equipment":gigs.Equipment,
+            "date":gigs.date,
+            "sound_check_time":gigs.sound_check_time
+        }
+        return Response(data={"status": status.HTTP_200_OK,
+                            "message": "gigs updated",
+                            "results": {'data': response_data}},
+                        status=status.HTTP_200_OK)
 class GigsListAPIView(ListAPIView):
     serializer_class =GigsSerializer
     queryset=Gigs.objects.all()
@@ -371,7 +351,6 @@ class ScheduleCreateAPIView(CreateAPIView):
         end_time=request.data["end_time"]
         type=request.data["type"]
         venue=request.data["venue"]
-    
 
         schedule=DaySchedule.objects.create(user=user,descriptions=descriptions,
         start_time=start_time,end_time=end_time,type=type,venue=venue)
@@ -430,7 +409,6 @@ class ScheduleUpdateAPIView(CreateAPIView):
             "type":schedule.type,
             "venue":schedule.venue,
         }
-
         return Response(data={"status": status.HTTP_200_OK,
                             "message": "Schedule Updated",
                             "results": {'data': response_data}},
@@ -490,7 +468,6 @@ class FlightBookCreateAPIView(CreateAPIView):
         flight_class=request.data["flight_class"]
         wather=request.data["wather"]
 
-
         flightbook=FlightBook.objects.create(user=user,gig=gig,depart_location=depart_location,depart_lat_long=depart_lat_long,
         depart_time=depart_time,depart_terminal=depart_terminal,depart_gate=depart_gate,arrival_location=arrival_location,
         arrival_lat_long=arrival_lat_long,arrival_time=arrival_time,arrival_terminal=arrival_terminal,
@@ -514,13 +491,11 @@ class FlightBookCreateAPIView(CreateAPIView):
             "flight_number":flightbook.flight_number,
             "flight_class":flightbook.flight_class,
             "wather":flightbook.wather,
-
             }
         return Response(data={"status": status.HTTP_200_OK,
                               "message": "flightbook created",
                               "results": {'data': response_data}},
                         status=status.HTTP_200_OK)
-
 
 class FlightBookUpdateAPIView(CreateAPIView):
     serializer_class=FlightBookSerializer
@@ -591,9 +566,7 @@ class FlightBookUpdateAPIView(CreateAPIView):
             "flight_number":flightbook.flight_number,
             "flight_class":flightbook.flight_class,
             "wather":flightbook.wather,
-
             }
-
         return Response(data={"status": status.HTTP_200_OK,
                             "message": "flightbook Updated",
                             "results": {'data': response_data}},
@@ -625,7 +598,6 @@ class FlightBookDeleteAPIView(DestroyAPIView):
         else:
             return Response({"res": "id {} is not exists".format(id)}, status=status.HTTP_400_BAD_REQUEST)
 
-
 class CabBookCreateAPIView(CreateAPIView):
     serializer_class = CabBookSerializer
 
@@ -648,7 +620,6 @@ class CabBookCreateAPIView(CreateAPIView):
         driver_number=request.data["driver_number"]
         wather=request.data["wather"]
 
-
         cabbook=CabBook.objects.create(user=user,gig=gig,depart_location=depart_location,depart_lat_long=depart_lat_long,
         depart_time=depart_time,arrival_location=arrival_location,
         arrival_lat_long=arrival_lat_long,arrival_time=arrival_time,
@@ -667,7 +638,6 @@ class CabBookCreateAPIView(CreateAPIView):
             "driver_name":cabbook.driver_name,
             "driver_number":cabbook.driver_number,
             "wather":cabbook.wather,
-
             }
         return Response(data={"status": status.HTTP_200_OK,
                               "message": "cabbook created",
@@ -773,6 +743,8 @@ class VenueCreateAPIView(CreateAPIView):
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
 
+        user= User.objects.get(id=request.data["user"])
+        gig= Gigs.objects.get(id=request.data["gig"])
         address = request.data["address"]
         direction = request.data["direction"]
         website = request.data["website"]
@@ -788,12 +760,14 @@ class VenueCreateAPIView(CreateAPIView):
         catring=request.data["catring"]
         catring_detail=request.data["catring_detail"]
 
-        venue=Venue.objects.create(address=address,direction=direction,website=website,number=number,
+        venue=Venue.objects.create(user=user,gig=gig,address=address,direction=direction,website=website,number=number,
         indoor=indoor,covered=covered,
         capacity=capacity,credential_collection=credential_collection,dressing_room=dressing_room,hospitality=hospitality
         ,hospitality_detail=hospitality_detail,catring=catring,catring_detail=catring_detail,wather=wather)
 
         response_data = {
+            "user":str(venue.user),
+            "gig":str(venue.gig),
             "id":venue.id,
             "address": venue.address,
             "direction": venue.direction,
@@ -824,7 +798,8 @@ class VenueUpdateAPIView(CreateAPIView):
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
-
+        user= User.objects.get(id=request.data["user"])
+        gig= Gigs.objects.get(id=request.data["gig"])
         address = request.data["address"]
         direction = request.data["direction"]
         website = request.data["website"]
@@ -847,6 +822,8 @@ class VenueUpdateAPIView(CreateAPIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
         vanue=Venue.objects.get(id=id)
+        vanue.user=user
+        vanue.gig=gig
         vanue.address=address
         vanue.direction=direction
         vanue.website=website
@@ -865,6 +842,8 @@ class VenueUpdateAPIView(CreateAPIView):
 
         response_data = {
             "id":vanue.id,
+            "user":str(vanue.user),
+            "gig":str(vanue.gig),
             "address": vanue.address,
             "direction": vanue.direction,
             "website": vanue.website,
@@ -922,7 +901,9 @@ class HotelCreateAPIView(CreateAPIView):
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
-
+        user= User.objects.get(id=request.data["user"])
+        gig= Gigs.objects.get(id=request.data["gig"])
+        hotel_name=request.data["hotel_name"]
         address = request.data["address"]
         direction = request.data["direction"]
         website = request.data["website"]
@@ -931,11 +912,14 @@ class HotelCreateAPIView(CreateAPIView):
         room_buyout =request.data["room_buyout"]
         
 
-        hotel=Hotel.objects.create(address=address,direction=direction,website=website,number=number,
+        hotel=Hotel.objects.create(user=user,gig=gig,hotel_name=hotel_name,address=address,direction=direction,website=website,number=number,
         wifi_paid_for=wifi_paid_for,room_buyout=room_buyout,)
 
         response_data = {
             "id":hotel.id,
+            "user":str(hotel.user),
+            "gig":str(hotel.gig),
+            "hotel_name":hotel.hotel_name,
             "address": hotel.address,
             "direction": hotel.direction,
             "website": hotel.website,
@@ -957,7 +941,8 @@ class HotelUpdateAPIView(CreateAPIView):
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
-
+        user= User.objects.get(id=request.data["user"])
+        gig= Gigs.objects.get(id=request.data["gig"])
         address = request.data["address"]
         direction = request.data["direction"]
         website = request.data["website"]
@@ -972,6 +957,8 @@ class HotelUpdateAPIView(CreateAPIView):
              "message": "hotel {} id is not exists".format(id)},status=status.HTTP_400_BAD_REQUEST)
 
         hotel=Hotel.objects.get(id=id)
+        hotel.user=user
+        hotel.gig=gig
         hotel.address=address
         hotel.direction=direction
         hotel.website=website
@@ -982,6 +969,8 @@ class HotelUpdateAPIView(CreateAPIView):
 
         response_data = {
             "id":hotel.id,
+            "user":str(hotel.user),
+            "gig":str(hotel.gig),
             "address": hotel.address,
             "direction": hotel.direction,
             "website": hotel.website,
@@ -1031,58 +1020,23 @@ class ContactCreateAPIView(CreateAPIView):
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
+        gig=Gigs.objects.get(id=request.data["gig"])
+        type = request.data["type"]
+        name = request.data["name"]
+        number = request.data["number"]
+        email=request.data["email"]
+        travelling_party =request.data["travelling_party"]
 
-        emergancy1_name = request.data["emergancy1_name"]
-        emergancy1_number = request.data["emergancy1_number"]
-        emergancy1_message = request.data["emergancy1_message"]
-        emergancy2_name=request.data["emergancy2_name"]
-        emergancy2_number =request.data["emergancy2_number"]
-        emergancy2_message =request.data["emergancy2_message"]
-        transport_cordinator_name=request.data["transport_cordinator_name"]
-        transport_cordinator_number=request.data["transport_cordinator_number"]
-        transport_cordinator_message=request.data["transport_cordinator_message"]
-        artist_liaison_name=request.data["artist_liaison_name"]
-        artist_liaison_number=request.data["artist_liaison_number"]
-        artist_liaison_message=request.data["artist_liaison_message"]
-        manager_name=request.data["manager_name"]
-        manager_email=request.data["manager_email"]
-        manager_number=request.data["manager_number"]
-        manager_message=request.data["manager_message"]
-        tm_name=request.data["tm_name"]
-        tm_email=request.data["tm_email"]
-        tm_number=request.data["tm_number"]
-        tm_message=request.data["tm_message"]
-
-
-        contact=Contacts.objects.create(emergancy1_name=emergancy1_name,emergancy1_number=emergancy1_number,emergancy1_message=emergancy1_message
-        ,emergancy2_name=emergancy2_name,emergancy2_number=emergancy2_number,emergancy2_message=emergancy2_message,
-        transport_cordinator_name=transport_cordinator_name,transport_cordinator_number=transport_cordinator_number,
-        transport_cordinator_message=transport_cordinator_message,artist_liaison_name=artist_liaison_name,
-        artist_liaison_number=artist_liaison_number,artist_liaison_message=artist_liaison_message,manager_name=manager_name
-        ,manager_email=manager_email,manager_number=manager_number,manager_message=manager_message,tm_name=tm_name,tm_email=tm_email,
-        tm_number=tm_number,tm_message=tm_message)
+        contact=Contacts.objects.create(gig=gig,type=type,name=name,number=number,email=email,travelling_party=travelling_party)
 
         response_data = {
             "id":contact.id,
-            "emergancy1_name": contact.emergancy1_name,
-            "emergancy1_number": contact.emergancy1_number,
-            "emergancy1_message": contact.emergancy1_message,
-            "emergancy2_name": contact.emergancy2_name,
-            "emergancy2_number": contact.emergancy2_number,
-            "emergancy2_message":contact.emergancy2_message,
-            "transport_cordinator_name":contact.transport_cordinator_name,
-            "transport_cordinator_number":contact.transport_cordinator_number,
-            "transport_cordinator_message":contact.transport_cordinator_message,
-            "artist_liaison_name":contact.artist_liaison_name,
-            "artist_liaison_number":contact.artist_liaison_number,
-            "manager_name":contact.manager_name,
-            "manager_email":contact.manager_email,
-            "manager_number":contact.manager_number,
-            "manager_message":contact.manager_message,
-            "tm_name":contact.tm_name,
-            "tm_email":contact.tm_email,
-            "tm_number":contact.tm_number,
-            "tm_message":contact.tm_message
+            "gig":str(contact.gig),
+            "type": contact.type,
+            "name": contact.name,
+            "number": contact.number,
+            "email": contact.email,
+            "travelling_party": contact.travelling_party,
             }
         return Response(data={"status": status.HTTP_200_OK,
                               "message": "Contact created",
@@ -1097,27 +1051,12 @@ class ContactUpdateAPIView(CreateAPIView):
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
-
-        emergancy1_name = request.data["emergancy1_name"]
-        emergancy1_number = request.data["emergancy1_number"]
-        emergancy1_message = request.data["emergancy1_message"]
-        emergancy2_name=request.data["emergancy2_name"]
-        emergancy2_number =request.data["emergancy2_number"]
-        emergancy2_message =request.data["emergancy2_message"]
-        transport_cordinator_name=request.data["transport_cordinator_name"]
-        transport_cordinator_number=request.data["transport_cordinator_number"]
-        transport_cordinator_message=request.data["transport_cordinator_message"]
-        artist_liaison_name=request.data["artist_liaison_name"]
-        artist_liaison_number=request.data["artist_liaison_number"]
-        artist_liaison_message=request.data["artist_liaison_message"]
-        manager_name=request.data["manager_name"]
-        manager_email=request.data["manager_email"]
-        manager_number=request.data["manager_number"]
-        manager_message=request.data["manager_message"]
-        tm_name=request.data["tm_name"]
-        tm_email=request.data["tm_email"]
-        tm_number=request.data["tm_number"]
-        tm_message=request.data["tm_message"]
+        gig=Gigs.objects.get(id=request.data["gig"])
+        type = request.data["type"]
+        name = request.data["name"]
+        number = request.data["number"]
+        email=request.data["email"]
+        travelling_party =request.data["travelling_party"]
         
         id=self.kwargs["pk"]
 
@@ -1126,58 +1065,27 @@ class ContactUpdateAPIView(CreateAPIView):
              "message": "contact {} id is not exists".format(id)}, status=status.HTTP_400_BAD_REQUEST)
 
         contact=Contacts.objects.get(id=id)
-        contact.emergancy1_name=emergancy1_name
-        contact.emergancy1_number=emergancy1_number
-        contact.emergancy1_message=emergancy1_message
-        contact.emergancy2_name=emergancy2_name
-        contact.emergancy2_number=emergancy2_number
-        contact.emergancy2_message=emergancy2_message
-        contact.transport_cordinator_name=transport_cordinator_name
-        contact.transport_cordinator_number=transport_cordinator_number
-        contact.transport_cordinator_message=transport_cordinator_message
-        contact.artist_liaison_name=artist_liaison_name
-        contact.artist_liaison_number=artist_liaison_number
-        contact.artist_liaison_message=artist_liaison_message
-        contact.manager_name=manager_name
-        contact.manager_email=manager_email
-        contact.manager_number=manager_number
-        contact.manager_message=manager_message
-        contact.tm_name=tm_name
-        contact.tm_email=tm_email
-        contact.tm_number=tm_number
-        contact.tm_message=tm_message
+        contact.gig=gig
+        contact.type=type
+        contact.name=name
+        contact.number=number
+        contact.email=email
+        contact.travelling_party=travelling_party
         contact.save()
 
         response_data = {
             "id":contact.id,
-            "emergancy1_name": contact.emergancy1_name,
-            "emergancy1_number": contact.emergancy1_number,
-            "emergancy1_message": contact.emergancy1_message,
-            "emergancy2_name": contact.emergancy2_name,
-            "emergancy2_number": contact.emergancy2_number,
-            "emergancy2_message":contact.emergancy2_message,
-            "transport_cordinator_name":contact.transport_cordinator_name,
-            "transport_cordinator_number":contact.transport_cordinator_number,
-            "transport_cordinator_message":contact.transport_cordinator_message,
-            "artist_liaison_name":contact.artist_liaison_name,
-            "artist_liaison_number":contact.artist_liaison_number,
-            "artist_liaison_message": contact.artist_liaison_message,
-            "manager_name": contact.manager_name,
-            "manager_email":contact.manager_email,
-            "manager_number":contact.manager_number,
-            "manager_message":contact.manager_message,
-            "tm_name":contact.tm_name,
-            "tm_email":contact.tm_email,
-            "tm_number":contact.tm_number,
-            "tm_message":contact.tm_message
+            "gig": str(contact.gig),
+            "type": contact.type,
+            "name": contact.name,
+            "number": contact.number,
+            "email": contact.email,
+            "travelling_party":contact.travelling_party,
             }
-
         return Response(data={"status": status.HTTP_200_OK,
                             "message": "Contact Updated",
                             "results": {'data': response_data}},
                         status=status.HTTP_200_OK)
-
-
 class ContactListAPIView(ListAPIView):
     serializer_class =ContactSerializer
     queryset=Contacts.objects.all()
@@ -1205,8 +1113,6 @@ class ContactDeleteAPIView(DestroyAPIView):
         else:
             return Response({"res": "id {} is not exists".format(id)}, status=status.HTTP_400_BAD_REQUEST)
 
-
-
 class DocumentCreateAPIView(CreateAPIView):
     serializer_class= DocumentSerializer
 
@@ -1215,20 +1121,20 @@ class DocumentCreateAPIView(CreateAPIView):
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
-
+        gig=Gigs.objects.get(id=request.data["gig"])
         boarding_passes=request.data["boarding_passes"]
         flight_confirmation_ticket= request.data["flight_confirmation_ticket"]
         hotel_voucher= request.data["hotel_voucher"]
 
-        document= Documents.objects.create(boarding_passes=boarding_passes,flight_confirmation_ticket=flight_confirmation_ticket
+        document= Documents.objects.create(gig=gig,boarding_passes=boarding_passes,flight_confirmation_ticket=flight_confirmation_ticket
         ,hotel_voucher=hotel_voucher)
 
         response_data={
             "id":document.id,
+            "gig":str(document.gig),
             "boarding_passes":document.boarding_passes,
             "flight_confirmation_ticket":document.flight_confirmation_ticket,
             "hotel_voucher":document.hotel_voucher
-        
         }
         return Response(data={"status":status.HTTP_200_OK,
                               "error":False,
@@ -1246,6 +1152,7 @@ class DocumentUpdateAPIView(CreateAPIView):
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
 
+        gig=Gigs.objects.get(id=request.data["gig"])
         boarding_passes = request.data["boarding_passes"]
         flight_confirmation_ticket = request.data["flight_confirmation_ticket"]
         hotel_voucher=request.data["hotel_voucher"]
@@ -1257,20 +1164,19 @@ class DocumentUpdateAPIView(CreateAPIView):
              "message": "Document {} id is not exists".format(id)},status=status.HTTP_400_BAD_REQUEST)
 
         document=Documents.objects.get(id=id)
+        document.gig=gig
         document.boarding_passes=boarding_passes
         document.flight_confirmation_ticket=flight_confirmation_ticket
         document.hotel_voucher=hotel_voucher
-     
         document.save()
 
         response_data = {
             "id":document.id,
+            "gig":str(document.gig),
             "boarding_passes": document.boarding_passes,
             "flight_confirmation_ticket": document.flight_confirmation_ticket,
             "hotel_voucher": document.hotel_voucher,
-            
             }
-
         return Response(data={"status": status.HTTP_200_OK,
                             "message": "document Updated",
                             "results": response_data},
@@ -1305,21 +1211,20 @@ class GuestListCreateAPIView(CreateAPIView):
         serializer= self.get_serializer(data=request.POST)
         if not serializer.is_valid():
             return Response(data={"status":status.HTTP_400_BAD_REQUEST,
-                                
                                 "error":serializer.errors,},
                         status=status.HTTP_400_BAD_REQUEST)
+        gig=Gigs.objects.get(id=request.data["gig"])
         guestlist_detail=request.data["guestlist_detail"]
         guestlist= request.data["guestlist"]
 
-        guestl= GuestList.objects.create(guestlist_detail=guestlist_detail,guestlist=guestlist)
+        guestl= GuestList.objects.create(gig=gig,guestlist_detail=guestlist_detail,guestlist=guestlist)
 
         response_data={
             "id":guestl.id,
+            "gig":str(guestl.gig),
             "guestlist_detail":guestl.guestlist_detail,
             "guestlist":guestl.guestlist,
-        
         }
-      
         return Response(data={"status":status.HTTP_200_OK,
                                 "error":False,
                                 "message":"guestlist created",
@@ -1334,7 +1239,7 @@ class GuestListUpdateAPIView(CreateAPIView):
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
-
+        gig=Gigs.objects.get(id=request.data["gig"])
         guestlist_detail = request.data["guestlist_detail"]
         guestlist = request.data["guestlist"]
         
@@ -1345,23 +1250,21 @@ class GuestListUpdateAPIView(CreateAPIView):
              "message": "guestlist {} id is not exists".format(id)},status=status.HTTP_400_BAD_REQUEST)
 
         guestl=GuestList.objects.get(id=id)
+        guestl.gig=gig
         guestl.guestlist_detail=guestlist_detail
         guestl.guestlist=guestlist
-     
         guestl.save()
 
         response_data = {
             "id":guestl.id,
+            "gig":str(guestl.gig),
             "guestlist_detail": guestl.guestlist_detail,
             "guestlist": guestl.guestlist,
-            
             }
-
         return Response(data={"status": status.HTTP_200_OK,
                             "message": "guestlist Updated",
                             "results": response_data},
                         status=status.HTTP_200_OK)
-
 
 class GuestListListAPIView(ListAPIView):
     serializer_class=GuestListSerializer
@@ -1376,7 +1279,6 @@ class GuestListListAPIView(ListAPIView):
                                 "result":serializer.data},
                         status=status.HTTP_200_OK)
 
-
 class GuestListDeleteAPIView(DestroyAPIView):
     serializer_class= GuestListSerializer
     def delete(self,request,*args,**kwargs):
@@ -1388,11 +1290,89 @@ class GuestListDeleteAPIView(DestroyAPIView):
         else:
             return Response({"res": "id {} is not exists".format(id)}, status=status.HTTP_400_BAD_REQUEST)
 
+class SetTimeCreateAPIView(CreateAPIView):
+    serializer_class=SetTimeSerialiazer
+    def post(self,request,*args,**kwargs):
+        serializer= self.get_serializer(data=request.POST)
+        if not serializer.is_valid():
+            return Response(data={"status":status.HTTP_400_BAD_REQUEST,
+                                "error":serializer.errors,},
+                        status=status.HTTP_400_BAD_REQUEST)
+        user=User.objects.get(id=request.data["user"])
+        gig=Gigs.objects.get(id=request.data["gig"])
+        venue=Venue.objects.get(id=request.data["venue"])
+        start=request.data["start"]
+        finish= request.data["finish"]
 
+        settime= SetTime.objects.create(user=user,gig=gig,venue=venue,start=start,finish=finish)
 
+        response_data={
+            "id":settime.id,
+            "user":str(settime.user),
+            "gig":str(settime.gig),
+            "venue":str(settime.venue),
+            "start":settime.start,
+            "finish":settime.finish
+        }
+        return Response(data={"status":status.HTTP_200_OK,
+                                "error":False,
+                                "message":"settime created",
+                                "result":{'data':response_data}},
+                        status=status.HTTP_200_OK)    
 
+class SetTimeUpdateAPIView(CreateAPIView):
+    serializer_class=SetTimeSerialiazer
+    def post(self,request,*args,**kwargs):
+        serializer = self.get_serializer(data=request.POST)
+        # print(serializer,'------------------------')
+        if not serializer.is_valid():
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
+                            status=status.HTTP_400_BAD_REQUEST)
+        user=User.objects.get(id=request.data["user"])
+        gig=Gigs.objects.get(id=request.data["gig"])
+        venue=Venue.objects.get(id=request.data["venue"])
+        start=request.data["start"]
+        finish= request.data["finish"]
+        
+        id=self.kwargs["pk"]
 
+        if not SetTime.objects.filter(id=id).exists():
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True,
+             "message": "settime {} id is not exists".format(id)},status=status.HTTP_400_BAD_REQUEST)
 
+        settime=SetTime.objects.get(id=id)
+        settime.user=user
+        settime.gig=gig
+        settime.venue=venue
+        settime.start=start
+        settime.finish=finish
+        settime.save()
+
+        response_data = {
+            "id":settime.id,
+            "user":str(settime.user),
+            "gig":str(settime.gig),
+            "venue":str(settime.venue),
+            "start": settime.start,
+            "finish": settime.finish,
+            }
+        return Response(data={"status": status.HTTP_200_OK,
+                            "message": "settime Updated",
+                            "results": response_data},
+                        status=status.HTTP_200_OK)
+
+class SetTimeListAPIView(ListAPIView):
+    serializer_class=SetTimeSerialiazer
+    queryset= SetTime.objects.all()
+
+    def get(self,request, *args, **kwargs):
+        queryset=self.get_queryset()
+        serializer=self.get_serializer(queryset, many=True)
+        return Response(data={"status":status.HTTP_200_OK,
+                                "error":False,
+                                "message":"SETTIME list",
+                                "result":serializer.data},
+                        status=status.HTTP_200_OK)
 
 
 
@@ -1529,8 +1509,6 @@ class ScheduleAPIView(GenericAPIView):
                 "user": cab.user.id,
                 "gig": cab.gig.id
             })
-
-              
         print(response)
         return Response(data={"status": status.HTTP_200_OK,
                                 "error": False,
@@ -1548,6 +1526,7 @@ class allListView(ListAPIView):
    serializer_class_CabBookSerializer = CabBookSerializer
    serializer_class_HotelListSerializer = HotelListSerializer
    serializer_class_VenueListSerializer = VenueListSerializer
+   serializer_class_SetTimeSerializer= SetTimeSerialiazer
 
    def get(self, request, *args, **kwrgs):
       if request.method == 'GET':
@@ -1557,6 +1536,7 @@ class allListView(ListAPIView):
         cabs = CabBook.objects.all()
         hotels = Hotel.objects.all()
         venues = Venue.objects.all()
+        settimes=SetTime.objects.all()
 
         seralizer1 = self.serializer_class_UserSerializer(users, many=True)
         seralizer2 = self.serializer_class_GigsSerializer(gigs, many=True)
@@ -1607,6 +1587,16 @@ class allListView(ListAPIView):
                 "wather": cab.wather,
                 "user": cab.user.id,
                 "gig": cab.gig.id
+            })
+        for settime in settimes:
+            final.append({
+                "type":"settime",
+                "settime_id":settime.id,
+                "user":str(settime.user),
+                "gig":str(settime.gig),
+                "venue":str(settime.venue),
+                "start":settime.start,
+                "finish":settime.finish
             })
 
         response = {
