@@ -108,7 +108,7 @@ class UserListAPIView(ListAPIView):
     def get(self, request, *args, **kwargs):
         queryset=self.get_queryset()
         serializer=self.get_serializer(queryset, many=True)
-        print(serializer,"------")  
+        # print(serializer,"------")  
         return Response(data={"status": status.HTTP_200_OK,
                                 "error": False,
                                 "message": "Users list",
@@ -148,7 +148,7 @@ class LoginAPIView(GenericAPIView):
         if user:
             payload={"email":user.email,"password":user.password}
 
-            print(payload)
+            # print(payload)
             jwt_token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
             return Response(data={"status": status.HTTP_200_OK,
                                 "error": False,
@@ -172,12 +172,10 @@ class AdminLoginAPIView(GenericAPIView):
 
         email = serializer.validated_data['email']
         password = serializer.validated_data['password']
-    
+        
         user = User.objects.get(email=email)
 
-        if not user.is_manager==True:
-            return Response(data={'status': status.HTTP_400_BAD_REQUEST, 'error':True, 
-            'message':"is_manage is not allow"}, status=status.HTTP_400_BAD_REQUEST)
+        
 
         if user is not None:
             if not user.password == password:
@@ -188,7 +186,7 @@ class AdminLoginAPIView(GenericAPIView):
         if user:
             payload={"email":user.email,"password":user.password}
 
-            print(payload)
+            # print(payload)
             jwt_token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
             return Response(data={"status": status.HTTP_200_OK,
                                 "error": False,
@@ -205,7 +203,7 @@ class GigsCreateAPIView(CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
+        # # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -251,7 +249,7 @@ class GigsUpdateAPIView(CreateAPIView):
     serializer_class=GigsSerializer
     def post(self,request,*args,**kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
+        # # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -313,10 +311,10 @@ class GigsListAPIView(ListAPIView):
     queryset=Gigs.objects.all()
     
     def get(self, request, *args, **kwargs):
-        # print(request.user,"------------------")
+        # # print(request.user,"------------------")
         queryset=self.get_queryset()
         serializer=self.get_serializer(queryset, many=True)
-        print(serializer,"------")  
+        # print(serializer,"------")  
         return Response(data={"status": status.HTTP_200_OK,
                                 "error": False,
                                 "message": "Gigs list",
@@ -340,7 +338,7 @@ class ScheduleCreateAPIView(CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
+        # # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -374,7 +372,7 @@ class ScheduleUpdateAPIView(CreateAPIView):
     serializer_class=DayScheduleSerializer
     def post(self,request,*args,**kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
+        # # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -419,10 +417,10 @@ class ScheduleListAPIView(ListAPIView):
     queryset=DaySchedule.objects.all()
     
     def get(self, request, *args, **kwargs):
-        # print(request.user,"------------------")
+        # # print(request.user,"------------------")
         queryset=self.get_queryset()
         serializer=self.get_serializer(queryset, many=True)
-        print(serializer,"------")  
+        # print(serializer,"------")  
         return Response(data={"status": status.HTTP_200_OK,
                                 "error": False,
                                 "message": "Schedule list",
@@ -446,7 +444,7 @@ class FlightBookCreateAPIView(CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
+        # # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -501,7 +499,7 @@ class FlightBookUpdateAPIView(CreateAPIView):
     serializer_class=FlightBookSerializer
     def post(self,request,*args,**kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
+        # # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -576,10 +574,10 @@ class FlightBookListAPIView(ListAPIView):
     queryset=FlightBook.objects.all()
     
     def get(self, request, *args, **kwargs):
-        # print(request.user,"------------------")
+        # # print(request.user,"------------------")
         queryset=self.get_queryset()
         serializer=self.get_serializer(queryset, many=True)
-        print(serializer,"------")  
+        # print(serializer,"------")  
         return Response(data={"status": status.HTTP_200_OK,
                                 "error": False,
                                 "message": "Flightbook list",
@@ -603,7 +601,7 @@ class CabBookCreateAPIView(CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
+        # # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -648,7 +646,7 @@ class CabBookUpdateAPIView(CreateAPIView):
     serializer_class=CabBookSerializer
     def post(self,request,*args,**kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
+        # # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -710,10 +708,10 @@ class CabBookListAPIView(ListAPIView):
     queryset=CabBook.objects.all()
     
     def get(self, request, *args, **kwargs):
-        # print(request.user,"------------------")
+        # # print(request.user,"------------------")
         queryset=self.get_queryset()
         serializer=self.get_serializer(queryset, many=True)
-        print(serializer,"------")  
+        # print(serializer,"------")  
         return Response(data={"status": status.HTTP_200_OK,
                                 "error": False,
                                 "message": "cabbook list",
@@ -738,7 +736,7 @@ class VenueCreateAPIView(CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
+        # # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -794,7 +792,7 @@ class VenueUpdateAPIView(CreateAPIView):
     serializer_class=VenueSerializer
     def post(self,request,*args,**kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
+        # # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -870,10 +868,10 @@ class VenueListAPIView(ListAPIView):
     queryset=Venue.objects.all()
     
     def get(self, request, *args, **kwargs):
-        # print(request.user,"------------------")
+        # # print(request.user,"------------------")
         queryset=self.get_queryset()
         serializer=self.get_serializer(queryset, many=True)
-        print(serializer,"------")  
+        # print(serializer,"------")  
         return Response(data={"status": status.HTTP_200_OK,
                                 "error": False,
                                 "message": "Venue list",
@@ -897,7 +895,7 @@ class HotelCreateAPIView(CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
+        # # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -937,7 +935,7 @@ class HotelUpdateAPIView(CreateAPIView):
     serializer_class=HotelSerializer
     def post(self,request,*args,**kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
+        # # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -989,10 +987,10 @@ class HotelListAPIView(ListAPIView):
     queryset=Hotel.objects.all()
     
     def get(self, request, *args, **kwargs):
-        # print(request.user,"------------------")
+        # # print(request.user,"------------------")
         queryset=self.get_queryset()
         serializer=self.get_serializer(queryset, many=True)
-        print(serializer,"------")  
+        # print(serializer,"------")  
         return Response(data={"status": status.HTTP_200_OK,
                                 "error": False,
                                 "message": "Hotel list",
@@ -1016,7 +1014,7 @@ class ContactCreateAPIView(CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
+        # # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -1047,7 +1045,7 @@ class ContactUpdateAPIView(CreateAPIView):
     serializer_class=ContactSerializer
     def post(self,request,*args,**kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
+        # # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -1091,10 +1089,10 @@ class ContactListAPIView(ListAPIView):
     queryset=Contacts.objects.all()
     
     def get(self, request, *args, **kwargs):
-        # print(request.user,"------------------")
+        # # print(request.user,"------------------")
         queryset=self.get_queryset()
         serializer=self.get_serializer(queryset, many=True)
-        print(serializer,"------")  
+        # print(serializer,"------")  
         return Response(data={"status": status.HTTP_200_OK,
                                 "error": False,
                                 "message": "Hotel list",
@@ -1147,7 +1145,7 @@ class DocumentUpdateAPIView(CreateAPIView):
     serializer_class=DocumentSerializer
     def post(self,request,*args,**kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
+        # # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -1235,7 +1233,7 @@ class GuestListUpdateAPIView(CreateAPIView):
     serializer_class=GuestListSerializer
     def post(self,request,*args,**kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
+        # # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -1324,7 +1322,7 @@ class SetTimeUpdateAPIView(CreateAPIView):
     serializer_class=SetTimeSerialiazer
     def post(self,request,*args,**kwargs):
         serializer = self.get_serializer(data=request.POST)
-        # print(serializer,'------------------------')
+        # # print(serializer,'------------------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -1404,7 +1402,7 @@ class AllDataAPIView(GenericAPIView):
                 
                 flights = FlightBook.objects.filter(gig=gig)
                 for flight in flights:
-                    print(flight,'----------flight-------')
+                    # print(flight,'----------flight-------')
                     flight_list.append({
                         "id": flight.id,
                         "depart_location": flight.depart_location,
@@ -1451,7 +1449,7 @@ class AllDataAPIView(GenericAPIView):
                 "gigs":gig_list
                 
             })
-        print(response)
+        # print(response)
         return Response(data={"status": status.HTTP_200_OK,
                                 "error": False,
                                 "message": "Schedule list",
@@ -1509,7 +1507,7 @@ class ScheduleAPIView(GenericAPIView):
                 "user": cab.user.id,
                 "gig": cab.gig.id
             })
-        print(response)
+        # print(response)
         return Response(data={"status": status.HTTP_200_OK,
                                 "error": False,
                                 "message": "Schedule list",
@@ -1592,11 +1590,11 @@ class allListView(ListAPIView):
             final.append({
                 "type":"settime",
                 "settime_id":settime.id,
-                "user":str(settime.user),
-                "gig":str(settime.gig),
-                "venue":str(settime.venue),
-                "start":settime.start,
-                "finish":settime.finish
+                "user":settime.user.id,
+                "gig":settime.gig.id,
+                "venue":settime.venue.direction,
+                "depart_time":settime.depart_time,
+                "arrival_time":settime.arrival_time
             })
 
         response = {
@@ -1668,7 +1666,7 @@ class ScheduleAPIView(GenericAPIView):
                 })
 
 
-                print(response)
+                # print(response)
                 return Response(data={"status": status.HTTP_200_OK,
                 "error": False,
                 "message": "Schedule list",

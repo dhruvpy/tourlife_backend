@@ -18,7 +18,7 @@ class User(AbstractUser):
     is_artist=models.BooleanField(default=False)
     
     def __str__ (self):
-        return f"{self.email}"
+        return f"{self.id}"
 class Usertoken(models.Model):
     user=models.ForeignKey(User,related_name='token',on_delete=models.CASCADE)
     token=models.CharField(max_length=500,null=True,blank=True)

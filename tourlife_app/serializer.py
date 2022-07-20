@@ -65,7 +65,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserListSerializer(serializers.ModelSerializer):
-    id=serializers.CharField(required=True)
+    # id=serializers.CharField(required=True)
     first_name=serializers.CharField(required=True)
     last_name=serializers.CharField(required=True)
     # is_manager=serializers.CharField(required=True)
