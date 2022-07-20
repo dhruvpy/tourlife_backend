@@ -140,6 +140,7 @@ CONTACT_CHOICES=(
     ("TM","TM")
 )
 class Contacts(models.Model):
+    user = models.ForeignKey(User,related_name='contact_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='contact_gig',on_delete=models.CASCADE)
     type= models.CharField(max_length=100,choices=CONTACT_CHOICES,null=True,blank=True)
     name = models.CharField(max_length=100,null=True,blank=True)
@@ -147,15 +148,9 @@ class Contacts(models.Model):
     email = models.CharField(max_length=100,null=True,blank=True)
     travelling_party=models.BooleanField(null=True,blank=True)
 
-class Documents(models.Model):
-    gig = models.ForeignKey(Gigs,related_name='document_gig',on_delete=models.CASCADE)
-    boarding_passes = models.CharField(max_length=100)
-    flight_confirmation_ticket = models.CharField(max_length=100)
-    hotel_voucher = models.CharField(max_length=100)
 
-# class RunningOrder(models.Model):
-#     pass
 class GuestList(models.Model):
+    user = models.ForeignKey(User,related_name='guest_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='guest_gig',on_delete=models.CASCADE)
     guestlist_detail=models.CharField(max_length=100,null=True,blank=True)
     guestlist= models.BooleanField(null=True,blank=True)
@@ -167,4 +162,8 @@ class SetTime(models.Model):
     depart_time=models.DateTimeField(null=True,blank=True)
     arrival_time=models.DateTimeField(null=True,blank=True)
 
-
+class Passes(models.Model):
+    user = models.ForeignKey(User,related_name='passes_user',on_delete=models.CASCADE)
+    gig = models.ForeignKey(Gigs,related_name='passes_gig',on_delete=models.CASCADE)
+    flight= models.ForeignKey(FlightBook,related_name='passes',on_delete=models.CASCADE)
+    passes = models.CharField(max_length=1000,null=True,blank=True)

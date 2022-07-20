@@ -19,7 +19,6 @@ urlpatterns = [
      path('schedule_create',views.ScheduleCreateAPIView.as_view(),name='schedule_create'),
      path('schedule_update/<int:pk>',views.ScheduleUpdateAPIView.as_view(),name='schedule_update'),
      path('schedule_list',views.ScheduleListAPIView.as_view(),name='schedule_list'),
-
      path('schedule_delete/<int:pk>',views.ScheduleDeleteAPIView.as_view(),name='schedule_delete'),
 
      path('flightbook_create',views.FlightBookCreateAPIView.as_view(),name='flightbook_create'),
@@ -47,25 +46,24 @@ urlpatterns = [
      path('contact_update/<int:pk>',views.ContactUpdateAPIView.as_view(),name='contact_update'),
      path('contact_list',views.ContactListAPIView.as_view(),name='contact_list'),
      path('contact_delete/<int:pk>',views.ContactDeleteAPIView.as_view(),name='contact_delete'),
-
-     path('document_create',views.DocumentCreateAPIView.as_view(),name='document_create'),
-     path('document_update/<int:pk>',views.DocumentUpdateAPIView.as_view(),name='document_update'),
-     path('document_list',views.DocumentListAPIView.as_view(),name='document_list'),
-     path('document_delete/<int:pk>',views.DocumentDeleteAPIView.as_view(),name='document_delete'),
  
 
      path('guestlist_create',views.GuestListCreateAPIView.as_view(),name='guestlist_create'),
      path('guestlist_update/<int:pk>',views.GuestListUpdateAPIView.as_view(),name='guestlist_update'),
      path('guestlist_list',views.GuestListListAPIView.as_view(), name="guestlist_list"),
      path('guestlist_delete/<int:pk>',views.GuestListDeleteAPIView.as_view(),name='guestlist_delete'),
-
      
      path('settime_create',views.SetTimeCreateAPIView.as_view(),name='settime_create'),
      path('settime_update/<int:pk>',views.SetTimeUpdateAPIView.as_view(),name='settime_update'),
      path('settime_list',views.SetTimeListAPIView.as_view(), name="settime_list"),
+     path('settime_delete/<int:pk>',views.SetTimeDeleteAPIView.as_view(),name='settime_delete'),
 
+     path('passes_create',views.PassesCreateAPIView.as_view(),name='passes_create'),
+     path('passes_update/<int:pk>',views.PassesUpdateAPIView.as_view(),name='passes_update'),
+     path('passes_list',views.PassesListAPIView.as_view(), name="passes_list"),
+     path('passes_delete/<int:pk>',views.PassesDeleteAPIView.as_view(),name='passes_delete'),
      
-     
+
      path('all_data',views.allListView.as_view(),name='all_data'),
      path('all_data2',views.AllDataAPIView.as_view(),name='all_data2'),
     
