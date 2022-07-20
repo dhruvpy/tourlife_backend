@@ -157,7 +157,7 @@ class LoginAPIView(GenericAPIView):
                                             'first_name':user.first_name, 
                                             'last_name':user.last_name, 
                                             'token': jwt_token,
-                                            'is_manager': user.is_superuser}},
+                                            'is_manager': user.is_manager}},
                                 status=status.HTTP_200_OK)
 
 class AdminLoginAPIView(GenericAPIView):
