@@ -148,7 +148,7 @@ class Contacts(models.Model):
     email = models.CharField(max_length=100,null=True,blank=True)
     travelling_party=models.BooleanField(null=True,blank=True)
 
-
+        
 class GuestList(models.Model):
     user = models.ForeignKey(User,related_name='guest_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='guest_gig',on_delete=models.CASCADE)

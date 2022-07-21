@@ -62,8 +62,9 @@ urlpatterns = [
      path('passes_update/<int:pk>',views.PassesUpdateAPIView.as_view(),name='passes_update'),
      path('passes_list',views.PassesListAPIView.as_view(), name="passes_list"),
      path('passes_delete/<int:pk>',views.PassesDeleteAPIView.as_view(),name='passes_delete'),
-     
 
+     # path('logout',views.Logout.as_view(),name='logout'),
+     
      path('all_data',views.allListView.as_view(),name='all_data'),
      path('all_data2',views.AllDataAPIView.as_view(),name='all_data2'),
     
