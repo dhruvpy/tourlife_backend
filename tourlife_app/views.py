@@ -8,6 +8,8 @@ import boto3
 import jwt
 from django.conf import settings
 class UserCreateAPIView(GenericAPIView):
+    permission_classes = [AllowAny]
+
     serializer_class = CreateUserSerializers
 
     def post(self, request, *args, **kwargs):
