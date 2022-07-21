@@ -1,3 +1,4 @@
+from lib2to3.pgen2 import token
 from pyexpat import model
 from rest_framework import serializers
 from .models import *
@@ -213,3 +214,9 @@ class PassesSerializer(serializers.ModelSerializer):
         model=Passes
         fields=["user","gig","flight","passes"]
 
+class LogoutSerializer(serializers.ModelSerializer):
+    token=serializers.CharField(required=True)
+
+    class Meta:
+        model=Usertoken
+        fields=["token"]

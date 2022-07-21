@@ -12,18 +12,16 @@ class MyLoginTokenAuthentications(TokenAuthentication):
         return User
 
     def authenticate(self, request):
-        auth = get_authorization_header(request).split()
+        auth = get_authorization_header(request).split()                                                                        
 
         if not auth or auth[0].lower() != b'token':
             return None
-
         if len(auth) == 1:
             msg = "Invalid token header. no creadential provided"
             raise exceptions.AuthenticationFailed(msg)
         elif len(auth) > 2:
             msg = 'Invalid token header'
-            raise exceptions.AuthenticationFailed(msg)
-        
+            raise exceptions.AuthenticationFailed(msg) 
         try:
             token = auth[1]
             if token == "null":
