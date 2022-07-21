@@ -12,14 +12,14 @@ from rest_framework.authentication import TokenAuthentication, get_authorization
 
 from tourlife_app import serializer
 class UserCreateAPIView(GenericAPIView):
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
     serializer_class = CreateUserSerializers
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.POST)
-        if not request.user.is_manager:
-            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},status=status.HTTP_400_BAD_REQUEST)
+        # if not request.user.is_manager:
+        #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},status=status.HTTP_400_BAD_REQUEST)
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},status=status.HTTP_400_BAD_REQUEST)
 
