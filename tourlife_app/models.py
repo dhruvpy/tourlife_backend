@@ -132,7 +132,7 @@ class Contacts(models.Model):
 class GuestList(models.Model):
     user = models.ForeignKey(User,related_name='guest_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='guest_gig',on_delete=models.CASCADE)
-    guestlist_detail=models.CharField(max_length=100,null=True,blank=True)
+    guestlist_detail=models.TextField(null=True,blank=True)
     guestlist= models.BooleanField(null=True,blank=True)
 
 class SetTime(models.Model):
@@ -142,8 +142,14 @@ class SetTime(models.Model):
     depart_time=models.DateTimeField(null=True,blank=True)
     arrival_time=models.DateTimeField(null=True,blank=True)
 
-class Passes(models.Model):
+DOCUMENT_CHOICES=(
+    ('BOARDING_PASSES','BOARDING_PASSES'),
+    ('FLIGHT_CONFIRMATIONS','FLIGHT_CONFIRMATIONS'),
+    ('HOTEL_VOUCHER','HOTEL_VOUCHER')
+)
+class Document(models.Model):
     user = models.ForeignKey(User,related_name='passes_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='passes_gig',on_delete=models.CASCADE)
     flight= models.ForeignKey(FlightBook,related_name='passes',on_delete=models.CASCADE)
-    passes = models.CharField(max_length=1000,null=True,blank=True)
+    type= models.CharField(max_length=100,choices=DOCUMENT_CHOICES,null=True,blank=True)
+    document = models.CharField(max_length=1000,null=True,blank=True)

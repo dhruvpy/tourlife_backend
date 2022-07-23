@@ -2,22 +2,19 @@ from .models import *
 from .serializer import *
 from rest_framework.generics import GenericAPIView, ListAPIView, CreateAPIView, UpdateAPIView, RetrieveAPIView, DestroyAPIView
 from rest_framework.response import Response
+from django.http import HttpResponseRedirect
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 import boto3
 import jwt
 from django.conf import settings
 from rest_framework.authentication import TokenAuthentication, get_authorization_header
+import random
 
+from django.conf import settings
 from django.core.mail import send_mail
 
-# send_mail(
-#     'Subject here',
-#     'Here is the message.',
-#     '',
-#     ['to@example.com'],
-#     fail_silently=False,
-# )
+
 from tourlife_app import serializer
 class UserCreateAPIView(GenericAPIView):
     permission_classes = [AllowAny]
@@ -33,6 +30,7 @@ class UserCreateAPIView(GenericAPIView):
 
         username = request.data["username"]
         last_name = request.data["last_name"]
+        first_name = request.data["first_name"]
         email = request.data["email"]
         password = request.data["password"]
         mobile_no = request.data["mobile_no"]
@@ -40,11 +38,12 @@ class UserCreateAPIView(GenericAPIView):
 
         if User.objects.filter(username=username).exists() | User.objects.filter(email=email).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "This email or username is already exists"},status=status.HTTP_400_BAD_REQUEST)
-        user = User.objects.create(username=username, last_name=last_name, password=password, email=email, mobile_no=mobile_no,
+        user = User.objects.create(username=username,first_name=first_name, last_name=last_name, password=password, email=email, mobile_no=mobile_no,
                                 profile_image=profile_image)
         response_data = {
             "id": user.id,
             "username": user.username,
+            "first_name": user.first_name,
             "last_name": user.last_name,
             "password": user.password,
             "email": user.email,
@@ -204,6 +203,53 @@ class AdminLoginAPIView(GenericAPIView):
                                         'token': jwt_token,
                                         'is_manager': user.is_manager}},
                             status=status.HTTP_200_OK)
+
+def verify_mail(request, token):
+    # url = 'http://3.129.88.232/auth/login'
+    # path = request.get_host()
+    # path1 = path.split(':')
+    # url = 'http://'+path1[0]+'/auth/login'
+    url = settings.AUTH_LOGIN_URL+'auth/login'
+    usertoken = Usertoken.objects.filter(token=token).first()
+    print(usertoken)
+    if usertoken:
+        user = User.objects.get(user=usertoken)
+        if user:
+            user.verified_status = True
+            user.save()
+        return HttpResponseRedirect(url)
+    return HttpResponseRedirect(url)
+
+# class ForgotPasswordAPIView(GenericAPIView):
+#     permission_classes = [AllowAny]
+#     serializer_class = ForgotPasswordSerializer
+
+#     def post(self, request, *args, **kwargs):
+#         serializer = self.get_serializer(data=request.data)
+
+#         if not serializer.is_valid():
+#             return Response(data={'status': status.HTTP_400_BAD_REQUEST, 'error':True, 'error_message':serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+#         email = serializer.validated_data['email']
+
+#         if not User.objects.filter(email=email).exists():
+#             return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error':True, 'error_message': "email is not registered", }, status=status.HTTP_400_BAD_REQUEST)
+        
+#         if User.objects.filter(email=email).exists:
+#             user = User.objects.get(email=email)
+#             random_num = random.randint(1000,9999)
+#             otp = random_num
+#             subject = "OTP for forgot password"
+#             message = " "
+#             to_list = [user.email]
+#             from_mail = settings.SENDER_EMAIL
+#             # from_mail = 'admin@squiznow.com'
+#             html_message = render_to_string('forgot_password_otp.html', {
+#                     'random_num':random_num,
+#                 })
+#             rest = send_mail(subject, message, from_mail , to_list, html_message=html_message)
+#             EmailOTP.objects.create(user=user, otp=otp)
+#             return Response(data={"Status": status.HTTP_200_OK, "error": False, 'message': 'We have sent you a otp to reset your password'}, status=status.HTTP_200_OK)
 
 
 class GigsCreateAPIView(CreateAPIView):
@@ -1141,11 +1187,16 @@ class GuestListCreateAPIView(CreateAPIView):
             return Response(data={"status":status.HTTP_400_BAD_REQUEST,
                                 "error":serializer.errors,},
                         status=status.HTTP_400_BAD_REQUEST)
+        
 
         user=User.objects.get(id=request.data["user"])
         gig=Gigs.objects.get(id=request.data["gig"])
         guestlist_detail=request.data["guestlist_detail"]
         guestlist= request.data["guestlist"]
+        if GuestList.objects.filter(user=user,gig=gig).exists():
+            return Response(data={"status":status.HTTP_400_BAD_REQUEST,
+                                "message":"guestlist is already add",},
+                        status=status.HTTP_400_BAD_REQUEST)
 
         guestl= GuestList.objects.create(user=user,gig=gig,guestlist_detail=guestlist_detail,guestlist=guestlist)
 
@@ -1358,10 +1409,10 @@ class SetTimeDeleteAPIView(DestroyAPIView):
                                 "message":"Settime deleted",
                                 "result":serializer.data},
                         status=status.HTTP_200_OK)
-class PassesCreateAPIView(CreateAPIView):
+class DocumentCreateAPIView(CreateAPIView):
     permission_classes = [AllowAny]
 
-    serializer_class =PassesSerializer
+    serializer_class =DocumentSerializer
     def post(self, request, *args, **kwargs):
         # if not request.user.is_manager:
         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
@@ -1374,7 +1425,8 @@ class PassesCreateAPIView(CreateAPIView):
         user=User.objects.get(id=request.data["user"])
         gig=Gigs.objects.get(id=request.data["gig"])
         flight=FlightBook.objects.get(id=request.data["flight"])
-        passes = request.FILES.get('passes')
+        type= request.data["type"]
+        document = request.FILES.get('document')
 
         session = boto3.session.Session()
         client = session.client('s3',
@@ -1384,124 +1436,127 @@ class PassesCreateAPIView(CreateAPIView):
                                 aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)                 
      
         client.put_object(Bucket='Music',
-                        Key=user.username+'.png',
-                        Body=passes,
+                        Key=user.first_name+'.png',
+                        Body=document,
                         ACL='public-read-write',
                         ContentType='image/png',
                         )
         url = client.generate_presigned_url(ClientMethod='get_object',
                                     Params={'Bucket': 'Music',
-                                            'Key': user.username+'.png'}, ExpiresIn=300, HttpMethod=None)
-        passe= Passes.objects.create(user=user,gig=gig,flight=flight,passes=url)
+                                            'Key': user.first_name+'.png'}, ExpiresIn=300, HttpMethod=None)
+        passe= Document.objects.create(user=user,gig=gig,flight=flight,type=type,document=url)
 
         response_data={
             "id":passe.id,
             "user":str(passe.user),
             "gig":str(passe.gig),
             "flight":str(passe.flight),
-            "passes":url
+            "type":passe.type,
+            "document":url
         }
         return Response(data={"status":status.HTTP_200_OK,
                                 "error":False,
-                                "message":"Passes created",
+                                "message":"Document created",
                                 "result":{'data':response_data}},
                         status=status.HTTP_200_OK)
 
-class PassesUpdateAPIView(CreateAPIView):
-    permission_classes = [AllowAny]
+# class PassesUpdateAPIView(CreateAPIView):
+#     permission_classes = [AllowAny]
 
-    serializer_class =PassesSerializer
-    def post(self, request, *args, **kwargs):
-        # if not request.user.is_manager:
-        #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
-        #                     status=status.HTTP_400_BAD_REQUEST)
-        serializer=self.get_serializer(data=request.POST)
-        if not serializer.is_valid():
-            return Response(data={"status":status.HTTP_400_BAD_REQUEST, "error":True, "message":serializer.errors},
-             status=status.HTTP_400_BAD_REQUEST)
-        user=User.objects.get(id=request.data["user"])
-        gig=Gigs.objects.get(id=request.data["gig"])
-        flight=FlightBook.objects.get(id=request.data["flight"])
-        passes = request.FILES.get('passes')
+#     serializer_class =PassesSerializer
+#     def post(self, request, *args, **kwargs):
+#         # if not request.user.is_manager:
+#         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
+#         #                     status=status.HTTP_400_BAD_REQUEST)
+#         serializer=self.get_serializer(data=request.POST)
+#         if not serializer.is_valid():
+#             return Response(data={"status":status.HTTP_400_BAD_REQUEST, "error":True, "message":serializer.errors},
+#              status=status.HTTP_400_BAD_REQUEST)
+#         user=User.objects.get(id=request.data["user"])
+#         gig=Gigs.objects.get(id=request.data["gig"])
+#         flight=FlightBook.objects.get(id=request.data["flight"])
+#         passes = request.FILES.get('passes')
 
-        session = boto3.session.Session()
-        client = session.client('s3',
-                                region_name='fra1',
-                                endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
-                                aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
-                                aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)                 
+#         session = boto3.session.Session()
+#         client = session.client('s3',
+#                                 region_name='fra1',
+#                                 endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
+#                                 aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
+#                                 aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)                 
      
-        client.put_object(Bucket='Music',
-                        Key=user.username+'.png',
-                        Body=passes,
-                        ACL='public-read-write',
-                        ContentType='image/png',
-                        )
-        url = client.generate_presigned_url(ClientMethod='get_object',
-                                    Params={'Bucket': 'Music',
-                                            'Key': user.username+'.png'}, ExpiresIn=300, HttpMethod=None)
-        id=self.kwargs["pk"]
+#         client.put_object(Bucket='Music',
+#                         Key=user.username+'.png',
+#                         Body=passes,
+#                         ACL='public-read-write',
+#                         ContentType='image/png',
+#                         )
+#         url = client.generate_presigned_url(ClientMethod='get_object',
+#                                     Params={'Bucket': 'Music',
+#                                             'Key': user.username+'.png'}, ExpiresIn=300, HttpMethod=None)
+#         id=self.kwargs["pk"]
 
-        if not Passes.objects.filter(id=id).exists():
-            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True,
-             "message": "Passes is not exists"},status=status.HTTP_400_BAD_REQUEST)
+#         if not Passes.objects.filter(id=id).exists():
+#             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True,
+#              "message": "Passes is not exists"},status=status.HTTP_400_BAD_REQUEST)
 
-        passe=passes.objects.get(id=id)
-        passe.user=user
-        passe.gig=gig
-        passe.flight=flight
-        passe.passes=url
-        passe.save()
+#         passe=passes.objects.get(id=id)
+#         passe.user=user
+#         passe.gig=gig
+#         passe.flight=flight
+#         passe.passes=url
+#         passe.save()
 
-        response_data={
-            "id":passe.id,
-            "user":passe.user,
-            "gig":passe.gig,
-            "flight":passe.flight,
-            "passes":url
-        }
-        return Response(data={"status":status.HTTP_200_OK,
-                                "error":False,
-                                "message":"Passes updated",
-                                "result":{'data':response_data}},
-                        status=status.HTTP_200_OK)
-class PassesListAPIView(ListAPIView):
-    permission_classes = [AllowAny]
+#         response_data={
+#             "id":passe.id,
+#             "user":passe.user,
+#             "gig":passe.gig,
+#             "flight":passe.flight,
+#             "passes":url
+#         }
+#         return Response(data={"status":status.HTTP_200_OK,
+#                                 "error":False,
+#                                 "message":"Passes updated",
+#                                 "result":{'data':response_data}},
+#                         status=status.HTTP_200_OK)
+# class PassesListAPIView(ListAPIView):
+#     permission_classes = [AllowAny]
 
-    serializer_class=PassesSerializer
-    queryset= Passes.objects.all()
+#     serializer_class=PassesSerializer
+#     queryset= Passes.objects.all()
 
-    def get(self,request, *args, **kwargs):
+#     def get(self,request, *args, **kwargs):
         
-        # if not request.user.is_manager:
-        #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
-        #                     status=status.HTTP_400_BAD_REQUEST)
-        queryset=self.get_queryset()
-        serializer=self.get_serializer(queryset, many=True)
-        return Response(data={"status":status.HTTP_200_OK,
-                                "error":False,
-                                "message":"Passes list",
-                                "result":serializer.data},
-                        status=status.HTTP_200_OK)
-class PassesDeleteAPIView(DestroyAPIView):
-    permission_classes = [AllowAny]
+#         # if not request.user.is_manager:
+#         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
+#         #                     status=status.HTTP_400_BAD_REQUEST)
+#         queryset=self.get_queryset()
+#         serializer=self.get_serializer(queryset, many=True)
+#         return Response(data={"status":status.HTTP_200_OK,
+#                                 "error":False,
+#                                 "message":"Passes list",
+#                                 "result":serializer.data},
+#                         status=status.HTTP_200_OK)
+# class PassesDeleteAPIView(DestroyAPIView):
+#     permission_classes = [AllowAny]
 
-    serializer_class= PassesSerializer
-    def delete(self,request,*args,**kwargs):
-        # if not request.user.is_manager:
-        #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
-        #                     status=status.HTTP_400_BAD_REQUEST)
-        id = self.kwargs["pk"]
-        if not Passes.objects.filter(id=id).exists():
-            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Passes is not exists"},
-                            status=status.HTTP_400_BAD_REQUEST)
-        passes=Passes.objects.get(id=id)
-        passes.delete()
-        return Response(data={"status":status.HTTP_200_OK,
-                                "error":False,
-                                "message":"Passes deleted",
-                                "result":serializer.data},
-                        status=status.HTTP_200_OK)
+#     serializer_class= PassesSerializer
+#     def delete(self,request,*args,**kwargs):
+#         # if not request.user.is_manager:
+#         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
+#         #                     status=status.HTTP_400_BAD_REQUEST)
+#         id = self.kwargs["pk"]
+#         if not Passes.objects.filter(id=id).exists():
+#             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Passes is not exists"},
+#                             status=status.HTTP_400_BAD_REQUEST)
+#         passes=Passes.objects.get(id=id)
+#         passes.delete()
+#         return Response(data={"status":status.HTTP_200_OK,
+#                                 "error":False,
+#                                 "message":"Passes deleted",
+#                                 "result":serializer.data},
+#                         status=status.HTTP_200_OK)
+
+
 
 # class Logout(GenericAPIView):
 #     # serializer_class =LogoutSerializer
@@ -1674,9 +1729,7 @@ class allListView(ListAPIView):
     serializer_class_SetTimeSerializer= SetTimeSerialiazer
     serializer_class_ContactSerializer= ContactSerializer
     serializer_class_GuestListSerializer= GuestListSerializer
-    serializer_class_PassesSerializer= PassesSerializer
-
-
+    serializer_class_DocumentSerializer= DocumentSerializer
 
     def get(self, request, *args, **kwrgs):
         if request.method == 'GET':
@@ -1689,7 +1742,11 @@ class allListView(ListAPIView):
             settimes=SetTime.objects.all()
             contacts = Contacts.objects.all()
             guestlist= GuestList.objects.all()
-            passes= Passes.objects.all()
+            documents= Document.objects.all()
+            # for doc in documents:
+            #     if doc.type=="BOARDING_PASSES":
+
+            #         print(len(doc),".............")
 
             seralizer1 = self.serializer_class_UserSerializer(users, many=True)
             seralizer2 = self.serializer_class_GigsSerializer(gigs, many=True)
@@ -1699,7 +1756,7 @@ class allListView(ListAPIView):
             seralizer6 = self.serializer_class_VenueListSerializer(venues, many=True)
             seralizer7 = self.serializer_class_ContactSerializer(contacts, many=True)
             serializer8 = self.serializer_class_GuestListSerializer(guestlist, many=True)
-            serializer9 =self.serializer_class_PassesSerializer(passes,many=True)
+            serializer9 =self.serializer_class_DocumentSerializer(documents,many=True)
 
             final = []
             users = User.objects.all()
@@ -1753,6 +1810,7 @@ class allListView(ListAPIView):
                     "depart_time":settime.depart_time,
                     "arrival_time":settime.arrival_time
                 })
+
             response = {
                 'users':seralizer1.data,
                 'gigs':seralizer2.data,
@@ -1763,8 +1821,8 @@ class allListView(ListAPIView):
                 "schedule" : final,
                 'contacts': seralizer7.data,
                 'guestlists': serializer8.data,
-                'passes': serializer9.data,
-                'passeslength': len(passes)
+                'documents': serializer9.data,
+                # 'passeslength': len()
 
                 }
             return Response(data={"status": status.HTTP_200_OK,

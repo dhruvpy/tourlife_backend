@@ -11,7 +11,7 @@ admin.site.register(Hotel)
 admin.site.register(Contacts)
 admin.site.register(GuestList)
 admin.site.register(SetTime)
-admin.site.register(Passes)
+admin.site.register(Document)
 
 
 

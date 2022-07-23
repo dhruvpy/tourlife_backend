@@ -193,14 +193,15 @@ class SetTimeSerialiazer(serializers.ModelSerializer):
         model=SetTime
         fields= ["user","gig","venue","depart_time","arrival_time"]
 
-class PassesSerializer(serializers.ModelSerializer):
+class DocumentSerializer(serializers.ModelSerializer):
     user=serializers.CharField(required=True)
     gig=serializers.CharField(required=True)
     flight=serializers.CharField(required=True)
-    passes=serializers.CharField(required=False)
+    type=serializers.CharField(required=True)
+    document=serializers.CharField(required=False)
     class Meta:
-        model=Passes
-        fields=["user","gig","flight","passes"]
+        model=Document
+        fields=["user","gig","flight","type","document"]
 
 class LogoutSerializer(serializers.ModelSerializer):
     token=serializers.CharField(required=True)
