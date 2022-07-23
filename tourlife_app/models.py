@@ -1,4 +1,3 @@
-# from pyexpat import model
 from time import time
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -42,24 +41,6 @@ class Gigs(models.Model):
 
     def __str__ (self):
         return f"{self.id}"
-
-SEMESTER_CHOICES = (
-    ("FLIGHT", "FLIGHT"),
-    ("CAB", "CAB"),
-    ("HOTEL", "HOTEL"),
-    ("OTHER", "OTHER"),
-)
-
-class DaySchedule(models.Model):
-    user=models.ForeignKey(User,related_name='schedule_user',on_delete=models.CASCADE)
-    descriptions=models.CharField(max_length=100,null=True,blank=True)
-    start_time=models.TimeField(null=True,blank=True)
-    end_time=models.TimeField(null=True,blank=True)
-    type = models.CharField(choices = SEMESTER_CHOICES,max_length = 20,default = 'OTHER')
-    venue = models.CharField(max_length=100,null=True,blank=True)
-
-    def __str__ (self):
-        return f"{self.descriptions}"
     
 class FlightBook(models.Model):
     user = models.ForeignKey(User,related_name='flight_user',on_delete=models.CASCADE)
@@ -148,7 +129,6 @@ class Contacts(models.Model):
     email = models.CharField(max_length=100,null=True,blank=True)
     travelling_party=models.BooleanField(null=True,blank=True)
 
-        
 class GuestList(models.Model):
     user = models.ForeignKey(User,related_name='guest_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='guest_gig',on_delete=models.CASCADE)

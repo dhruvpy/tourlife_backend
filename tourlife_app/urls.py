@@ -16,11 +16,6 @@ urlpatterns = [
      path('gigs_update/<int:pk>',views.GigsUpdateAPIView.as_view(),name='gigs_update'),
      path('gigs_delete/<int:pk>',views.GigsDeleteAPIView.as_view(),name='gigs_delete'),
 
-     path('schedule_create',views.ScheduleCreateAPIView.as_view(),name='schedule_create'),
-     path('schedule_update/<int:pk>',views.ScheduleUpdateAPIView.as_view(),name='schedule_update'),
-     path('schedule_list',views.ScheduleListAPIView.as_view(),name='schedule_list'),
-     path('schedule_delete/<int:pk>',views.ScheduleDeleteAPIView.as_view(),name='schedule_delete'),
-
      path('flightbook_create',views.FlightBookCreateAPIView.as_view(),name='flightbook_create'),
      path('flightbook_update/<int:pk>',views.FlightBookUpdateAPIView.as_view(),name='flightbook_update'),
      path('flightbook_list',views.FlightBookListAPIView.as_view(),name='flightbook_list'),

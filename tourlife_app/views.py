@@ -9,7 +9,15 @@ import jwt
 from django.conf import settings
 from rest_framework.authentication import TokenAuthentication, get_authorization_header
 
+from django.core.mail import send_mail
 
+# send_mail(
+#     'Subject here',
+#     'Here is the message.',
+#     '',
+#     ['to@example.com'],
+#     fail_silently=False,
+# )
 from tourlife_app import serializer
 class UserCreateAPIView(GenericAPIView):
     permission_classes = [AllowAny]
@@ -196,6 +204,8 @@ class AdminLoginAPIView(GenericAPIView):
                                         'token': jwt_token,
                                         'is_manager': user.is_manager}},
                             status=status.HTTP_200_OK)
+
+
 class GigsCreateAPIView(CreateAPIView):
     permission_classes = [AllowAny]
 
@@ -351,129 +361,6 @@ class GigsDeleteAPIView(DestroyAPIView):
                             "message": "Gigs deleted",
                             "result": serializer.data},
                             status=status.HTTP_200_OK)
-class ScheduleCreateAPIView(CreateAPIView):
-    permission_classes = [AllowAny]
-
-    serializer_class = DayScheduleSerializer
-
-    def post(self, request, *args, **kwargs):
-        # if not request.user.is_manager:
-        #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
-        #                     status=status.HTTP_400_BAD_REQUEST)
-        serializer = self.get_serializer(data=request.POST)
-        if not serializer.is_valid():
-            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        user= User.objects.get(id=request.data["user"])
-        descriptions = request.data["descriptions"]
-        start_time = request.data["start_time"]
-        end_time=request.data["end_time"]
-        type=request.data["type"]
-        venue=request.data["venue"]
-
-        schedule=DaySchedule.objects.create(user=user,descriptions=descriptions,
-        start_time=start_time,end_time=end_time,type=type,venue=venue)
-
-        response_data = {
-            "id":schedule.id,
-            "user":  str(schedule.user),
-            "descriptions": schedule.descriptions,
-            "start_time":schedule.start_time,
-            "end_time":schedule.end_time,
-            "type":schedule.type,
-            "venue":schedule.venue,
-            }
-        return Response(data={"status": status.HTTP_200_OK,
-                              "message": "Schedule created",
-                              "error":False,
-                              "results": {'data': response_data}},
-                        status=status.HTTP_200_OK)
-class ScheduleUpdateAPIView(CreateAPIView):
-    permission_classes = [AllowAny]
-
-    serializer_class=DayScheduleSerializer
-    def post(self,request,*args,**kwargs):
-        # if not request.user.is_manager:
-        #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
-        #                     status=status.HTTP_400_BAD_REQUEST)
-        serializer = self.get_serializer(data=request.POST)
-        if not serializer.is_valid():
-            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        user=User.objects.get(id=request.data["user"])
-        descriptions=request.data["descriptions"]
-        start_time=request.data["start_time"]
-        end_time=request.data["end_time"]
-        type=request.data["type"]
-        venue=request.data["venue"]
-        
-        id=self.kwargs["pk"]
-
-        if not DaySchedule.objects.filter(id=id).exists():
-            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Schedule is not exists"},
-                            status=status.HTTP_400_BAD_REQUEST)
-        schedule=DaySchedule.objects.get(id=id)
-        schedule.user=user
-        schedule.descriptions=descriptions
-        schedule.start_time=start_time
-        schedule.end_time=end_time
-        schedule.type=type
-        schedule.venue=venue
-        schedule.save()
-
-        response_data = {
-            "id": schedule.id,
-            "user":str(schedule.user),
-            "descriptions":schedule.descriptions,
-            "start_time":schedule.start_time,
-            "end_time":schedule.end_time,
-            "type":schedule.type,
-            "venue":schedule.venue,
-        }
-        return Response(data={"status": status.HTTP_200_OK,
-                            "message": "Schedule Updated",
-                            "error":False,
-                            "results": {'data': response_data}},
-                        status=status.HTTP_200_OK)   
-class ScheduleListAPIView(ListAPIView):
-    permission_classes = [AllowAny]
-
-    serializer_class =DayScheduleSerializer
-    queryset=DaySchedule.objects.all()
-    
-    def get(self, request, *args, **kwargs):
-        # if not request.user.is_manager:
-        #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
-        #                     status=status.HTTP_400_BAD_REQUEST)
-        queryset=self.get_queryset()
-        serializer=self.get_serializer(queryset, many=True)
-        return Response(data={"status": status.HTTP_200_OK,
-                                "error": False,
-                                "message": "Schedule list",
-                                 "result": serializer.data},
-                                status=status.HTTP_200_OK)
-class ScheduleDeleteAPIView(DestroyAPIView):
-    permission_classes = [AllowAny]
-
-    serializer_class = DayScheduleSerializer
-
-    def delete(self, request, *args, **kwargs):
-        # if not request.user.is_manager:
-        #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
-        #                     status=status.HTTP_400_BAD_REQUEST)
-        id = self.kwargs["pk"]
-        if not DaySchedule.objects.filter(id=id).exists():
-            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Schedule is not exists"},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        schedule = DaySchedule.objects.get(id=id)
-        schedule.delete()
-        return Response(data={"status": status.HTTP_200_OK,
-                                "error": False,
-                                "message": "Schedule deleted",},
-                        status=status.HTTP_200_OK)
 
 class FlightBookCreateAPIView(CreateAPIView):
     permission_classes = [AllowAny]
@@ -1776,99 +1663,113 @@ class ScheduleAPIView(GenericAPIView):
                                  "result": final},
                                 status=status.HTTP_200_OK)
 class allListView(ListAPIView):
-    permission_classes = [AllowAny]
+   serializer_class_UserSerializer = UserListSerializer
+   serializer_class_GigsSerializer = GigsSerializer
+   serializer_class_FlightSerializer = FlightSerializer
+   serializer_class_CabBookSerializer = CabBookSerializer
+   serializer_class_HotelListSerializer = HotelListSerializer
+   serializer_class_VenueListSerializer = VenueListSerializer
+   serializer_class_SetTimeSerializer= SetTimeSerialiazer
+   serializer_class_ContactSerializer= ContactSerializer
+   serializer_class_GuestListSerializer= GuestListSerializer
+   serializer_class_PassesSerializer= PassesSerializer
 
-    serializer_class_UserSerializer = UserListSerializer
-    serializer_class_GigsSerializer = GigsSerializer
-    serializer_class_FlightSerializer = FlightSerializer
-    serializer_class_CabBookSerializer = CabBookSerializer
-    serializer_class_HotelListSerializer = HotelListSerializer
-    serializer_class_VenueListSerializer = VenueListSerializer
-    serializer_class_SetTimeSerializer= SetTimeSerialiazer
 
-    def get(self, request, *args, **kwrgs):
-        if request.method == 'GET':
-            users = User.objects.all()
-            gigs = Gigs.objects.all()
-            flights = FlightBook.objects.all()
-            cabs = CabBook.objects.all()
-            hotels = Hotel.objects.all()
-            venues = Venue.objects.all()
-            settimes=SetTime.objects.all()
 
-            seralizer1 = self.serializer_class_UserSerializer(users, many=True)
-            seralizer2 = self.serializer_class_GigsSerializer(gigs, many=True)
-            seralizer3 = self.serializer_class_FlightSerializer(flights, many=True)
-            seralizer4 = self.serializer_class_CabBookSerializer(cabs, many=True)
-            seralizer5 = self.serializer_class_HotelListSerializer(hotels, many=True)
-            seralizer6 = self.serializer_class_VenueListSerializer(venues, many=True)
+   def get(self, request, *args, **kwrgs):
+      if request.method == 'GET':
+        users = User.objects.all()
+        gigs = Gigs.objects.all()
+        flights = FlightBook.objects.all()
+        cabs = CabBook.objects.all()
+        hotels = Hotel.objects.all()
+        venues = Venue.objects.all()
+        settimes=SetTime.objects.all()
+        contacts = Contacts.objects.all()
+        guestlist= GuestList.objects.all()
+        passes= Passes.objects.all()
 
-            final = []
-            users = User.objects.all()
-            
-            flights = FlightBook.objects.all()
-            cabs = CabBook.objects.all()
-            for flight in flights:
-                final.append({
-                    "type" : "flight",
-                    "flight_id": flight.id,
-                    "depart_location": flight.depart_location,
-                    "depart_lat_long": flight.depart_lat_long,
-                    "depart_time": flight.depart_time,
-                    "depart_terminal": flight.depart_terminal,
-                    "depart_gate": flight.depart_gate,
-                    "arrival_location": flight.arrival_location,
-                    "arrival_lat_long": flight.arrival_lat_long,
-                    "arrival_time": flight.arrival_time,
-                    "arrival_terminal": flight.arrival_terminal,
-                    "arrival_gate": flight.arrival_gate,
-                    "airlines": flight.airlines,
-                    "flight_number": flight.flight_number,
-                    "flight_class": flight.flight_class,
-                    "wather": flight.wather,
-                    "user": flight.user.id,
-                    "gig": flight.gig.id
-                })
-            for cab in cabs:
-                final.append({
-                    "type" : "cab",
-                    "cab_id": cab.id,
-                    "depart_location": cab.depart_location,
-                    "depart_lat_long": cab.depart_lat_long,
-                    "depart_time": cab.depart_time,
-                    "arrival_location": cab.arrival_location,
-                    "arrival_lat_long": cab.arrival_lat_long,
-                    "arrival_time": cab.arrival_time,
-                    "driver_name": cab.driver_name,
-                    "driver_number": cab.driver_number,
-                    "wather": cab.wather,
-                    "user": cab.user.id,
-                    "gig": cab.gig.id
-                })
-            for settime in settimes:
-                final.append({
-                    "type":"settime",
-                    "settime_id":settime.id,
-                    "user":settime.user.id,
-                    "gig":settime.gig.id,
-                    "venue":settime.venue.direction,
-                    "depart_time":settime.depart_time,
-                    "arrival_time":settime.arrival_time
-                })
-            response = {
-                'users':seralizer1.data,
-                'gigs':seralizer2.data,
-                'hotels':seralizer5.data,
-                'venues':seralizer6.data,
-                # 'flights':seralizer3.data,
-                # 'cabs':seralizer4.data,
-                "schedule" : final
-                }
-            return Response(data={"status": status.HTTP_200_OK,
-                                    "error": False,
-                                    "message": "Schedule list",
-                                        "result": response},
-                                    status=status.HTTP_200_OK)
+        seralizer1 = self.serializer_class_UserSerializer(users, many=True)
+        seralizer2 = self.serializer_class_GigsSerializer(gigs, many=True)
+        seralizer3 = self.serializer_class_FlightSerializer(flights, many=True)
+        seralizer4 = self.serializer_class_CabBookSerializer(cabs, many=True)
+        seralizer5 = self.serializer_class_HotelListSerializer(hotels, many=True)
+        seralizer6 = self.serializer_class_VenueListSerializer(venues, many=True)
+        seralizer7 = self.serializer_class_ContactSerializer(contacts, many=True)
+        serializer8 = self.serializer_class_GuestListSerializer(guestlist, many=True)
+        serializer9 =self.serializer_class_PassesSerializer(passes,many=True)
+
+        final = []
+        users = User.objects.all()
+        
+        flights = FlightBook.objects.all()
+        cabs = CabBook.objects.all()
+        for flight in flights:
+            final.append({
+                "type" : "flight",
+                "flight_id": flight.id,
+                "depart_location": flight.depart_location,
+                "depart_lat_long": flight.depart_lat_long,
+                "depart_time": flight.depart_time,
+                "depart_terminal": flight.depart_terminal,
+                "depart_gate": flight.depart_gate,
+                "arrival_location": flight.arrival_location,
+                "arrival_lat_long": flight.arrival_lat_long,
+                "arrival_time": flight.arrival_time,
+                "arrival_terminal": flight.arrival_terminal,
+                "arrival_gate": flight.arrival_gate,
+                "airlines": flight.airlines,
+                "flight_number": flight.flight_number,
+                "flight_class": flight.flight_class,
+                "wather": flight.wather,
+                "user": flight.user.id,
+                "gig": flight.gig.id
+            })
+        for cab in cabs:
+            final.append({
+                "type" : "cab",
+                "cab_id": cab.id,
+                "depart_location": cab.depart_location,
+                "depart_lat_long": cab.depart_lat_long,
+                "depart_time": cab.depart_time,
+                "arrival_location": cab.arrival_location,
+                "arrival_lat_long": cab.arrival_lat_long,
+                "arrival_time": cab.arrival_time,
+                "driver_name": cab.driver_name,
+                "driver_number": cab.driver_number,
+                "wather": cab.wather,
+                "user": cab.user.id,
+                "gig": cab.gig.id
+            })
+        for settime in settimes:
+            final.append({
+                "type":"settime",
+                "settime_id":settime.id,
+                "user":settime.user.id,
+                "gig":settime.gig.id,
+                "venue":settime.venue.direction,
+                "depart_time":settime.depart_time,
+                "arrival_time":settime.arrival_time
+            })
+        response = {
+            'users':seralizer1.data,
+            'gigs':seralizer2.data,
+            'hotels':seralizer5.data,
+            'venues':seralizer6.data,
+            # 'flights':seralizer3.data,
+            # 'cabs':seralizer4.data,
+            "schedule" : final,
+            'contacts': seralizer7.data,
+            'guestlists': serializer8.data,
+            'passes': serializer9.data,
+            'passeslength': len(passes)
+
+            }
+        return Response(data={"status": status.HTTP_200_OK,
+                                "error": False,
+                                "message": "Schedule list",
+                                    "result": response},
+                                status=status.HTTP_200_OK)
 class ScheduleAPIView(GenericAPIView):
     permission_classes = [AllowAny]
     # serializer_class = LoginUserSerializers

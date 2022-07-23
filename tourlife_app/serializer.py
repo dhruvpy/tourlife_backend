@@ -71,19 +71,7 @@ class UserListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model=User
-        fields=["id","first_name","last_name","is_manager"]
-
-class DayScheduleSerializer(serializers.ModelSerializer):
-    user=serializers.CharField(required=True)
-    descriptions=serializers.CharField(required=True)
-    start_time=serializers.CharField(required=True)
-    end_time=serializers.CharField(required=True)
-    type=serializers.CharField(required=True)
-    venue=serializers.CharField(required=True)
-    
-    class Meta:
-        model=DaySchedule
-        fields=["user","descriptions","start_time","end_time","type","venue"]
+        fields=["id","first_name","last_name","is_manager"]                                                                 
 
 class FlightBookSerializer(serializers.ModelSerializer):
     user = serializers.CharField(required=True)
