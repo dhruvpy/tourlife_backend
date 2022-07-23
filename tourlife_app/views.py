@@ -1663,113 +1663,115 @@ class ScheduleAPIView(GenericAPIView):
                                  "result": final},
                                 status=status.HTTP_200_OK)
 class allListView(ListAPIView):
-   serializer_class_UserSerializer = UserListSerializer
-   serializer_class_GigsSerializer = GigsSerializer
-   serializer_class_FlightSerializer = FlightSerializer
-   serializer_class_CabBookSerializer = CabBookSerializer
-   serializer_class_HotelListSerializer = HotelListSerializer
-   serializer_class_VenueListSerializer = VenueListSerializer
-   serializer_class_SetTimeSerializer= SetTimeSerialiazer
-   serializer_class_ContactSerializer= ContactSerializer
-   serializer_class_GuestListSerializer= GuestListSerializer
-   serializer_class_PassesSerializer= PassesSerializer
+    permission_classes = [AllowAny]
+
+    serializer_class_UserSerializer = UserListSerializer
+    serializer_class_GigsSerializer = GigsSerializer
+    serializer_class_FlightSerializer = FlightSerializer
+    serializer_class_CabBookSerializer = CabBookSerializer
+    serializer_class_HotelListSerializer = HotelListSerializer
+    serializer_class_VenueListSerializer = VenueListSerializer
+    serializer_class_SetTimeSerializer= SetTimeSerialiazer
+    serializer_class_ContactSerializer= ContactSerializer
+    serializer_class_GuestListSerializer= GuestListSerializer
+    serializer_class_PassesSerializer= PassesSerializer
 
 
 
-   def get(self, request, *args, **kwrgs):
-      if request.method == 'GET':
-        users = User.objects.all()
-        gigs = Gigs.objects.all()
-        flights = FlightBook.objects.all()
-        cabs = CabBook.objects.all()
-        hotels = Hotel.objects.all()
-        venues = Venue.objects.all()
-        settimes=SetTime.objects.all()
-        contacts = Contacts.objects.all()
-        guestlist= GuestList.objects.all()
-        passes= Passes.objects.all()
+    def get(self, request, *args, **kwrgs):
+        if request.method == 'GET':
+            users = User.objects.all()
+            gigs = Gigs.objects.all()
+            flights = FlightBook.objects.all()
+            cabs = CabBook.objects.all()
+            hotels = Hotel.objects.all()
+            venues = Venue.objects.all()
+            settimes=SetTime.objects.all()
+            contacts = Contacts.objects.all()
+            guestlist= GuestList.objects.all()
+            passes= Passes.objects.all()
 
-        seralizer1 = self.serializer_class_UserSerializer(users, many=True)
-        seralizer2 = self.serializer_class_GigsSerializer(gigs, many=True)
-        seralizer3 = self.serializer_class_FlightSerializer(flights, many=True)
-        seralizer4 = self.serializer_class_CabBookSerializer(cabs, many=True)
-        seralizer5 = self.serializer_class_HotelListSerializer(hotels, many=True)
-        seralizer6 = self.serializer_class_VenueListSerializer(venues, many=True)
-        seralizer7 = self.serializer_class_ContactSerializer(contacts, many=True)
-        serializer8 = self.serializer_class_GuestListSerializer(guestlist, many=True)
-        serializer9 =self.serializer_class_PassesSerializer(passes,many=True)
+            seralizer1 = self.serializer_class_UserSerializer(users, many=True)
+            seralizer2 = self.serializer_class_GigsSerializer(gigs, many=True)
+            seralizer3 = self.serializer_class_FlightSerializer(flights, many=True)
+            seralizer4 = self.serializer_class_CabBookSerializer(cabs, many=True)
+            seralizer5 = self.serializer_class_HotelListSerializer(hotels, many=True)
+            seralizer6 = self.serializer_class_VenueListSerializer(venues, many=True)
+            seralizer7 = self.serializer_class_ContactSerializer(contacts, many=True)
+            serializer8 = self.serializer_class_GuestListSerializer(guestlist, many=True)
+            serializer9 =self.serializer_class_PassesSerializer(passes,many=True)
 
-        final = []
-        users = User.objects.all()
-        
-        flights = FlightBook.objects.all()
-        cabs = CabBook.objects.all()
-        for flight in flights:
-            final.append({
-                "type" : "flight",
-                "flight_id": flight.id,
-                "depart_location": flight.depart_location,
-                "depart_lat_long": flight.depart_lat_long,
-                "depart_time": flight.depart_time,
-                "depart_terminal": flight.depart_terminal,
-                "depart_gate": flight.depart_gate,
-                "arrival_location": flight.arrival_location,
-                "arrival_lat_long": flight.arrival_lat_long,
-                "arrival_time": flight.arrival_time,
-                "arrival_terminal": flight.arrival_terminal,
-                "arrival_gate": flight.arrival_gate,
-                "airlines": flight.airlines,
-                "flight_number": flight.flight_number,
-                "flight_class": flight.flight_class,
-                "wather": flight.wather,
-                "user": flight.user.id,
-                "gig": flight.gig.id
-            })
-        for cab in cabs:
-            final.append({
-                "type" : "cab",
-                "cab_id": cab.id,
-                "depart_location": cab.depart_location,
-                "depart_lat_long": cab.depart_lat_long,
-                "depart_time": cab.depart_time,
-                "arrival_location": cab.arrival_location,
-                "arrival_lat_long": cab.arrival_lat_long,
-                "arrival_time": cab.arrival_time,
-                "driver_name": cab.driver_name,
-                "driver_number": cab.driver_number,
-                "wather": cab.wather,
-                "user": cab.user.id,
-                "gig": cab.gig.id
-            })
-        for settime in settimes:
-            final.append({
-                "type":"settime",
-                "settime_id":settime.id,
-                "user":settime.user.id,
-                "gig":settime.gig.id,
-                "venue":settime.venue.direction,
-                "depart_time":settime.depart_time,
-                "arrival_time":settime.arrival_time
-            })
-        response = {
-            'users':seralizer1.data,
-            'gigs':seralizer2.data,
-            'hotels':seralizer5.data,
-            'venues':seralizer6.data,
-            # 'flights':seralizer3.data,
-            # 'cabs':seralizer4.data,
-            "schedule" : final,
-            'contacts': seralizer7.data,
-            'guestlists': serializer8.data,
-            'passes': serializer9.data,
-            'passeslength': len(passes)
+            final = []
+            users = User.objects.all()
+            
+            flights = FlightBook.objects.all()
+            cabs = CabBook.objects.all()
+            for flight in flights:
+                final.append({
+                    "type" : "flight",
+                    "flight_id": flight.id,
+                    "depart_location": flight.depart_location,
+                    "depart_lat_long": flight.depart_lat_long,
+                    "depart_time": flight.depart_time,
+                    "depart_terminal": flight.depart_terminal,
+                    "depart_gate": flight.depart_gate,
+                    "arrival_location": flight.arrival_location,
+                    "arrival_lat_long": flight.arrival_lat_long,
+                    "arrival_time": flight.arrival_time,
+                    "arrival_terminal": flight.arrival_terminal,
+                    "arrival_gate": flight.arrival_gate,
+                    "airlines": flight.airlines,
+                    "flight_number": flight.flight_number,
+                    "flight_class": flight.flight_class,
+                    "wather": flight.wather,
+                    "user": flight.user.id,
+                    "gig": flight.gig.id
+                })
+            for cab in cabs:
+                final.append({
+                    "type" : "cab",
+                    "cab_id": cab.id,
+                    "depart_location": cab.depart_location,
+                    "depart_lat_long": cab.depart_lat_long,
+                    "depart_time": cab.depart_time,
+                    "arrival_location": cab.arrival_location,
+                    "arrival_lat_long": cab.arrival_lat_long,
+                    "arrival_time": cab.arrival_time,
+                    "driver_name": cab.driver_name,
+                    "driver_number": cab.driver_number,
+                    "wather": cab.wather,
+                    "user": cab.user.id,
+                    "gig": cab.gig.id
+                })
+            for settime in settimes:
+                final.append({
+                    "type":"settime",
+                    "settime_id":settime.id,
+                    "user":settime.user.id,
+                    "gig":settime.gig.id,
+                    "venue":settime.venue.direction,
+                    "depart_time":settime.depart_time,
+                    "arrival_time":settime.arrival_time
+                })
+            response = {
+                'users':seralizer1.data,
+                'gigs':seralizer2.data,
+                'hotels':seralizer5.data,
+                'venues':seralizer6.data,
+                # 'flights':seralizer3.data,
+                # 'cabs':seralizer4.data,
+                "schedule" : final,
+                'contacts': seralizer7.data,
+                'guestlists': serializer8.data,
+                'passes': serializer9.data,
+                'passeslength': len(passes)
 
-            }
-        return Response(data={"status": status.HTTP_200_OK,
-                                "error": False,
-                                "message": "Schedule list",
-                                    "result": response},
-                                status=status.HTTP_200_OK)
+                }
+            return Response(data={"status": status.HTTP_200_OK,
+                                    "error": False,
+                                    "message": "Schedule list",
+                                        "result": response},
+                                    status=status.HTTP_200_OK)
 class ScheduleAPIView(GenericAPIView):
     permission_classes = [AllowAny]
     # serializer_class = LoginUserSerializers
