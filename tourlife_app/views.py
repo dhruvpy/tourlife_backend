@@ -1810,10 +1810,34 @@ class allListView(ListAPIView):
                     "depart_time":settime.depart_time,
                     "arrival_time":settime.arrival_time
                 })
+            gig_response = []
+            for gig in gigs:
+                schedule = FlightBook.objects.filter(gig=gig.id).count() + CabBook.objects.filter(gig=gig.id).count() + SetTime.objects.filter(gig=gig.id).count()
+                contact = Contacts.objects.filter(gig=gig.id).count()
+                document = Document.objects.filter(gig=gig.id).count()
+                
+                gig_response.append({
+                    "id": gig.id,
+                    "title": gig.title,
+                    "descriptions": gig.descriptions,
+                    "profile_pic": gig.profile_pic,
+                    "cover_image": gig.cover_image,
+                    "location": gig.location,
+                    "show": gig.show,
+                    "stage": gig.stage,
+                    "visa": gig.visa,
+                    "Equipment": gig.Equipment,
+                    "date": gig.date,
+                    "sound_check_time": gig.sound_check_time,
+                    "user": gig.user.id,
+                    "schedule_count" : schedule,
+                    "contact_count" : contact,
+                    "document_count" : document,
+                })
 
             response = {
                 'users':seralizer1.data,
-                'gigs':seralizer2.data,
+                'gigs':gig_response,
                 'hotels':seralizer5.data,
                 'venues':seralizer6.data,
                 # 'flights':seralizer3.data,
