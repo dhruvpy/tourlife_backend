@@ -175,13 +175,13 @@ class ContactSerializer(serializers.ModelSerializer):
         fields=["user","gig","type","name","number","email","travelling_party"]
 
 class GuestListSerializer(serializers.ModelSerializer):
-    user=serializers.CharField(required=True)
-    gig=serializers.CharField(required=True)
-    guestlist_detail= serializers.CharField(required=True)
-    guestlist=serializers.BooleanField(required=True)
+    # user=serializers.CharField(required=True)
+    # gig=serializers.CharField(required=True)
+    # guestlist_detail= serializers.CharField(required=True)
+    # guestlist=serializers.BooleanField(required=True)
     class Meta:
         model=GuestList
-        fields=["user","gig","guestlist_detail","guestlist"]
+        fields='__all__'
 
 class SetTimeSerialiazer(serializers.ModelSerializer):
     user=serializers.CharField(required=True)

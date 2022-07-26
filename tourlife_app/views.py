@@ -13,6 +13,7 @@ import random
 
 from django.conf import settings
 from django.core.mail import send_mail
+from .pagination import CustomPagination
 
 
 from tourlife_app import serializer
@@ -104,11 +105,21 @@ class UserUpdateAPIView(CreateAPIView):
                             "message": "user updated",
                             "results": {'data': response_data}},
                         status=status.HTTP_200_OK)
+
+from rest_framework.pagination import PageNumberPagination
+
+class MyPaginator(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
+    max_page_size = 1
+
 class UserListAPIView(ListAPIView):
     permission_classes = [AllowAny]
 
     serializer_class=CreateUserSerializers
+    pagination_class = CustomPagination
     queryset=User.objects.all()
+
     
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
@@ -1175,7 +1186,7 @@ class ContactDeleteAPIView(DestroyAPIView):
 
 class GuestListCreateAPIView(CreateAPIView):
     permission_classes = [AllowAny]
-
+    
     serializer_class=GuestListSerializer
 
     def post(self,request,*args,**kwargs):
@@ -1257,7 +1268,7 @@ class GuestListUpdateAPIView(CreateAPIView):
                         status=status.HTTP_200_OK)
 class GuestListListAPIView(ListAPIView):
     permission_classes = [AllowAny]
-
+    pagination_class = CustomPagination
     serializer_class=GuestListSerializer
     queryset= GuestList.objects.all()
 
@@ -1267,11 +1278,12 @@ class GuestListListAPIView(ListAPIView):
         #                     status=status.HTTP_400_BAD_REQUEST)
         queryset=self.get_queryset()
         serializer=self.get_serializer(queryset, many=True)
-        return Response(data={"status":status.HTTP_200_OK,
-                                "error":False,
-                                "message":"Guestlist list",
-                                "result":serializer.data},
-                        status=status.HTTP_200_OK)
+        page = self.paginate_queryset(serializer.data)
+
+        return self.get_paginated_response(page)
+
+
+
 class GuestListDeleteAPIView(DestroyAPIView):
     permission_classes = [AllowAny]
 
@@ -1717,6 +1729,8 @@ class ScheduleAPIView(GenericAPIView):
                                 "message": "Schedule list",
                                  "result": final},
                                 status=status.HTTP_200_OK)
+from django.db.models import Count
+
 class allListView(ListAPIView):
     permission_classes = [AllowAny]
 
@@ -1834,7 +1848,36 @@ class allListView(ListAPIView):
                     "contact_count" : contact,
                     "document_count" : document,
                 })
+            dates = []
+            user_list = []
+            f = []
+            for i in final:
+                dates.append(str(i["depart_time"]))
+                user_list.append(str(i["user"]))
+                
+            dates = [*set(dates)]
 
+            print(f)
+            print(user_list)
+            a = {}
+            for date in dates:
+                f.append({date: []})
+                
+            # for date in dates:
+            #     for i in final:
+            #         if date == str(i["depart_time"]):
+                        
+            #             print(date, str(i["depart_time"]))
+            #             print('--------------')
+            print(f,'=============')
+            users_list = []
+            for user in users:
+                users_list.append({
+                    "id": user.id,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "is_manager": user.is_manager
+                })
             response = {
                 'users':seralizer1.data,
                 'gigs':gig_response,
@@ -1849,6 +1892,7 @@ class allListView(ListAPIView):
                 # 'passeslength': len()
 
                 }
+
             return Response(data={"status": status.HTTP_200_OK,
                                     "error": False,
                                     "message": "Schedule list",
