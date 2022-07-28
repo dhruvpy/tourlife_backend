@@ -16,6 +16,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from .pagination import CustomPagination
 from rest_framework.pagination import PageNumberPagination
+import json
 
 
 from tourlife_app import serializer
@@ -334,8 +335,17 @@ class GigsCreateAPIView(CreateAPIView):
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
-
-        user = User.objects.get(id=request.data["user"])
+        
+        # temp = Gigs.objects.filter(id=3)
+        # for i in temp:
+        #     print(i.user.all())
+        #     temp2 = Gigs.objects.filter(id=2).first()
+        #     temp2.user.set(i.user.all())
+        #     temp2.save()
+        user_id_list = request.data["user"]
+        user_id_list = json.loads(user_id_list)
+        # print(type(a))
+        user = User.objects.filter(id__in=user_id_list)
         title = request.data["title"]
         descriptions = request.data["descriptions"]
         profile_pic = request.data["profile_pic"]
@@ -348,9 +358,10 @@ class GigsCreateAPIView(CreateAPIView):
         date = request.data["date"]
         sound_check_time = request.data["sound_check_time"]
 
-        gigs = Gigs.objects.create(user=user, title=title, descriptions=descriptions,
+        gigs = Gigs.objects.create(title=title, descriptions=descriptions,
                                    profile_pic=profile_pic, cover_image=cover_image, location=location, show=show, stage=stage, visa=visa, Equipment=Equipment, sound_check_time=sound_check_time, date=date)
-
+        gigs.user.set(user_id_list)
+        gigs.save()
         response_data = {
             "id": gigs.id,
             "user":  str(gigs.user),
@@ -387,7 +398,10 @@ class GigsUpdateAPIView(CreateAPIView):
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.get(id=request.data["user"])
+        user_id_list = request.data["user"]
+        user_id_list = json.loads(user_id_list)
+        # print(type(a))
+        user = User.objects.filter(id__in=user_id_list)
         title = request.data["title"]
         descriptions = request.data["descriptions"]
         profile_pic = request.data["profile_pic"]
@@ -405,7 +419,7 @@ class GigsUpdateAPIView(CreateAPIView):
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gigs is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
         gigs = Gigs.objects.get(id=id)
-        gigs.user = user
+        # gigs.user = user
         gigs.title = title
         gigs.descriptions = descriptions
         gigs.profile_pic = profile_pic
@@ -417,6 +431,8 @@ class GigsUpdateAPIView(CreateAPIView):
         gigs.Equipment = Equipment
         gigs.date = date
         gigs.sound_check_time = sound_check_time
+        gigs.user.set(user_id_list)
+
         gigs.save()
 
         response_data = {
@@ -1398,13 +1414,13 @@ class GuestListUpdateAPIView(CreateAPIView):
 
         if not GuestList.objects.filter(id=id).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True,
-                                  "message": "Guestlist is not exists".format(id)}, status=status.HTTP_400_BAD_REQUEST)
-
-        guestl = GuestList.objects.get(id=id)
-        guestl.user = user
-        guestl.gig = gig
-        guestl.guestlist_detail = guestlist_detail
-        guestl.guestlist = guestlist
+             "message": "Guestlist is not exists".format(id)},status=status.HTTP_400_BAD_REQUEST)
+        
+        guestl=GuestList.objects.get(id=id)
+        guestl.user=user
+        guestl.gig=gig
+        guestl.guestlist_detail=guestlist_detail
+        guestl.guestlist=guestlist
         guestl.save()
 
         response_data = {
@@ -1897,6 +1913,7 @@ class allListView(ListAPIView):
 
     def get(self, request, *args, **kwrgs):
         if request.method == 'GET':
+            
             users = User.objects.all()
             gigs = Gigs.objects.all()
             flights = FlightBook.objects.all()
@@ -1983,7 +2000,14 @@ class allListView(ListAPIView):
                 ) + CabBook.objects.filter(gig=gig.id).count() + SetTime.objects.filter(gig=gig.id).count()
                 contact = Contacts.objects.filter(gig=gig.id).count()
                 document = Document.objects.filter(gig=gig.id).count()
-
+                gig_users_list = []
+                for user in gig.user.all():
+                    gig_users_list.append({
+                    "id": user.id,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "is_manager": user.is_manager
+                })
                 gig_response.append({
                     "id": gig.id,
                     "title": gig.title,
@@ -1997,7 +2021,7 @@ class allListView(ListAPIView):
                     "Equipment": gig.Equipment,
                     "date": gig.date,
                     "sound_check_time": gig.sound_check_time,
-                    "user": gig.user.id,
+                    "user": gig_users_list,
                     "schedule_count": schedule,
                     "contact_count": contact,
                     "document_count": document,

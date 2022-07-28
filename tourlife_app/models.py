@@ -21,7 +21,7 @@ class Usertoken(models.Model):
     token=models.CharField(max_length=500,null=True,blank=True)
 
 class Gigs(models.Model):
-    user=models.ForeignKey(User,related_name='gig_user',on_delete=models.CASCADE)
+    user=models.ManyToManyField(User)
     title=models.CharField(max_length=20,null=True,blank=True)
     descriptions=models.CharField(max_length=100,null=True,blank=True)
     profile_pic=models.CharField(max_length=200,null=True,blank=True)

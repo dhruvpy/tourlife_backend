@@ -118,6 +118,7 @@ class CabBookSerializer(serializers.ModelSerializer):
     driver_name = serializers.CharField(required=True)
     driver_number = serializers.CharField(required=True)
     wather = serializers.CharField(required=True)
+
     class Meta:
         model=CabBook
         fields=["user","gig","depart_location","depart_lat_long","depart_time","arrival_location","arrival_lat_long","arrival_time"
