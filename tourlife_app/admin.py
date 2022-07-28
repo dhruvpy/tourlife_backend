@@ -12,6 +12,9 @@ admin.site.register(Contacts)
 admin.site.register(GuestList)
 admin.site.register(SetTime)
 admin.site.register(Document)
+admin.site.register(Emailotp)
+admin.site.register(SetNewPassword)
+
 
 
 

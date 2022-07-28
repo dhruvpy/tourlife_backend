@@ -2,7 +2,6 @@ from lib2to3.pgen2 import token
 from pyexpat import model
 from rest_framework import serializers
 from .models import *
-# from django.contrib.auth.models import User
 
 class CreateUserSerializers(serializers.ModelSerializer):
     username=serializers.CharField(required=True)
@@ -10,16 +9,18 @@ class CreateUserSerializers(serializers.ModelSerializer):
     last_name=serializers.CharField(required=True)
     password=serializers.CharField(required=True)
     email=serializers.EmailField(required=True)
-    mobile_no=serializers.IntegerField(required=False)
-    profile_image=serializers.CharField(required=False)
-    is_manager=serializers.BooleanField(required=False)
-    is_artist=serializers.BooleanField(required=False)
-
+    mobile_no=serializers.IntegerField(required=True)
+    profile_image=serializers.CharField(required=True)
+    is_manager=serializers.BooleanField(required=True)
+    is_artist=serializers.BooleanField(required=True)
     class Meta:
         model= User
         fields= ["username","first_name","last_name","password","email","mobile_no","profile_image","is_manager","is_artist"]
 
-
+class ListUserSerializers(serializers.ModelSerializer):
+    class Meta:
+        model= User
+        fields= "__all__"
 class LoginUserSerializers(serializers.ModelSerializer):
     email=serializers.EmailField(required=True)
     password=serializers.CharField(required=True)
@@ -28,28 +29,38 @@ class LoginUserSerializers(serializers.ModelSerializer):
         model=User
         fields=["email","password"]
 
-class GigsSerializer(serializers.ModelSerializer):
-    # user=serializers.CharField(required=True)
-    # title=serializers.CharField(required=True)
-    # descriptions=serializers.CharField(required=True)
-    # profile_pic=serializers.CharField(required=True)
-    # cover_image=serializers.CharField(required=True)
-    # date=serializers.DateField(required=True)
+class CreateGigsSerializer(serializers.ModelSerializer):
+    user=serializers.CharField(required=True)
+    title=serializers.CharField(required=True)
+    descriptions=serializers.CharField(required=True)
+    profile_pic=serializers.CharField(required=True)
+    cover_image=serializers.CharField(required=True)
+    date=serializers.DateTimeField(required=True)
+    location = serializers.CharField(required=True)
+    show = serializers.CharField(required=True)
+    stage = serializers.CharField(required=True)
+    visa=serializers.CharField(required=True)
+    Equipment =serializers.CharField(required=True)
+    date=serializers.CharField(required=True)
+    sound_check_time = serializers.CharField(required=True)
     class Meta:
         model=Gigs
-        # fields=["user","title","descriptions","profile_pic","cover_image","date"]
-        fields="__all__"
+        fields=["user","title","descriptions","profile_pic","cover_image","date","location","show","stage","visa","Equipment","date","sound_check_time"]
+        # fields="__all__"
+
+class ListGigSerializer(serializers.ModelSerializer):
+    class Meta:
+        model= Gigs
+        fields= "__all__"
 
 
 class FlightSerializer(serializers.ModelSerializer):
-
     class Meta:
         model=FlightBook
         # fields=["user","title","descriptions","profile_pic","cover_image","date"]
         fields="__all__"
 
-class CabBookSerializer(serializers.ModelSerializer):
-
+class CabSerializer(serializers.ModelSerializer):
     class Meta:
         model=CabBook
         # fields=["user","title","descriptions","profile_pic","cover_image","date"]
@@ -59,7 +70,6 @@ class UserSerializer(serializers.ModelSerializer):
     id=serializers.CharField(required=True)
     first_name=serializers.CharField(required=True)
     last_name=serializers.CharField(required=True)
-    
     class Meta:
         model=User
         fields=["id","first_name","last_name"]
@@ -162,6 +172,9 @@ class HotelListSerializer(serializers.ModelSerializer):
         model=Hotel
         fields='__all__'
 
+
+
+
 class ContactSerializer(serializers.ModelSerializer):
     user=serializers.CharField(required=True)
     gig=serializers.CharField(required=True)
@@ -174,15 +187,23 @@ class ContactSerializer(serializers.ModelSerializer):
         model=Contacts
         fields=["user","gig","type","name","number","email","travelling_party"]
 
+class ContactListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Contacts
+        fields='__all__'
 class GuestListSerializer(serializers.ModelSerializer):
-    # user=serializers.CharField(required=True)
-    # gig=serializers.CharField(required=True)
-    # guestlist_detail= serializers.CharField(required=True)
-    # guestlist=serializers.BooleanField(required=True)
+    user=serializers.CharField(required=True)
+    gig=serializers.CharField(required=True)
+    guestlist_detail= serializers.CharField(required=True)
+    guestlist=serializers.BooleanField(required=True)
+    class Meta:
+        model=GuestList
+        fields=["user","gig","guestlist_detail","guestlist"]
+
+class GuestSerializer(serializers.ModelSerializer):
     class Meta:
         model=GuestList
         fields='__all__'
-
 class SetTimeSerialiazer(serializers.ModelSerializer):
     user=serializers.CharField(required=True)
     gig=serializers.CharField(required=True)
@@ -192,6 +213,11 @@ class SetTimeSerialiazer(serializers.ModelSerializer):
     class Meta:
         model=SetTime
         fields= ["user","gig","venue","depart_time","arrival_time"]
+
+class SetTimeListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=SetTime
+        fields='__all__'
 
 class DocumentSerializer(serializers.ModelSerializer):
     user=serializers.CharField(required=True)
@@ -203,9 +229,17 @@ class DocumentSerializer(serializers.ModelSerializer):
         model=Document
         fields=["user","gig","flight","type","document"]
 
-class LogoutSerializer(serializers.ModelSerializer):
-    token=serializers.CharField(required=True)
-
+class DocumentsListSerializer(serializers.ModelSerializer):
     class Meta:
-        model=Usertoken
-        fields=["token"]
+        model=Document
+        fields='__all__'
+class ForgotpasswordSerializer(serializers.ModelSerializer):
+    email=serializers.EmailField(required=True)
+    class Meta:
+        model=Emailotp
+        fields=["email"]
+
+class SetNewPasswordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model= SetNewPassword
+        fields="__all__"

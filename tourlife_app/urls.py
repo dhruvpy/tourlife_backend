@@ -10,16 +10,22 @@ urlpatterns = [
      path('user_update/<int:pk>', views.UserUpdateAPIView.as_view(), name="update_user"),
      path('user_list', views.UserListAPIView.as_view(), name="list_user"),
      path('user_delete/<int:pk>', views.UserDeleteAPIView.as_view(), name="delete_user"),
+     path('all_user', views.GetAllUserAPIView.as_view(), name="all_user"),
+     
 
      path('gigs_create',views.GigsCreateAPIView.as_view(),name='gigs_create'),
      path('gigs_list',views.GigsListAPIView.as_view(),name='gigs_list'),
      path('gigs_update/<int:pk>',views.GigsUpdateAPIView.as_view(),name='gigs_update'),
      path('gigs_delete/<int:pk>',views.GigsDeleteAPIView.as_view(),name='gigs_delete'),
+     path('all_gigs',views.GetallGigsAPIView.as_view(),name='all_gigs'),
+     
 
      path('flightbook_create',views.FlightBookCreateAPIView.as_view(),name='flightbook_create'),
      path('flightbook_update/<int:pk>',views.FlightBookUpdateAPIView.as_view(),name='flightbook_update'),
      path('flightbook_list',views.FlightBookListAPIView.as_view(),name='flightbook_list'),
      path('flightbook_delete/<int:pk>',views.FlightBookDeleteAPIView.as_view(),name='flightbook_delete'),
+     path('all_flight',views.GetallFlightAPIView.as_view(),name='all_flight'),
+     
      
      path('cabbook_create',views.CabBookCreateAPIView.as_view(),name='cabbook_create'),
      path('cabbook_update/<int:pk>',views.CabBookUpdateAPIView.as_view(),name='cabbook_update'),
@@ -30,6 +36,7 @@ urlpatterns = [
      path('venue_update/<int:pk>',views.VenueUpdateAPIView.as_view(),name='venue_update'),
      path('venue_list',views.VenueListAPIView.as_view(),name='venue_list'),
      path('venue_delete/<int:pk>',views.VenueDeleteAPIView.as_view(),name='venue_delete'),
+     path('all_venue',views.GetallVenueAPIView.as_view(),name='all_venue'),
      
 
      path('hotel_create',views.HotelCreateAPIView.as_view(),name='hotel_create'),
@@ -54,13 +61,15 @@ urlpatterns = [
      path('settime_delete/<int:pk>',views.SetTimeDeleteAPIView.as_view(),name='settime_delete'),
 
      path('document_create',views.DocumentCreateAPIView.as_view(),name='document_create'),
-     # path('passes_update/<int:pk>',views.PassesUpdateAPIView.as_view(),name='passes_update'),
-     # path('passes_list',views.PassesListAPIView.as_view(), name="passes_list"),
-     # path('passes_delete/<int:pk>',views.PassesDeleteAPIView.as_view(),name='passes_delete'),
+     path('document_update/<int:pk>',views.DocumentUpdateAPIView.as_view(),name='document_update'),
+     path('document_list',views.DocumentListAPIView.as_view(), name="document_list"),
+     path('document_delete/<int:pk>',views.DocumentDeleteAPIView.as_view(),name='document_delete'),
 
-     # path('logout',views.Logout.as_view(),name='logout'),
 
-     # verify_mail
+     path('forgot_password',views.ForgotPasswordAPIView.as_view(),name='forgot_password'),
+     path('otpcheck',views.OTPCheckAPIView.as_view(),name='otpcheck'),
+     path('set_new_password',views.SetNewPasswordAPIView.as_view(),name='set_new_password'),
+     
      
      path('all_data',views.allListView.as_view(),name='all_data'),
      path('all_data2',views.AllDataAPIView.as_view(),name='all_data2'),

@@ -2,28 +2,23 @@ from time import time
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-# from phonenumber_field.modelfields import PhoneNumberField
-# Create your models here.
 class User(AbstractUser):
     
     username=models.CharField(max_length=20, null=True,blank=True,unique= True)
     first_name=models.CharField(max_length=20, null=True,blank=True)
     last_name=models.CharField(max_length=20, null=True,blank=True)
-    email=models.EmailField(max_length=20,unique=True)
+    email=models.EmailField(max_length=100,unique=True)
     password=models.CharField(max_length=200,null=True,blank=True)
     mobile_no=models.CharField(max_length=10,null=True,blank=True)
     profile_image=models.CharField(max_length=200,null=True,blank=True)
     is_manager=models.BooleanField(default=False)
     is_artist=models.BooleanField(default=False)
-    
+
     def __str__ (self):
         return f"{self.id}"
 class Usertoken(models.Model):
     user=models.ForeignKey(User,related_name='token',on_delete=models.CASCADE)
     token=models.CharField(max_length=500,null=True,blank=True)
-
-class Person(models.Model):
-    name=models.CharField(max_length=20)
 
 class Gigs(models.Model):
     user=models.ForeignKey(User,related_name='gig_user',on_delete=models.CASCADE)
@@ -101,7 +96,6 @@ class Venue(models.Model):
     hospitality_email=models.CharField(max_length=100,null=True,blank=True)
     catring=models.BooleanField(default=False)
     catring_detail=models.CharField(max_length=100,null=True,blank=True)
-
 class Hotel(models.Model):
     user = models.ForeignKey(User,related_name='h_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='h_gig',on_delete=models.CASCADE)
@@ -128,7 +122,6 @@ class Contacts(models.Model):
     number = models.CharField(max_length=100,null=True,blank=True)
     email = models.CharField(max_length=100,null=True,blank=True)
     travelling_party=models.BooleanField(null=True,blank=True)
-
 class GuestList(models.Model):
     user = models.ForeignKey(User,related_name='guest_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='guest_gig',on_delete=models.CASCADE)
@@ -138,7 +131,7 @@ class GuestList(models.Model):
 class SetTime(models.Model):
     user = models.ForeignKey(User,related_name='settime_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='settime_gig',on_delete=models.CASCADE)
-    venue = models.ForeignKey(Venue,related_name='settime_gig',on_delete=models.CASCADE)
+    venue = models.ForeignKey(Venue,related_name='settime_venue',on_delete=models.CASCADE)
     depart_time=models.DateTimeField(null=True,blank=True)
     arrival_time=models.DateTimeField(null=True,blank=True)
 
@@ -150,6 +143,14 @@ DOCUMENT_CHOICES=(
 class Document(models.Model):
     user = models.ForeignKey(User,related_name='passes_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='passes_gig',on_delete=models.CASCADE)
-    flight= models.ForeignKey(FlightBook,related_name='passes',on_delete=models.CASCADE)
+    flight= models.ForeignKey(FlightBook,related_name='flight_passes',on_delete=models.CASCADE)
     type= models.CharField(max_length=100,choices=DOCUMENT_CHOICES,null=True,blank=True)
     document = models.CharField(max_length=1000,null=True,blank=True)
+
+class Emailotp(models.Model):
+    email=models.EmailField(max_length=100)
+    otp=models.CharField(max_length=4,null=True,blank=True)
+
+class SetNewPassword(models.Model):
+    email=models.EmailField(max_length=100)
+    new_password= models.CharField(max_length=10)
