@@ -360,11 +360,11 @@ class GigsCreateAPIView(CreateAPIView):
 
         gigs = Gigs.objects.create(title=title, descriptions=descriptions,
                                    profile_pic=profile_pic, cover_image=cover_image, location=location, show=show, stage=stage, visa=visa, Equipment=Equipment, sound_check_time=sound_check_time, date=date)
-        gigs.user.set(user_id_list)
+        gigs.user.set(user)
         gigs.save()
         response_data = {
             "id": gigs.id,
-            "user":  str(gigs.user),
+            "user":  gigs.user.all().values_list('id', flat=True),
             "title": gigs.title,
             "descriptions": gigs.descriptions,
             "profile_pic": str(gigs.profile_pic),
@@ -437,7 +437,7 @@ class GigsUpdateAPIView(CreateAPIView):
 
         response_data = {
             "id": gigs.id,
-            "user": str(gigs.user),
+            "user": gigs.user.all().values_list('id', flat=True),
             "title": gigs.title,
             "descriptions": gigs.descriptions,
             "profile_pic": str(gigs.profile_pic),
