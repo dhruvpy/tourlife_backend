@@ -4,6 +4,7 @@ from .models import *
 admin.site.register(User)
 admin.site.register(Usertoken)
 admin.site.register(Gigs)
+admin.site.register(GigMaster)
 admin.site.register(FlightBook)
 admin.site.register(CabBook)
 admin.site.register(Venue)

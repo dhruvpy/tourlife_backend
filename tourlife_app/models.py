@@ -34,9 +34,19 @@ class Gigs(models.Model):
     date=models.DateTimeField(null=True,blank=True)
     sound_check_time = models.TimeField(null=True,blank=True)
 
+    # def save(self, *args, **kwargs):
+    #     print(self,'--------------')
+
     def __str__ (self):
         return f"{self.id}"
-    
+
+class GigMaster(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    gig = models.ForeignKey(Gigs,on_delete=models.CASCADE)
+
+    def __str__ (self):
+        return f"{self.gig.title}"
+
 class FlightBook(models.Model):
     user = models.ForeignKey(User,related_name='flight_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='flight_gig',on_delete=models.CASCADE)

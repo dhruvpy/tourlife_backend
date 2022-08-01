@@ -357,11 +357,14 @@ class GigsCreateAPIView(CreateAPIView):
         Equipment = request.data["Equipment"]
         date = request.data["date"]
         sound_check_time = request.data["sound_check_time"]
-
+        # print(user,'=-=-=-=-=-=-=-=--=-=-=-=-=')
+        # print(k)
         gigs = Gigs.objects.create(title=title, descriptions=descriptions,
                                    profile_pic=profile_pic, cover_image=cover_image, location=location, show=show, stage=stage, visa=visa, Equipment=Equipment, sound_check_time=sound_check_time, date=date)
         gigs.user.set(user)
         gigs.save()
+        for i in user:
+            GigMaster.objects.create(gig=gigs,user=i)
         response_data = {
             "id": gigs.id,
             "user":  gigs.user.all().values_list('id', flat=True),
@@ -528,6 +531,13 @@ class FlightBookCreateAPIView(CreateAPIView):
         serializer = self.get_serializer(data=request.POST)
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if not User.objects.filter(id=request.data["user"]).exists():
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "user not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if not Gigs.objects.filter(id=request.data["gig"]).exists():
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "gig not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.get(id=request.data["user"])
@@ -1916,6 +1926,7 @@ class allListView(ListAPIView):
             
             users = User.objects.all()
             gigs = Gigs.objects.all()
+            gig_master = GigMaster.objects.all()
             flights = FlightBook.objects.all()
             cabs = CabBook.objects.all()
             hotels = Hotel.objects.all()
@@ -1995,13 +2006,13 @@ class allListView(ListAPIView):
                     "arrival_time": settime.arrival_time
                 })
             gig_response = []
-            for gig in gigs:
-                schedule = FlightBook.objects.filter(gig=gig.id).count(
-                ) + CabBook.objects.filter(gig=gig.id).count() + SetTime.objects.filter(gig=gig.id).count()
-                contact = Contacts.objects.filter(gig=gig.id).count()
-                document = Document.objects.filter(gig=gig.id).count()
+            for gig in gig_master:
+                schedule = FlightBook.objects.filter(gig=gig.gig.id).count(
+                ) + CabBook.objects.filter(gig=gig.gig.id).count() + SetTime.objects.filter(gig=gig.gig.id).count()
+                contact = Contacts.objects.filter(gig=gig.gig.id).count()
+                document = Document.objects.filter(gig=gig.gig.id).count()
                 gig_users_list = []
-                for user in gig.user.all():
+                for user in gig.gig.user.all():
                     gig_users_list.append({
                     "id": user.id,
                     "first_name": user.first_name,
@@ -2009,19 +2020,19 @@ class allListView(ListAPIView):
                     "is_manager": user.is_manager
                 })
                 gig_response.append({
-                    "id": gig.id,
-                    "title": gig.title,
-                    "descriptions": gig.descriptions,
-                    "profile_pic": gig.profile_pic,
-                    "cover_image": gig.cover_image,
-                    "location": gig.location,
-                    "show": gig.show,
-                    "stage": gig.stage,
-                    "visa": gig.visa,
-                    "Equipment": gig.Equipment,
-                    "date": gig.date,
-                    "sound_check_time": gig.sound_check_time,
-                    "user": gig_users_list,
+                    "id": gig.gig.id,
+                    "title": gig.gig.title,
+                    "descriptions": gig.gig.descriptions,
+                    "profile_pic": gig.gig.profile_pic,
+                    "cover_image": gig.gig.cover_image,
+                    "location": gig.gig.location,
+                    "show": gig.gig.show,
+                    "stage": gig.gig.stage,
+                    "visa": gig.gig.visa,
+                    "Equipment": gig.gig.Equipment,
+                    "date": gig.gig.date,
+                    "sound_check_time": gig.gig.sound_check_time,
+                    "user": gig.user.id,
                     "schedule_count": schedule,
                     "contact_count": contact,
                     "document_count": document,
