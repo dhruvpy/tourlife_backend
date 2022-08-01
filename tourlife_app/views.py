@@ -2020,7 +2020,7 @@ class allListView(ListAPIView):
                     "is_manager": user.is_manager
                 })
                 gig_response.append({
-                    "id": gig.gig.id,
+                    "id": int(gig.gig.id),
                     "title": gig.gig.title,
                     "descriptions": gig.gig.descriptions,
                     "profile_pic": gig.gig.profile_pic,
@@ -2032,7 +2032,7 @@ class allListView(ListAPIView):
                     "Equipment": gig.gig.Equipment,
                     "date": gig.gig.date,
                     "sound_check_time": gig.gig.sound_check_time,
-                    "user": gig.user.id,
+                    "user": int(gig.user.id),
                     "schedule_count": schedule,
                     "contact_count": contact,
                     "document_count": document,
