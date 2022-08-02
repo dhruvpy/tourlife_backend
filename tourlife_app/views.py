@@ -416,7 +416,8 @@ class GigsUpdateAPIView(CreateAPIView):
         stage = request.data["stage"]
         visa = request.data["visa"]
         Equipment = request.data["Equipment"]
-        date = request.data["date"]
+        start_date = request.data["start_date"]
+        end_date = request.data["end_date"]
         sound_check_time = request.data["sound_check_time"]
 
         id = self.kwargs["pk"]
@@ -434,7 +435,8 @@ class GigsUpdateAPIView(CreateAPIView):
         gigs.stage = stage
         gigs.visa = visa
         gigs.Equipment = Equipment
-        gigs.date = date
+        gigs.start_date = start_date
+        gigs.end_date = end_date
         gigs.sound_check_time = sound_check_time
         gigs.user.set(user_id_list)
 
@@ -452,7 +454,8 @@ class GigsUpdateAPIView(CreateAPIView):
             "stage": gigs.stage,
             "visa": gigs.visa,
             "Equipment": gigs.Equipment,
-            "date": gigs.date,
+            "start_date" : gigs.start_date,
+            "end_date" : gigs.end_date,
             "sound_check_time": gigs.sound_check_time
         }
         return Response(data={"status": status.HTTP_200_OK,
@@ -2032,7 +2035,8 @@ class allListView(ListAPIView):
                     "stage": gig.gig.stage,
                     "visa": gig.gig.visa,
                     "Equipment": gig.gig.Equipment,
-                    "date": gig.gig.date,
+                    "start_date": gig.gig.start_date,
+                    "end_date": gig.gig.end_date,
                     "sound_check_time": gig.gig.sound_check_time,
                     "user": int(gig.user.id),
                     "schedule_count": schedule,
