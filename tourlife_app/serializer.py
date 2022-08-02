@@ -138,9 +138,14 @@ class VenueSerializer(serializers.ModelSerializer):
         "dressing_room","hospitality","hospitality_detail","catring","catring_detail"]
 
 class VenueListSerializer(serializers.ModelSerializer):
+    gig = serializers.SlugRelatedField(
+        slug_field='title',
+        queryset=Gigs.objects.all()
+    )
     class Meta:
         model=Venue
-        fields='__all__'
+        fields=["user","gig","address","direction","website","number","indoor","covered","capacity","wather","credential_collection",
+        "dressing_room","hospitality","hospitality_detail","catring","catring_detail"]
 
 class HotelSerializer(serializers.ModelSerializer):
     user=serializers.IntegerField(required=True)
