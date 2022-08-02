@@ -3,7 +3,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
-    
     username=models.CharField(max_length=20, null=True,blank=True,unique= True)
     first_name=models.CharField(max_length=20, null=True,blank=True)
     last_name=models.CharField(max_length=20, null=True,blank=True)
@@ -39,7 +38,7 @@ class Gigs(models.Model):
     #     print(self,'--------------')
 
     def __str__ (self):
-        return f"{self.id}"
+        return f"{self.title}"
 
 class GigMaster(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -66,7 +65,6 @@ class FlightBook(models.Model):
     flight_class = models.CharField(max_length=100,null=True,blank=True)
     wather = models.CharField(max_length=100,null=True,blank=True)
 
-
     def __str__ (self):
         return f"{self.flight_number}"
 
@@ -87,7 +85,6 @@ class CabBook(models.Model):
         return f"{self.arrival_location}"
 
     # 1d416dd6f1f006195c0aa4bd9685b88d
-
 class Venue(models.Model):
     user = models.ForeignKey(User,related_name='venue_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='venue_gig',on_delete=models.CASCADE)

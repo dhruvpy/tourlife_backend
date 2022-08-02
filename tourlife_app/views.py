@@ -1,9 +1,7 @@
-from django.db.models import Count
 from .models import *
 from .serializer import *
 from rest_framework.generics import GenericAPIView, ListAPIView, CreateAPIView, UpdateAPIView, RetrieveAPIView, DestroyAPIView
 from rest_framework.response import Response
-from django.http import HttpResponseRedirect
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 import boto3
@@ -11,16 +9,11 @@ import jwt
 from django.conf import settings
 from rest_framework.authentication import TokenAuthentication, get_authorization_header
 import random
-
 from django.conf import settings
 from django.core.mail import send_mail
 from .pagination import CustomPagination
 from rest_framework.pagination import PageNumberPagination
 import json
-
-
-from tourlife_app import serializer
-
 
 class UserCreateAPIView(GenericAPIView):
     permission_classes = [AllowAny]
@@ -321,7 +314,6 @@ class SetNewPasswordAPIView(GenericAPIView):
         emailotp_obj.delete()
         return Response(data={'status': status.HTTP_200_OK, 'error': False, 'message': 'Successfully set new password'}, status=status.HTTP_200_OK)
 
-
 class GigsCreateAPIView(CreateAPIView):
     permission_classes = [AllowAny]
 
@@ -336,15 +328,8 @@ class GigsCreateAPIView(CreateAPIView):
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
         
-        # temp = Gigs.objects.filter(id=3)
-        # for i in temp:
-        #     print(i.user.all())
-        #     temp2 = Gigs.objects.filter(id=2).first()
-        #     temp2.user.set(i.user.all())
-        #     temp2.save()
         user_id_list = request.data["user"]
         user_id_list = json.loads(user_id_list)
-        # print(type(a))
         user = User.objects.filter(id__in=user_id_list)
         title = request.data["title"]
         descriptions = request.data["descriptions"]
@@ -388,7 +373,6 @@ class GigsCreateAPIView(CreateAPIView):
                               "results": {'data': response_data}},
                         status=status.HTTP_200_OK)
 
-
 class GigsUpdateAPIView(CreateAPIView):
     permission_classes = [AllowAny]
 
@@ -398,6 +382,7 @@ class GigsUpdateAPIView(CreateAPIView):
         # if not request.user.is_manager:
         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
         #                     status=status.HTTP_400_BAD_REQUEST)
+
         serializer = self.get_serializer(data=request.POST)
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
@@ -405,7 +390,6 @@ class GigsUpdateAPIView(CreateAPIView):
 
         user_id_list = request.data["user"]
         user_id_list = json.loads(user_id_list)
-        # print(type(a))
         user = User.objects.filter(id__in=user_id_list)
         title = request.data["title"]
         descriptions = request.data["descriptions"]
@@ -425,7 +409,6 @@ class GigsUpdateAPIView(CreateAPIView):
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gigs is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
         gigs = Gigs.objects.get(id=id)
-        # gigs.user = user
         gigs.title = title
         gigs.descriptions = descriptions
         gigs.profile_pic = profile_pic
@@ -438,8 +421,7 @@ class GigsUpdateAPIView(CreateAPIView):
         gigs.start_date = start_date
         gigs.end_date = end_date
         gigs.sound_check_time = sound_check_time
-        gigs.user.set(user_id_list)
-
+        gigs.user.set(user)
         gigs.save()
 
         response_data = {
@@ -519,8 +501,7 @@ class GigsDeleteAPIView(DestroyAPIView):
         gigs.delete()
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
-                              "message": "Gigs deleted",
-                              "result": serializer.data},
+                              "message": "Gigs deleted"},
                         status=status.HTTP_200_OK)
 
 
@@ -537,13 +518,14 @@ class FlightBookCreateAPIView(CreateAPIView):
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
-        if not User.objects.filter(id=request.data["user"]).exists():
-            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "user not exists"},
+        if not User.objects.filter(id=request.data["user"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        if not Gigs.objects.filter(id=request.data["gig"]).exists():
-            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "gig not exists"},
+        if not Gigs.objects.filter(id=request.data["gig"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gig not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
+
 
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
@@ -561,7 +543,10 @@ class FlightBookCreateAPIView(CreateAPIView):
         flight_number = request.data["flight_number"]
         flight_class = request.data["flight_class"]
         wather = request.data["wather"]
-
+        print(user,"/////////////////////")
+        # if not FlightBook.objects.filter(user=user).exists():
+        #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User or gig not exists "},
+        #      status=status.HTTP_400_BAD_REQUEST)
         flightbook = FlightBook.objects.create(user=user, gig=gig, depart_location=depart_location, depart_lat_long=depart_lat_long,
                                                depart_time=depart_time, depart_terminal=depart_terminal, depart_gate=depart_gate, arrival_location=arrival_location,
                                                arrival_lat_long=arrival_lat_long, arrival_time=arrival_time, arrival_terminal=arrival_terminal,
@@ -604,6 +589,13 @@ class FlightBookUpdateAPIView(CreateAPIView):
         serializer = self.get_serializer(data=request.POST)
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if not User.objects.filter(id=request.data["user"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if not Gigs.objects.filter(id=request.data["gig"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gig not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.get(id=request.data["user"])
@@ -728,8 +720,7 @@ class FlightBookDeleteAPIView(DestroyAPIView):
         flightbook.delete()
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
-                              "message": "Flightbook deleted",
-                              "result": serializer.data},
+                              "message": "Flightbook deleted"},
                         status=status.HTTP_200_OK)
 
 
@@ -745,6 +736,13 @@ class CabBookCreateAPIView(CreateAPIView):
         serializer = self.get_serializer(data=request.POST)
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if not User.objects.filter(id=request.data["user"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if not Gigs.objects.filter(id=request.data["gig"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gig not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.get(id=request.data["user"])
@@ -797,6 +795,13 @@ class CabBookUpdateAPIView(CreateAPIView):
         serializer = self.get_serializer(data=request.POST)
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if not User.objects.filter(id=request.data["user"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if not Gigs.objects.filter(id=request.data["gig"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gig not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.get(id=request.data["user"])
@@ -888,8 +893,7 @@ class CabBookDeleteAPIView(DestroyAPIView):
         cabbook.delete()
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
-                              "message": "Cabbook deleted",
-                              "result": serializer.data},
+                              "message": "Cabbook deleted"},
                         status=status.HTTP_200_OK)
 
 
@@ -905,6 +909,13 @@ class VenueCreateAPIView(CreateAPIView):
         serializer = self.get_serializer(data=request.POST)
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if not User.objects.filter(id=request.data["user"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if not Gigs.objects.filter(id=request.data["gig"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gig not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.get(id=request.data["user"])
@@ -967,6 +978,14 @@ class VenueUpdateAPIView(CreateAPIView):
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
+        if not User.objects.filter(id=request.data["user"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if not Gigs.objects.filter(id=request.data["gig"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gig not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
         address = request.data["address"]
@@ -1086,8 +1105,7 @@ class VenueDeleteAPIView(DestroyAPIView):
         venue.delete()
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
-                              "message": "Venue deleted",
-                              "result": serializer.data},
+                              "message": "Venue deleted"},
                         status=status.HTTP_200_OK)
 
 
@@ -1104,6 +1122,15 @@ class HotelCreateAPIView(CreateAPIView):
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
+
+        if not User.objects.filter(id=request.data["user"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if not Gigs.objects.filter(id=request.data["gig"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gig not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
         hotel_name = request.data["hotel_name"]
@@ -1148,6 +1175,13 @@ class HotelUpdateAPIView(CreateAPIView):
         serializer = self.get_serializer(data=request.POST)
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        if not User.objects.filter(id=request.data["user"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if not Gigs.objects.filter(id=request.data["gig"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gig not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
         address = request.data["address"]
@@ -1225,8 +1259,7 @@ class HotelDeleteAPIView(DestroyAPIView):
         hotel.delete()
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
-                              "message": "Hotel deleted",
-                              "result": serializer.data},
+                              "message": "Hotel deleted"},
                         status=status.HTTP_200_OK)
 
 
@@ -1242,6 +1275,14 @@ class ContactCreateAPIView(CreateAPIView):
         serializer = self.get_serializer(data=request.POST)
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if not User.objects.filter(id=request.data["user"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if not Gigs.objects.filter(id=request.data["gig"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gig not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.get(id=request.data["user"])
@@ -1285,6 +1326,15 @@ class ContactUpdateAPIView(CreateAPIView):
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
+
+        if not User.objects.filter(id=request.data["user"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if not Gigs.objects.filter(id=request.data["gig"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gig not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
         type = request.data["type"]
@@ -1360,8 +1410,7 @@ class ContactDeleteAPIView(DestroyAPIView):
         contact.delete()
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
-                              "message": "Contact deleted",
-                              "result": serializer.data},
+                              "message": "Contact deleted"},
                         status=status.HTTP_200_OK)
 
 
@@ -1379,7 +1428,13 @@ class GuestListCreateAPIView(CreateAPIView):
             return Response(data={"status": status.HTTP_400_BAD_REQUEST,
                                   "error": serializer.errors, },
                             status=status.HTTP_400_BAD_REQUEST)
+        if not User.objects.filter(id=request.data["user"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
+        if not Gigs.objects.filter(id=request.data["gig"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gig not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
         guestlist_detail = request.data["guestlist_detail"]
@@ -1419,7 +1474,13 @@ class GuestListUpdateAPIView(CreateAPIView):
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
+        if not User.objects.filter(id=request.data["user"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
+        if not Gigs.objects.filter(id=request.data["gig"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gig not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
         guestlist_detail = request.data["guestlist_detail"]
@@ -1487,8 +1548,7 @@ class GuestListDeleteAPIView(DestroyAPIView):
         guestl.delete()
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
-                              "message": "Guestlist deleted",
-                              "result": serializer.data},
+                              "message": "Guestlist deleted"},
                         status=status.HTTP_200_OK)
 
 
@@ -1506,7 +1566,17 @@ class SetTimeCreateAPIView(CreateAPIView):
             return Response(data={"status": status.HTTP_400_BAD_REQUEST,
                                   "error": serializer.errors, },
                             status=status.HTTP_400_BAD_REQUEST)
+        if not User.objects.filter(id=request.data["user"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
+        if not Gigs.objects.filter(id=request.data["gig"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gig not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if not Venue.objects.filter(id=request.data["venue"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Venue not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
         venue = Venue.objects.get(id=request.data["venue"])
@@ -1544,7 +1614,16 @@ class SetTimeUpdateAPIView(CreateAPIView):
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
+        if not User.objects.filter(id=request.data["user"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
+        if not Gigs.objects.filter(id=request.data["gig"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gig not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if not Venue.objects.filter(id=request.data["venue"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Venue not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
         venue = Venue.objects.get(id=request.data["venue"])
@@ -1615,8 +1694,7 @@ class SetTimeDeleteAPIView(DestroyAPIView):
         settime.delete()
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
-                              "message": "Settime deleted",
-                              "result": serializer.data},
+                              "message": "Settime deleted"},
                         status=status.HTTP_200_OK)
 
 
@@ -1633,7 +1711,16 @@ class DocumentCreateAPIView(CreateAPIView):
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
+        if not User.objects.filter(id=request.data["user"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
+        if not Gigs.objects.filter(id=request.data["gig"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gig not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if not FlightBook.objects.filter(id=request.data["flight"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Flight not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
         flight = FlightBook.objects.get(id=request.data["flight"])
@@ -1686,6 +1773,16 @@ class DocumentUpdateAPIView(CreateAPIView):
         serializer = self.get_serializer(data=request.POST)
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if not User.objects.filter(id=request.data["user"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if not Gigs.objects.filter(id=request.data["gig"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gig not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if not FlightBook.objects.filter(id=request.data["flight"]):
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Flight not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
@@ -1774,20 +1871,10 @@ class DocumentDeleteAPIView(DestroyAPIView):
         passes.delete()
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
-                              "message": "Passes deleted",
-                              "result": serializer.data},
+                              "message": "Passes deleted"},
                         status=status.HTTP_200_OK)
 
 
-# class Logout(GenericAPIView):
-#     # serializer_class =LogoutSerializer
-#     def post(self,request,*args,**keargs):
-#         auth = get_authorization_header(request).split()
-#         print(auth)
-#         auth.pop()
-#         # print(auth,"/////////////////////")
-#         # .remove(auth)
-#         return Response("logout ")
 
 
 class AllDataAPIView(GenericAPIView):
