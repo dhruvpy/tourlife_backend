@@ -31,7 +31,8 @@ class Gigs(models.Model):
     stage=models.CharField(max_length=200,null=True,blank=True)
     visa=models.CharField(max_length=200,null=True,blank=True)
     Equipment = models.BooleanField(default=False)
-    date=models.DateTimeField(null=True,blank=True)
+    start_date=models.DateTimeField(null=True,blank=True)
+    end_date=models.DateTimeField(null=True,blank=True)
     sound_check_time = models.TimeField(null=True,blank=True)
 
     # def save(self, *args, **kwargs):

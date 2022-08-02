@@ -355,12 +355,13 @@ class GigsCreateAPIView(CreateAPIView):
         stage = request.data["stage"]
         visa = request.data["visa"]
         Equipment = request.data["Equipment"]
-        date = request.data["date"]
+        start_date = request.data["start_date"]
+        end_date = request.data["end_date"]
         sound_check_time = request.data["sound_check_time"]
         # print(user,'=-=-=-=-=-=-=-=--=-=-=-=-=')
         # print(k)
         gigs = Gigs.objects.create(title=title, descriptions=descriptions,
-                                   profile_pic=profile_pic, cover_image=cover_image, location=location, show=show, stage=stage, visa=visa, Equipment=Equipment, sound_check_time=sound_check_time, date=date)
+                                   profile_pic=profile_pic, cover_image=cover_image, location=location, show=show, stage=stage, visa=visa, Equipment=Equipment, sound_check_time=sound_check_time, start_date=start_date, end_date=end_date)
         gigs.user.set(user)
         gigs.save()
         for i in user:
@@ -377,7 +378,8 @@ class GigsCreateAPIView(CreateAPIView):
             "stage": gigs.stage,
             "visa": gigs.visa,
             "Equipment": gigs.Equipment,
-            "date": str(gigs.date),
+            "start_date" : gigs.start_date,
+            "end_date" : gigs.end_date,
             "sound_check_time": gigs.sound_check_time
         }
         return Response(data={"status": status.HTTP_200_OK,

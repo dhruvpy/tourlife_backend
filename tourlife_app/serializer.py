@@ -35,17 +35,17 @@ class CreateGigsSerializer(serializers.ModelSerializer):
     descriptions=serializers.CharField(required=True)
     profile_pic=serializers.CharField(required=True)
     cover_image=serializers.CharField(required=True)
-    date=serializers.DateTimeField(required=True)
+    start_date=serializers.DateTimeField(required=True)
+    end_date=serializers.DateTimeField(required=True)
     location = serializers.CharField(required=True)
     show = serializers.CharField(required=True)
     stage = serializers.CharField(required=True)
     visa=serializers.CharField(required=True)
     Equipment =serializers.CharField(required=True)
-    date=serializers.CharField(required=True)
     sound_check_time = serializers.CharField(required=True)
     class Meta:
         model=Gigs
-        fields=["user","title","descriptions","profile_pic","cover_image","date","location","show","stage","visa","Equipment","date","sound_check_time"]
+        fields=["user","title","descriptions","profile_pic","cover_image","start_date","end_date","location","show","stage","visa","Equipment","sound_check_time"]
         # fields="__all__"
 
 class ListGigSerializer(serializers.ModelSerializer):
