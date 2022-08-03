@@ -37,8 +37,8 @@ class Gigs(models.Model):
     # def save(self, *args, **kwargs):
     #     print(self,'--------------')
 
-    def __str__ (self):
-        return f"{self.title}"
+    # def __str__ (self):
+    #     return f"{self.id}"
 
 class GigMaster(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)

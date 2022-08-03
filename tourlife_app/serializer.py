@@ -45,21 +45,34 @@ class CreateGigsSerializer(serializers.ModelSerializer):
         # fields="__all__"
 
 class ListGigSerializer(serializers.ModelSerializer):
+
+    # user_id= serializers.ReadOnlyField(source='user.id')
+    # user_name= serializers.ReadOnlyField(source='user.username')
     class Meta:
         model= Gigs
-        fields= "__all__"
+        fields=["id","user","title","descriptions","profile_pic","cover_image","start_date","end_date","location","show","stage","visa","Equipment","sound_check_time"]
 
 class FlightSerializer(serializers.ModelSerializer):
+    user_id= serializers.ReadOnlyField(source='user.id')
+    user_name= serializers.ReadOnlyField(source='user.username')
+    gig_id= serializers.ReadOnlyField(source='gig.id')
+    gig_title= serializers.ReadOnlyField(source='gig.title')
+
     class Meta:
         model=FlightBook
-        # fields=["user","title","descriptions","profile_pic","cover_image","date"]
-        fields="__all__"
+        fields=["id","user_id","user_name","gig_id","gig_title","depart_location","depart_lat_long","depart_time","depart_terminal","depart_gate","arrival_location",
+        "arrival_lat_long","arrival_time","arrival_terminal","arrival_gate","airlines","flight_number","flight_class","wather"]
 
 class CabSerializer(serializers.ModelSerializer):
+    user_id= serializers.ReadOnlyField(source='user.id')
+    user_name= serializers.ReadOnlyField(source='user.username')
+    gig_id= serializers.ReadOnlyField(source='gig.id')
+    gig_title= serializers.ReadOnlyField(source='gig.title')
     class Meta:
         model=CabBook
-        # fields=["user","title","descriptions","profile_pic","cover_image","date"]
-        fields="__all__"
+        fields=["id","user_id","user_name","gig_id","gig_title","depart_location","depart_lat_long","depart_time","arrival_location","arrival_lat_long","arrival_time"
+        ,"driver_name","driver_number","wather"]
+        
 
 class UserSerializer(serializers.ModelSerializer):
     id=serializers.CharField(required=True)
@@ -118,6 +131,7 @@ class CabBookSerializer(serializers.ModelSerializer):
 class VenueSerializer(serializers.ModelSerializer):
     user=serializers.IntegerField(required=True)
     gig=serializers.IntegerField(required=True)
+    venue_name=serializers.CharField(required=True)
     address=serializers.CharField(required=True)
     direction=serializers.CharField(required=True)
     website=serializers.CharField(required=True)
@@ -134,17 +148,18 @@ class VenueSerializer(serializers.ModelSerializer):
     catring_detail=serializers.CharField(required=True)
     class Meta:
         model=Venue
-        fields=["user","gig","address","direction","website","number","indoor","covered","capacity","wather","credential_collection",
+        fields=["user","gig","venue_name","address","direction","website","number","indoor","covered","capacity","wather","credential_collection",
         "dressing_room","hospitality","hospitality_detail","catring","catring_detail"]
 
 class VenueListSerializer(serializers.ModelSerializer):
-    gig = serializers.SlugRelatedField(
-        slug_field='title',
-        queryset=Gigs.objects.all()
-    )
+    
+    user_id= serializers.ReadOnlyField(source='user.id')
+    user_name= serializers.ReadOnlyField(source='user.username')
+    gig_id= serializers.ReadOnlyField(source='gig.id')
+    gig_title= serializers.ReadOnlyField(source='gig.title')
     class Meta:
         model=Venue
-        fields=["user","gig","address","direction","website","number","indoor","covered","capacity","wather","credential_collection",
+        fields=["id","user_id","user_name","gig_id","gig_title","venue_name","address","direction","website","number","indoor","covered","capacity","wather","credential_collection",
         "dressing_room","hospitality","hospitality_detail","catring","catring_detail"]
 
 class HotelSerializer(serializers.ModelSerializer):
@@ -162,9 +177,14 @@ class HotelSerializer(serializers.ModelSerializer):
         fields=["user","gig","hotel_name","address","direction","website","number","wifi_paid_for","room_buyout"]
 
 class HotelListSerializer(serializers.ModelSerializer):
+    user_id= serializers.ReadOnlyField(source='user.id')
+    user_name= serializers.ReadOnlyField(source='user.username')
+    gig_id= serializers.ReadOnlyField(source='gig.id')
+    gig_title= serializers.ReadOnlyField(source='gig.title')
     class Meta:
         model=Hotel
-        fields='__all__'
+        fields=["id","user_id","user_name","gig_id","gig_title","hotel_name","address","direction","website","number","wifi_paid_for","room_buyout"]
+
 
 class ContactSerializer(serializers.ModelSerializer):
     user=serializers.IntegerField(required=True)
@@ -179,9 +199,14 @@ class ContactSerializer(serializers.ModelSerializer):
         fields=["user","gig","type","name","number","email","travelling_party"]
 
 class ContactListSerializer(serializers.ModelSerializer):
+    user_id= serializers.ReadOnlyField(source='user.id')
+    user_name= serializers.ReadOnlyField(source='user.username')
+    gig_id= serializers.ReadOnlyField(source='gig.id')
+    gig_title= serializers.ReadOnlyField(source='gig.title')
     class Meta:
         model=Contacts
-        fields='__all__'
+        fields=["id","user_id","user_name","gig_id","gig_title","type","name","number","email","travelling_party"]
+
 class GuestListSerializer(serializers.ModelSerializer):
     user=serializers.IntegerField(required=True)
     gig=serializers.IntegerField(required=True)
@@ -192,9 +217,14 @@ class GuestListSerializer(serializers.ModelSerializer):
         fields=["user","gig","guestlist_detail","guestlist"]
 
 class GuestSerializer(serializers.ModelSerializer):
+    user_id= serializers.ReadOnlyField(source='user.id')
+    user_name= serializers.ReadOnlyField(source='user.username')
+    gig_id= serializers.ReadOnlyField(source='gig.id')
+    gig_title= serializers.ReadOnlyField(source='gig.title')
     class Meta:
         model=GuestList
-        fields='__all__'
+        fields=["id","user_id","user_name","gig_id","gig_title","guestlist_detail","guestlist"]
+
 class SetTimeSerialiazer(serializers.ModelSerializer):
     user=serializers.IntegerField(required=True)
     gig=serializers.IntegerField(required=True)
@@ -206,9 +236,16 @@ class SetTimeSerialiazer(serializers.ModelSerializer):
         fields= ["user","gig","venue","depart_time","arrival_time"]
 
 class SetTimeListSerializer(serializers.ModelSerializer):
+    user_id= serializers.ReadOnlyField(source='user.id')
+    user_name= serializers.ReadOnlyField(source='user.username')
+    gig_id= serializers.ReadOnlyField(source='gig.id')
+    gig_title= serializers.ReadOnlyField(source='gig.title')
+    venue_id= serializers.ReadOnlyField(source='venue.id')
+    venue_name= serializers.ReadOnlyField(source='venue.venue_name')
     class Meta:
         model=SetTime
-        fields='__all__'
+        fields= ["id","user_id","user_name","gig_id","gig_title","venue_id","venue_name","depart_time","arrival_time"]
+
 
 class DocumentSerializer(serializers.ModelSerializer):
     user=serializers.IntegerField(required=True)
@@ -221,9 +258,16 @@ class DocumentSerializer(serializers.ModelSerializer):
         fields=["user","gig","flight","type","document"]
 
 class DocumentsListSerializer(serializers.ModelSerializer):
+    user_id= serializers.ReadOnlyField(source='user.id')
+    user_name= serializers.ReadOnlyField(source='user.username')
+    gig_id= serializers.ReadOnlyField(source='gig.id')
+    gig_title= serializers.ReadOnlyField(source='gig.title')
+    flight_id= serializers.ReadOnlyField(source='flight.id')
+    flight_name= serializers.ReadOnlyField(source='flight.airlines')
     class Meta:
         model=Document
-        fields='__all__'
+        fields=["id","user_id","user_name","gig_id","gig_title","flight_id","flight_name","type","document"]
+
 class ForgotpasswordSerializer(serializers.ModelSerializer):
     email=serializers.EmailField(required=True)
     class Meta:

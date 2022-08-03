@@ -345,8 +345,8 @@ class GigsCreateAPIView(CreateAPIView):
         sound_check_time = request.data["sound_check_time"]
         # print(user,'=-=-=-=-=-=-=-=--=-=-=-=-=')
         # print(k)
-        gigs = Gigs.objects.create(title=title, descriptions=descriptions,
-                                   profile_pic=profile_pic, cover_image=cover_image, location=location, show=show, stage=stage, visa=visa, Equipment=Equipment, sound_check_time=sound_check_time, start_date=start_date, end_date=end_date)
+        gigs = Gigs.objects.create(title=title, descriptions=descriptions,profile_pic=profile_pic, cover_image=cover_image, 
+        location=location, show=show, stage=stage, visa=visa, Equipment=Equipment, sound_check_time=sound_check_time, start_date=start_date, end_date=end_date)
         gigs.user.set(user)
         gigs.save()
         for i in user:
@@ -453,12 +453,14 @@ class GigsListAPIView(ListAPIView):
 
     serializer_class = ListGigSerializer
     queryset = Gigs.objects.all()
+    
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
         #                     status=status.HTTP_400_BAD_REQUEST)
         queryset = self.get_queryset()
+        # print(queryset.id)
         serializer = self.get_serializer(queryset, many=True)
         page = self.paginate_queryset(serializer.data)
 
@@ -920,6 +922,8 @@ class VenueCreateAPIView(CreateAPIView):
 
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
+        venue_name = request.data["venue_name"]
+
         address = request.data["address"]
         direction = request.data["direction"]
         website = request.data["website"]
@@ -935,7 +939,7 @@ class VenueCreateAPIView(CreateAPIView):
         catring = request.data["catring"]
         catring_detail = request.data["catring_detail"]
 
-        venue = Venue.objects.create(user=user, gig=gig, address=address, direction=direction, website=website, number=number,
+        venue = Venue.objects.create(user=user, gig=gig, venue_name=venue_name,address=address, direction=direction, website=website, number=number,
                                      indoor=indoor, covered=covered,
                                      capacity=capacity, credential_collection=credential_collection, dressing_room=dressing_room, hospitality=hospitality, hospitality_detail=hospitality_detail, catring=catring, catring_detail=catring_detail, wather=wather)
 
@@ -943,6 +947,7 @@ class VenueCreateAPIView(CreateAPIView):
             "user": str(venue.user),
             "gig": str(venue.gig),
             "id": venue.id,
+            "venue_name":venue.venue_name,
             "address": venue.address,
             "direction": venue.direction,
             "website": venue.website,
@@ -988,6 +993,7 @@ class VenueUpdateAPIView(CreateAPIView):
 
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
+        venue_name = request.data["venue_name"]
         address = request.data["address"]
         direction = request.data["direction"]
         website = request.data["website"]
@@ -1012,6 +1018,7 @@ class VenueUpdateAPIView(CreateAPIView):
         vanue = Venue.objects.get(id=id)
         vanue.user = user
         vanue.gig = gig
+        vanue.venue_name=venue_name
         vanue.address = address
         vanue.direction = direction
         vanue.website = website
@@ -1032,6 +1039,7 @@ class VenueUpdateAPIView(CreateAPIView):
             "id": vanue.id,
             "user": str(vanue.user),
             "gig": str(vanue.gig),
+            "venue_name":vanue.venue_name,
             "address": vanue.address,
             "direction": vanue.direction,
             "website": vanue.website,
@@ -1108,7 +1116,6 @@ class VenueDeleteAPIView(DestroyAPIView):
                               "message": "Venue deleted"},
                         status=status.HTTP_200_OK)
 
-
 class HotelCreateAPIView(CreateAPIView):
     permission_classes = [AllowAny]
 
@@ -1182,6 +1189,7 @@ class HotelUpdateAPIView(CreateAPIView):
         if not Gigs.objects.filter(id=request.data["gig"]):
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gig not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
+
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
         address = request.data["address"]
@@ -1721,11 +1729,14 @@ class DocumentCreateAPIView(CreateAPIView):
         if not FlightBook.objects.filter(id=request.data["flight"]):
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Flight not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
+
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
         flight = FlightBook.objects.get(id=request.data["flight"])
         type = request.data["type"]
-        document = request.FILES.get('document')
+        document = request.data["document"]
+
+        # document = request.FILES.get('document')
 
         session = boto3.session.Session()
         client = session.client('s3',
