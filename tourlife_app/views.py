@@ -936,12 +936,13 @@ class VenueCreateAPIView(CreateAPIView):
         dressing_room = request.data["dressing_room"]
         hospitality = request.data["hospitality"]
         hospitality_detail = request.data["hospitality_detail"]
+        hospitality_email = request.data["hospitality_email"]
         catring = request.data["catring"]
         catring_detail = request.data["catring_detail"]
 
         venue = Venue.objects.create(user=user, gig=gig, venue_name=venue_name,address=address, direction=direction, website=website, number=number,
-                                     indoor=indoor, covered=covered,
-                                     capacity=capacity, credential_collection=credential_collection, dressing_room=dressing_room, hospitality=hospitality, hospitality_detail=hospitality_detail, catring=catring, catring_detail=catring_detail, wather=wather)
+                                     indoor=indoor, covered=covered,capacity=capacity, credential_collection=credential_collection, dressing_room=dressing_room, 
+                                     hospitality=hospitality, hospitality_detail=hospitality_detail,hospitality_email=hospitality_email ,catring=catring, catring_detail=catring_detail, wather=wather)
 
         response_data = {
             "user": str(venue.user),
@@ -959,6 +960,7 @@ class VenueCreateAPIView(CreateAPIView):
             "dressing_room": venue.dressing_room,
             "hospitality": venue.hospitality,
             "hospitality_detail": venue.hospitality_detail,
+            "hospitality_email": venue.hospitality_email,
             "catring": venue.catring,
             "catring_detail": venue.catring_detail,
             "wather": venue.wather,
@@ -1006,6 +1008,7 @@ class VenueUpdateAPIView(CreateAPIView):
         dressing_room = request.data["dressing_room"]
         hospitality = request.data["hospitality"]
         hospitality_detail = request.data["hospitality_detail"]
+        hospitality_email = request.data["hospitality_email"]
         catring = request.data["catring"]
         catring_detail = request.data["catring_detail"]
 
@@ -1031,6 +1034,7 @@ class VenueUpdateAPIView(CreateAPIView):
         vanue.dressing_room = dressing_room
         vanue.hospitality = hospitality
         vanue.hospitality_detail = hospitality_detail
+        vanue.hospitality_email = hospitality_email
         vanue.catring = catring
         vanue.catring_detail = catring_detail
         vanue.save()
@@ -1052,6 +1056,7 @@ class VenueUpdateAPIView(CreateAPIView):
             "dressing_room": vanue.dressing_room,
             "hospitality": vanue.hospitality,
             "hospitality_detail": vanue.hospitality_detail,
+            "hospitality_email": vanue.hospitality_email,
             "catring": vanue.catring,
             "catring_detail": vanue.catring_detail
         }

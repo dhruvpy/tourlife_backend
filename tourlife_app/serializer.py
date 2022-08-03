@@ -144,12 +144,14 @@ class VenueSerializer(serializers.ModelSerializer):
     dressing_room=serializers.CharField(required=True)
     hospitality=serializers.BooleanField(required=True)
     hospitality_detail=serializers.CharField(required=True)
+    hospitality_email=serializers.CharField(required=True)
     catring=serializers.BooleanField(required=True)
     catring_detail=serializers.CharField(required=True)
+    
     class Meta:
         model=Venue
         fields=["user","gig","venue_name","address","direction","website","number","indoor","covered","capacity","wather","credential_collection",
-        "dressing_room","hospitality","hospitality_detail","catring","catring_detail"]
+        "dressing_room","hospitality","hospitality_detail","hospitality_email","catring","catring_detail"]
 
 class VenueListSerializer(serializers.ModelSerializer):
     
@@ -160,7 +162,7 @@ class VenueListSerializer(serializers.ModelSerializer):
     class Meta:
         model=Venue
         fields=["id","user_id","user_name","gig_id","gig_title","venue_name","address","direction","website","number","indoor","covered","capacity","wather","credential_collection",
-        "dressing_room","hospitality","hospitality_detail","catring","catring_detail"]
+        "dressing_room","hospitality","hospitality_detail",'hospitality_email',"catring","catring_detail"]
 
 class HotelSerializer(serializers.ModelSerializer):
     user=serializers.IntegerField(required=True)

@@ -1,4 +1,3 @@
-from django.contrib import admin
 from django.urls import path
 from tourlife_app import views
 
