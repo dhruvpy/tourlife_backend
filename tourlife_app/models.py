@@ -37,8 +37,8 @@ class Gigs(models.Model):
     # def save(self, *args, **kwargs):
     #     print(self,'--------------')
 
-    # def __str__ (self):
-    #     return f"{self.id}"
+    def __str__ (self):
+        return f"{self.title}"
 
 class GigMaster(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -104,6 +104,9 @@ class Venue(models.Model):
     hospitality_email=models.CharField(max_length=100,null=True,blank=True)
     catring=models.BooleanField(default=False)
     catring_detail=models.CharField(max_length=100,null=True,blank=True)
+
+    def __str__ (self):
+        return f"{self.venue_name}"
 class Hotel(models.Model):
     user = models.ForeignKey(User,related_name='h_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='h_gig',on_delete=models.CASCADE)
