@@ -18,6 +18,7 @@ class ListUserSerializers(serializers.ModelSerializer):
     class Meta:
         model= User
         fields= "__all__"
+        
 class LoginUserSerializers(serializers.ModelSerializer):
     email=serializers.EmailField(required=True)
     password=serializers.CharField(required=True)
@@ -44,10 +45,13 @@ class CreateGigsSerializer(serializers.ModelSerializer):
         fields=["user","title","descriptions","profile_pic","cover_image","start_date","end_date","location","show","stage","visa","Equipment","sound_check_time"]
         # fields="__all__"
 
+class UserS(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id','username']
 class ListGigSerializer(serializers.ModelSerializer):
 
-    # user_id= serializers.ReadOnlyField(source='user.id')
-    # user_name= serializers.ReadOnlyField(source='user.username')
+    user = UserS(read_only=True,many=True)
     class Meta:
         model= Gigs
         fields=["id","user","title","descriptions","profile_pic","cover_image","start_date","end_date","location","show","stage","visa","Equipment","sound_check_time"]
