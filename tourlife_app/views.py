@@ -260,7 +260,7 @@ class ForgotPasswordAPIView(GenericAPIView):
             message = 'your otp is {}'.format(otp)
             email_from = settings.EMAIL_HOST_USER
             recipient_list = [user.email]
-            # send_mail(subject, message, email_from, recipient_list)
+            send_mail(subject, message, email_from, recipient_list)
 
             Emailotp.objects.create(email=email, otp=otp)
 
