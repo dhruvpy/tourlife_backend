@@ -245,11 +245,11 @@ class ForgotPasswordAPIView(GenericAPIView):
         serializer = self.get_serializer(data=request.POST)
 
         if not serializer.is_valid():
-            return Response(data={'status': status.HTTP_400_BAD_REQUEST, 'error': True, 'error_message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'status': status.HTTP_400_BAD_REQUEST, 'error': True, 'message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
         email = request.data['email']
         if not User.objects.filter(email=email).exists():
-            return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'error_message': "email is not registered", }, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'message': "email is not registered", }, status=status.HTTP_400_BAD_REQUEST)
 
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
@@ -277,20 +277,20 @@ class OTPCheckAPIView(GenericAPIView):
         print(email)
 
         if otp is None:
-            return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'error_message': 'please enter otp'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'message': 'please enter otp'}, status=status.HTTP_400_BAD_REQUEST)
 
         if email is None:
-            return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'error_message': 'please enter email address'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'message': 'please enter email address'}, status=status.HTTP_400_BAD_REQUEST)
         emailotp = Emailotp.objects.filter(email=email).last()
         print(emailotp.otp,"''''''''''''''''''''''''''")
         print(emailotp.email,"''''''''''''''''''''''''''")
 
 
         if not emailotp.otp:
-            return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'error_message': 'please enter valid email or otp'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'message': 'please enter valid email or otp'}, status=status.HTTP_400_BAD_REQUEST)
 
         if not (emailotp.email == email and emailotp.otp == otp):
-            return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'error_message': 'otp is expire or not valid this mail'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'message': 'otp is expire or not valid this mail'}, status=status.HTTP_400_BAD_REQUEST)
 
         emailotp.otp_check = True
         emailotp.save()
@@ -309,7 +309,10 @@ class SetNewPasswordAPIView(GenericAPIView):
 
         email = request.data['email']
         new_password = request.data['new_password']
+
         user = User.objects.filter(email=email).last()
+        print(user)
+
         emailotp_obj = Emailotp.objects.filter(email=user.email).last()
         if not user:
             return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'error_message': 'please enter valid email'}, status=status.HTTP_400_BAD_REQUEST)
