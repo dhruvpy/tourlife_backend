@@ -274,6 +274,7 @@ class OTPCheckAPIView(GenericAPIView):
         otp = request.data.get('otp')
         print(otp)
         email = request.data.get('email')
+        print(email)
 
         if otp is None:
             return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'error_message': 'please enter otp'}, status=status.HTTP_400_BAD_REQUEST)
@@ -281,11 +282,14 @@ class OTPCheckAPIView(GenericAPIView):
         if email is None:
             return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'error_message': 'please enter email address'}, status=status.HTTP_400_BAD_REQUEST)
         emailotp = Emailotp.objects.filter(email=email).last()
+        print(emailotp.otp,"''''''''''''''''''''''''''")
+        print(emailotp.email,"''''''''''''''''''''''''''")
 
-        if not emailotp:
+
+        if not emailotp.otp:
             return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'error_message': 'please enter valid email or otp'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not emailotp.email == email and emailotp.otp == otp:
+        if not (emailotp.email == email and emailotp.otp == otp):
             return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'error_message': 'otp is expire or not valid this mail'}, status=status.HTTP_400_BAD_REQUEST)
 
         emailotp.otp_check = True
@@ -343,6 +347,8 @@ class GigsCreateAPIView(CreateAPIView):
         start_date = request.data["start_date"]
         end_date = request.data["end_date"]
         sound_check_time = request.data["sound_check_time"]
+
+        
         # print(user,'=-=-=-=-=-=-=-=--=-=-=-=-=')
         # print(k)
         gigs = Gigs.objects.create(title=title, descriptions=descriptions,profile_pic=profile_pic, cover_image=cover_image, 
