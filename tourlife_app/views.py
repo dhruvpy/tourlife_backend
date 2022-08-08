@@ -305,19 +305,20 @@ class SetNewPasswordAPIView(GenericAPIView):
         serializer = self.get_serializer(data=request.POST)
 
         if not serializer.is_valid():
-            return Response(data={'status': status.HTTP_400_BAD_REQUEST, 'error': True, 'error_message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'status': status.HTTP_400_BAD_REQUEST, 'error': True, 'message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
         email = request.data['email']
+        print(email)
         new_password = request.data['new_password']
 
         user = User.objects.filter(email=email).last()
-        print(user)
+        print(user,"////////////////////")
 
-        emailotp_obj = Emailotp.objects.filter(email=user.email).last()
         if not user:
-            return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'error_message': 'please enter valid email'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'message': 'please enter valid email'}, status=status.HTTP_400_BAD_REQUEST)
         user.password = new_password
         user.save()
+        emailotp_obj = Emailotp.objects.filter(email=user.email).last()
         emailotp_obj.delete()
         return Response(data={'status': status.HTTP_200_OK, 'error': False, 'message': 'Successfully set new password'}, status=status.HTTP_200_OK)
 
@@ -1809,6 +1810,7 @@ class DocumentUpdateAPIView(CreateAPIView):
         if not FlightBook.objects.filter(id=request.data["flight"]):
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Flight not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
+                            
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
         flight = FlightBook.objects.get(id=request.data["flight"])
@@ -1824,10 +1826,12 @@ class DocumentUpdateAPIView(CreateAPIView):
 
         client.put_object(Bucket='Music',
                           Key=user.first_name+'.png',
-                          Body=document,
+                        #   Body=document,
+                          Body=bytes(json.dumps(document).encode()),
                           ACL='public-read-write',
                           ContentType='image/png',
                           )
+                          
         url = client.generate_presigned_url(ClientMethod='get_object',
                                             Params={'Bucket': 'Music',
                                                     'Key': user.first_name+'.png'}, ExpiresIn=300, HttpMethod=None)
