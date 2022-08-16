@@ -2093,13 +2093,16 @@ class allListView(ListAPIView):
         if request.method == 'GET':
             
             users = User.objects.all()
-            gigs = Gigs.objects.filter(start_date__gte = datetime.datetime.now())
-            gig_master = GigMaster.objects.filter(gig__start_date__gte = datetime.datetime.now())
+            # gigs = Gigs.objects.filter(start_date__gte = datetime.datetime.now())
+            gigs = Gigs.objects.all()
+            # gig_master = GigMaster.objects.filter(gig__start_date__gte = datetime.datetime.now())
+            gig_master = GigMaster.objects.all()
             flights = FlightBook.objects.all()
             cabs = CabBook.objects.all()
             hotels = Hotel.objects.all()
             venues = Venue.objects.all()
-            settimes = SetTime.objects.filter(gig__start_date__gte = datetime.datetime.now())
+            # settimes = SetTime.objects.filter(gig__start_date__gte = datetime.datetime.now())
+            settimes = SetTime.objects.all()
             contacts = Contacts.objects.all()
             guestlist = GuestList.objects.all()
             documents = Document.objects.all()
@@ -2124,8 +2127,10 @@ class allListView(ListAPIView):
             final = []
             users = User.objects.all()
 
-            flights = FlightBook.objects.filter(gig__start_date__gte = datetime.datetime.now())
-            cabs = CabBook.objects.filter(gig__start_date__gte = datetime.datetime.now())
+            # flights = FlightBook.objects.filter(gig__start_date__gte = datetime.datetime.now())
+            # cabs = CabBook.objects.filter(gig__start_date__gte = datetime.datetime.now())
+            flights = FlightBook.objects.all()
+            cabs = CabBook.objects.all()
             for flight in flights:
                 final.append({
                     "type": "flight",
