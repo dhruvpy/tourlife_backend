@@ -2099,7 +2099,7 @@ class allListView(ListAPIView):
             cabs = CabBook.objects.all()
             hotels = Hotel.objects.all()
             venues = Venue.objects.all()
-            settimes = SetTime.objects.all()
+            settimes = SetTime.objects.filter(gig__start_date__gte = datetime.datetime.now())
             contacts = Contacts.objects.all()
             guestlist = GuestList.objects.all()
             documents = Document.objects.all()
