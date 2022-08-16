@@ -14,6 +14,7 @@ from django.core.mail import send_mail
 from .pagination import CustomPagination
 from rest_framework.pagination import PageNumberPagination
 import json
+import datetime
 
 class UserCreateAPIView(GenericAPIView):
     permission_classes = [AllowAny]
@@ -2092,8 +2093,9 @@ class allListView(ListAPIView):
         if request.method == 'GET':
             
             users = User.objects.all()
-            gigs = Gigs.objects.all()
-            gig_master = GigMaster.objects.all()
+            gigs = Gigs.objects.filter(start_date__gte = datetime.datetime.now())
+            print(gigs)
+            gig_master = GigMaster.objects.filter(gig__start_date__gte = datetime.datetime.now())
             flights = FlightBook.objects.all()
             cabs = CabBook.objects.all()
             hotels = Hotel.objects.all()
@@ -2186,6 +2188,7 @@ class allListView(ListAPIView):
                     "last_name": user.last_name,
                     "is_manager": user.is_manager
                 })
+                print(gig.gig.start_date<=datetime.datetime.now())
                 gig_response.append({
                     "id": int(gig.gig.id),
                     "title": gig.gig.title,

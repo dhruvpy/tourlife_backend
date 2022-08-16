@@ -42,7 +42,7 @@ class Gigs(models.Model):
 
 class GigMaster(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
-    gig = models.ForeignKey(Gigs,on_delete=models.CASCADE)
+    gig = models.ForeignKey(Gigs,related_name='gig_master',on_delete=models.CASCADE)
 
     def __str__ (self):
         return f"{self.gig.title}"
