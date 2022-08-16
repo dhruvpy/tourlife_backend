@@ -2094,7 +2094,6 @@ class allListView(ListAPIView):
             
             users = User.objects.all()
             gigs = Gigs.objects.filter(start_date__gte = datetime.datetime.now())
-            print(gigs)
             gig_master = GigMaster.objects.filter(gig__start_date__gte = datetime.datetime.now())
             flights = FlightBook.objects.all()
             cabs = CabBook.objects.all()
@@ -2188,7 +2187,6 @@ class allListView(ListAPIView):
                     "last_name": user.last_name,
                     "is_manager": user.is_manager
                 })
-                print(gig.gig.start_date<=datetime.datetime.now())
                 gig_response.append({
                     "id": int(gig.gig.id),
                     "title": gig.gig.title,
@@ -2229,7 +2227,6 @@ class allListView(ListAPIView):
 
             #             print(date, str(i["depart_time"]))
             #             print('--------------')
-            print(f, '=============')
             users_list = []
             for user in users:
                 users_list.append({
