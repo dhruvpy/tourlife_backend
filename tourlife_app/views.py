@@ -2124,8 +2124,8 @@ class allListView(ListAPIView):
             final = []
             users = User.objects.all()
 
-            flights = FlightBook.objects.filter(gig__depart_time__gte = datetime.datetime.now())
-            cabs = CabBook.objects.filter(gig__depart_time__gte = datetime.datetime.now())
+            flights = FlightBook.objects.filter(gig__start_date__gte = datetime.datetime.now())
+            cabs = CabBook.objects.filter(gig__start_date__gte = datetime.datetime.now())
             for flight in flights:
                 final.append({
                     "type": "flight",
