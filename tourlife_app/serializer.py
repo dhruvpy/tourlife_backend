@@ -7,7 +7,7 @@ class CreateUserSerializers(serializers.ModelSerializer):
     password=serializers.CharField(required=True)
     email=serializers.EmailField(required=True)
     mobile_no=serializers.IntegerField(required=True)
-    profile_image=serializers.CharField(required=True)
+    profile_image=serializers.FileField(required=False)
     is_manager=serializers.BooleanField(required=True)
     is_artist=serializers.BooleanField(required=True)
     class Meta:
@@ -258,7 +258,7 @@ class DocumentSerializer(serializers.ModelSerializer):
     gig=serializers.IntegerField(required=True)
     flight=serializers.IntegerField(required=True)
     type=serializers.CharField(required=True)
-    document=serializers.CharField(required=True)
+    document=serializers.FileField(required=False)
     class Meta:
         model=Document
         fields=["user","gig","flight","type","document"]

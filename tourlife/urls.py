@@ -18,10 +18,27 @@ from django.urls import path,include
 from django.conf import settings
 
 from django.conf.urls.static import static
-
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+from rest_framework import permissions
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Jaseci API",
+        default_version='v1',
+        description="Welcome to the world of Jaseci",
+        terms_of_service="https://www.jaseci.org",
+        contact=openapi.Contact(email="jason@jaseci.org"),
+        license=openapi.License(name="Awesome IP"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('tourlife_app.urls'))
+    path('',include('tourlife_app.urls')),
+    path('doc/', schema_view.with_ui('swagger', cache_timeout=0),
+         name='schema-swagger-ui'), 
+    # path('user/', include('user_api.urls')),
 ]
 
 if settings.DEBUG:

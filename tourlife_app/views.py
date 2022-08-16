@@ -33,12 +33,35 @@ class UserCreateAPIView(GenericAPIView):
         email = request.data["email"]
         password = request.data["password"]
         mobile_no = request.data["mobile_no"]
-        profile_image = request.data["profile_image"]
+        profile_image = request.FILES.get('profile_image')
+        # profile_image2 = request.FILES.get('profile_image2')
+        print(profile_image,"////////////////////")
+
+        session = boto3.session.Session()
+        client = session.client('s3',
+                                region_name='fra1',
+                                endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
+                                aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
+                                aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
+        # put_object(Key=s3_path, Body=hostzone2)
+        # profile_image=json.dumps(profile_image, ensure_ascii=False)
+
+        client.put_object(Bucket='Music',
+                          Key=first_name+'.png',
+                        #   Body=bytes(json.dumps(profile_image).encode()),
+                        Body= profile_image,
+                        #   ACL='public-read-write',
+                        #   ContentType='image/png',
+                          )
+
+        url = client.generate_presigned_url(ClientMethod='get_object',
+                                            Params={'Bucket': 'Music',
+                                                    'Key': first_name+'.png'}, ExpiresIn=300, HttpMethod=None)
 
         if User.objects.filter(username=username).exists() | User.objects.filter(email=email).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "This email or username is already exists"}, status=status.HTTP_400_BAD_REQUEST)
         user = User.objects.create(username=username, first_name=first_name, last_name=last_name, password=password, email=email, mobile_no=mobile_no,
-                                   profile_image=profile_image)
+                                   profile_image=url)
         response_data = {
             "id": user.id,
             "username": user.username,
@@ -47,7 +70,8 @@ class UserCreateAPIView(GenericAPIView):
             "password": user.password,
             "email": user.email,
             "mobile_no": str(user.mobile_no),
-            "profile_image": str(user.profile_image),
+            "profile_image": str(url),
+            # "profile_image2":url
         }
         return Response(data={"status": status.HTTP_200_OK,
                               "message": 'add new user',
@@ -72,7 +96,31 @@ class UserUpdateAPIView(CreateAPIView):
         password = request.data["password"]
         email = request.data["email"]
         mobile_no = request.data["mobile_no"]
-        profile_image = request.data["profile_image"]
+        profile_image = request.FILES.get('profile_image')
+        # profile_image2 = request.FILES.get('profile_image2')
+        print(profile_image,"////////////////////")
+
+        session = boto3.session.Session()
+        client = session.client('s3',
+                                region_name='fra1',
+                                endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
+                                aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
+                                aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
+        # put_object(Key=s3_path, Body=hostzone2)
+        # profile_image=json.dumps(profile_image, ensure_ascii=False)
+
+        client.put_object(Bucket='Music',
+                          Key=first_name+'.png',
+                        #   Body=bytes(json.dumps(profile_image).encode()),
+                        Body= profile_image,
+                        #   ACL='public-read-write',
+                        #   ContentType='image/png',
+                          )
+
+        url = client.generate_presigned_url(ClientMethod='get_object',
+                                            Params={'Bucket': 'Music',
+                                                    'Key': first_name+'.png'}, ExpiresIn=300, HttpMethod=None)
+
 
         id = self.kwargs["pk"]
 
@@ -89,7 +137,7 @@ class UserUpdateAPIView(CreateAPIView):
         user.password = password
         user.email = email
         user.mobile_no = mobile_no
-        user.profile_image = profile_image
+        user.profile_image = url
         user.save()
 
         response_data = {
@@ -281,13 +329,14 @@ class OTPCheckAPIView(GenericAPIView):
 
         if email is None:
             return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'message': 'please enter email address'}, status=status.HTTP_400_BAD_REQUEST)
+        
         emailotp = Emailotp.objects.filter(email=email).last()
-        print(emailotp.otp,"''''''''''''''''''''''''''")
-        print(emailotp.email,"''''''''''''''''''''''''''")
+        # print(emailotp.otp,"''''''''''''''''''''''''''")
+        # print(emailotp.email,"''''''''''''''''''''''''''")
 
 
-        if not emailotp.otp:
-            return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'message': 'please enter valid email or otp'}, status=status.HTTP_400_BAD_REQUEST)
+        if not emailotp:
+            return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'message': 'please enter valid email'}, status=status.HTTP_400_BAD_REQUEST)
 
         if not (emailotp.email == email and emailotp.otp == otp):
             return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'message': 'otp is expire or not valid this mail'}, status=status.HTTP_400_BAD_REQUEST)
@@ -418,6 +467,7 @@ class GigsUpdateAPIView(CreateAPIView):
         if not Gigs.objects.filter(id=id).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gigs is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
+
         gigs = Gigs.objects.get(id=id)
         gigs.title = title
         gigs.descriptions = descriptions
@@ -462,15 +512,15 @@ class GigsListAPIView(ListAPIView):
     pagination_class = CustomPagination
 
     serializer_class = ListGigSerializer
-    queryset = Gigs.objects.all()
     
+    queryset = Gigs.objects.all()
+    # print(queryset)
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
         #                     status=status.HTTP_400_BAD_REQUEST)
         queryset = self.get_queryset()
-        # print(queryset.id)
         serializer = self.get_serializer(queryset, many=True)
         page = self.paginate_queryset(serializer.data)
 
@@ -1749,7 +1799,7 @@ class DocumentCreateAPIView(CreateAPIView):
         gig = Gigs.objects.get(id=request.data["gig"])
         flight = FlightBook.objects.get(id=request.data["flight"])
         type = request.data["type"]
-        document = request.data["document"]
+        document = request.FILES.get("document")
 
         # document = request.FILES.get('document')
 
@@ -1826,12 +1876,11 @@ class DocumentUpdateAPIView(CreateAPIView):
 
         client.put_object(Bucket='Music',
                           Key=user.first_name+'.png',
-                        #   Body=document,
                           Body=bytes(json.dumps(document).encode()),
                           ACL='public-read-write',
                           ContentType='image/png',
                           )
-                          
+
         url = client.generate_presigned_url(ClientMethod='get_object',
                                             Params={'Bucket': 'Music',
                                                     'Key': user.first_name+'.png'}, ExpiresIn=300, HttpMethod=None)
