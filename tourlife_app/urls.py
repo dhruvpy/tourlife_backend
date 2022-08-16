@@ -23,7 +23,7 @@ urlpatterns = [
      path('flightbook_update/<int:pk>',views.FlightBookUpdateAPIView.as_view(),name='flightbook_update'),
      path('flightbook_list',views.FlightBookListAPIView.as_view(),name='flightbook_list'),
      path('flightbook_delete/<int:pk>',views.FlightBookDeleteAPIView.as_view(),name='flightbook_delete'),
-     path('all_flight',views.GetallFlightAPIView.as_view(),name='all_flight'),
+     path('all_flight',views.GetallFlightAPIView.as_view(),name='all_flight'), 
      
      
      path('cabbook_create',views.CabBookCreateAPIView.as_view(),name='cabbook_create'),

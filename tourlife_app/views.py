@@ -390,7 +390,7 @@ class GigsCreateAPIView(CreateAPIView):
         user = User.objects.filter(id__in=user_id_list)
         title = request.data["title"]
         descriptions = request.data["descriptions"]
-        profile_pic = request.data["profile_pic"]
+        # profile_pic = request.data["profile_pic"]
         cover_image = request.data["cover_image"]
         location = request.data["location"]
         show = request.data["show"]
@@ -404,7 +404,7 @@ class GigsCreateAPIView(CreateAPIView):
         
         # print(user,'=-=-=-=-=-=-=-=--=-=-=-=-=')
         # print(k)
-        gigs = Gigs.objects.create(title=title, descriptions=descriptions,profile_pic=profile_pic, cover_image=cover_image, 
+        gigs = Gigs.objects.create(title=title, descriptions=descriptions,cover_image=cover_image, 
         location=location, show=show, stage=stage, visa=visa, Equipment=Equipment, sound_check_time=sound_check_time, start_date=start_date, end_date=end_date)
         gigs.user.set(user)
         gigs.save()
@@ -415,7 +415,6 @@ class GigsCreateAPIView(CreateAPIView):
             "user":  gigs.user.all().values_list('id', flat=True),
             "title": gigs.title,
             "descriptions": gigs.descriptions,
-            "profile_pic": str(gigs.profile_pic),
             "cover_image": str(gigs.cover_image),
             "location": gigs.location,
             "show": gigs.show,
@@ -452,7 +451,7 @@ class GigsUpdateAPIView(CreateAPIView):
         user = User.objects.filter(id__in=user_id_list)
         title = request.data["title"]
         descriptions = request.data["descriptions"]
-        profile_pic = request.data["profile_pic"]
+        # profile_pic = request.data["profile_pic"]
         cover_image = request.data["cover_image"]
         location = request.data["location"]
         show = request.data["show"]
@@ -471,7 +470,6 @@ class GigsUpdateAPIView(CreateAPIView):
         gigs = Gigs.objects.get(id=id)
         gigs.title = title
         gigs.descriptions = descriptions
-        gigs.profile_pic = profile_pic
         gigs.cover_image = cover_image
         gigs.location = location
         gigs.show = show
@@ -489,7 +487,6 @@ class GigsUpdateAPIView(CreateAPIView):
             "user": gigs.user.all().values_list('id', flat=True),
             "title": gigs.title,
             "descriptions": gigs.descriptions,
-            "profile_pic": str(gigs.profile_pic),
             "cover_image": str(gigs.cover_image),
             "location": gigs.location,
             "show": gigs.show,
@@ -2193,7 +2190,7 @@ class allListView(ListAPIView):
                     "id": int(gig.gig.id),
                     "title": gig.gig.title,
                     "descriptions": gig.gig.descriptions,
-                    "profile_pic": gig.gig.profile_pic,
+                    "profile_pic": gig.user.profile_image,
                     "cover_image": gig.gig.cover_image,
                     "location": gig.gig.location,
                     "show": gig.gig.show,

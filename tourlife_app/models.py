@@ -23,7 +23,7 @@ class Gigs(models.Model):
     user=models.ManyToManyField(User)
     title=models.CharField(max_length=20,null=True,blank=True)
     descriptions=models.CharField(max_length=100,null=True,blank=True)
-    profile_pic=models.CharField(max_length=200,null=True,blank=True)
+    # profile_pic=models.CharField(max_length=200,null=True,blank=True)
     cover_image=models.CharField(max_length=200,null=True,blank=True)
     location=models.CharField(max_length=200,null=True,blank=True)
     show=models.CharField(max_length=200,null=True,blank=True)
