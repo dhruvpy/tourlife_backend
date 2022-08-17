@@ -38,6 +38,12 @@ class UserCreateAPIView(GenericAPIView):
         # profile_image2 = request.FILES.get('profile_image2')
         print(profile_image,"////////////////////")
 
+
+        if User.objects.filter(username=username).exists() | User.objects.filter(email=email).exists():
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "This email or username is already exists"}, status=status.HTTP_400_BAD_REQUEST)
+        user = User.objects.create(username=username, first_name=first_name, last_name=last_name, password=password, email=email, mobile_no=mobile_no)
+
+
         session = boto3.session.Session()
         client = session.client('s3',
                                 region_name='fra1',
@@ -48,21 +54,21 @@ class UserCreateAPIView(GenericAPIView):
         # profile_image=json.dumps(profile_image, ensure_ascii=False)
 
         client.put_object(Bucket='Music',
-                          Key=first_name+'.png',
+                          Key='User/user'+str(user.id)+'.png',
                         #   Body=bytes(json.dumps(profile_image).encode()),
                         Body= profile_image,
-                        #   ACL='public-read-write',
-                        #   ContentType='image/png',
+                          ACL='public-read-write',
+                          ContentType='image/png',
                           )
 
         url = client.generate_presigned_url(ClientMethod='get_object',
                                             Params={'Bucket': 'Music',
-                                                    'Key': first_name+'.png'}, ExpiresIn=300, HttpMethod=None)
+                                                    'Key': 'User/user'+str(user.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
 
-        if User.objects.filter(username=username).exists() | User.objects.filter(email=email).exists():
-            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "This email or username is already exists"}, status=status.HTTP_400_BAD_REQUEST)
-        user = User.objects.create(username=username, first_name=first_name, last_name=last_name, password=password, email=email, mobile_no=mobile_no,
-                                   profile_image=url)
+        
+        user.profile_image=url
+        user.save()
+
         response_data = {
             "id": user.id,
             "username": user.username,
@@ -98,8 +104,15 @@ class UserUpdateAPIView(CreateAPIView):
         email = request.data["email"]
         mobile_no = request.data["mobile_no"]
         profile_image = request.FILES.get('profile_image')
-        # profile_image2 = request.FILES.get('profile_image2')
-        print(profile_image,"////////////////////")
+        id = self.kwargs["pk"]
+
+        if not User.objects.filter(id=id).exists():
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User is not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        # if User.objects.filter(username=username).exists() | User.objects.filter(email=email).exists():
+        #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "This email or username is already exists"},
+        #                     status=status.HTTP_400_BAD_REQUEST)
+        user = User.objects.get(id=id)
 
         session = boto3.session.Session()
         client = session.client('s3',
@@ -111,27 +124,19 @@ class UserUpdateAPIView(CreateAPIView):
         # profile_image=json.dumps(profile_image, ensure_ascii=False)
 
         client.put_object(Bucket='Music',
-                          Key=first_name+'.png',
+                          Key='User/user'+str(user.id)+'.png',
                         #   Body=bytes(json.dumps(profile_image).encode()),
                         Body= profile_image,
-                        #   ACL='public-read-write',
-                        #   ContentType='image/png',
+                          ACL='public-read-write',
+                          ContentType='image/png',
                           )
 
         url = client.generate_presigned_url(ClientMethod='get_object',
                                             Params={'Bucket': 'Music',
-                                                    'Key': first_name+'.png'}, ExpiresIn=300, HttpMethod=None)
+                                                    'Key': 'User/user'+str(user.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
 
 
-        id = self.kwargs["pk"]
-
-        if not User.objects.filter(id=id).exists():
-            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User is not exists"},
-                            status=status.HTTP_400_BAD_REQUEST)
-        # if User.objects.filter(username=username).exists() | User.objects.filter(email=email).exists():
-        #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "This email or username is already exists"},
-        #                     status=status.HTTP_400_BAD_REQUEST)
-        user = User.objects.get(id=id)
+        
         user.username = username
         user.first_name = first_name
         user.last_name = last_name
@@ -382,6 +387,7 @@ class GigsCreateAPIView(CreateAPIView):
         # if not request.user.is_manager:
         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
         #                     status=status.HTTP_400_BAD_REQUEST)
+        print(request.FILES.get("cover_image"),'--------------')
         if not serializer.is_valid():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -392,7 +398,7 @@ class GigsCreateAPIView(CreateAPIView):
         title = request.data["title"]
         descriptions = request.data["descriptions"]
         # profile_pic = request.data["profile_pic"]
-        cover_image = request.data["cover_image"]
+        cover_image = request.FILES.get("cover_image")
         location = request.data["location"]
         show = request.data["show"]
         stage = request.data["stage"]
@@ -402,12 +408,35 @@ class GigsCreateAPIView(CreateAPIView):
         end_date = request.data["end_date"]
         sound_check_time = request.data["sound_check_time"]
 
-        
-        # print(user,'=-=-=-=-=-=-=-=--=-=-=-=-=')
-        # print(k)
-        gigs = Gigs.objects.create(title=title, descriptions=descriptions,cover_image=cover_image, 
+        gigs = Gigs.objects.create(title=title, descriptions=descriptions,
         location=location, show=show, stage=stage, visa=visa, Equipment=Equipment, sound_check_time=sound_check_time, start_date=start_date, end_date=end_date)
         gigs.user.set(user)
+
+
+        session = boto3.session.Session()
+        client = session.client('s3',
+                                region_name='fra1',
+                                endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
+                                aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
+                                aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
+        # put_object(Key=s3_path, Body=hostzone2)
+        # profile_image=json.dumps(profile_image, ensure_ascii=False)
+        
+        client.put_object(Bucket='Music',
+                          Key='Gigs/gig'+str(gigs.id)+'.png',
+                        #   Body=bytes(json.dumps(profile_image).encode()),
+                        Body= cover_image,
+                        ACL='public-read-write',
+                          ContentType='image/png',
+                          )
+
+        url = client.generate_presigned_url(ClientMethod='get_object',
+                                            Params={'Bucket': 'Music',
+                                                    'Key': 'Gigs/gig'+str(gigs.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
+        # print(user,'=-=-=-=-=-=-=-=--=-=-=-=-=')
+        # print(k)
+        gigs.cover_image=url
+        print(gigs.id,'----------')
         gigs.save()
         for i in user:
             GigMaster.objects.create(gig=gigs,user=i)
@@ -453,7 +482,7 @@ class GigsUpdateAPIView(CreateAPIView):
         title = request.data["title"]
         descriptions = request.data["descriptions"]
         # profile_pic = request.data["profile_pic"]
-        cover_image = request.data["cover_image"]
+        cover_image = request.FILES.get("cover_image")
         location = request.data["location"]
         show = request.data["show"]
         stage = request.data["stage"]
@@ -462,16 +491,40 @@ class GigsUpdateAPIView(CreateAPIView):
         start_date = request.data["start_date"]
         end_date = request.data["end_date"]
         sound_check_time = request.data["sound_check_time"]
-
         id = self.kwargs["pk"]
         if not Gigs.objects.filter(id=id).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gigs is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
 
+
         gigs = Gigs.objects.get(id=id)
+
+
+        session = boto3.session.Session()
+        client = session.client('s3',
+                                region_name='fra1',
+                                endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
+                                aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
+                                aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
+        # put_object(Key=s3_path, Body=hostzone2)
+        # profile_image=json.dumps(profile_image, ensure_ascii=False)
+
+        client.put_object(Bucket='Music',
+                          Key='Gigs/gig'+str(gigs.id)+'.png',
+                        #   Body=bytes(json.dumps(profile_image).encode()),
+                        Body= cover_image,
+                          ACL='public-read-write',
+                          ContentType='image/png',
+                          )
+
+        url = client.generate_presigned_url(ClientMethod='get_object',
+                                            Params={'Bucket': 'Music',
+                                                    'Key': 'Gigs/gig'+str(gigs.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
+
+        
         gigs.title = title
         gigs.descriptions = descriptions
-        gigs.cover_image = cover_image
+        gigs.cover_image = url
         gigs.location = location
         gigs.show = show
         gigs.stage = stage

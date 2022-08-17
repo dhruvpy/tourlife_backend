@@ -30,8 +30,7 @@ class CreateGigsSerializer(serializers.ModelSerializer):
     user=serializers.CharField(required=True)
     title=serializers.CharField(required=True)
     descriptions=serializers.CharField(required=True)
-    # profile_pic=serializers.CharField(required=True)
-    cover_image=serializers.CharField(required=True)
+    cover_image=serializers.FileField(required=False)
     start_date=serializers.DateTimeField(required=True)
     end_date=serializers.DateTimeField(required=True)
     location = serializers.CharField(required=True)
@@ -49,13 +48,12 @@ class UserS(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id','username']
-        
+
 class ListGigSerializer(serializers.ModelSerializer):
-    profile_pic = serializers.ReadOnlyField(source='user.profile_image')
     user = UserS(read_only=True,many=True)
     class Meta:
         model= Gigs
-        fields=["id","user","title","descriptions","profile_pic","cover_image","start_date","end_date","location","show","stage","visa","Equipment","sound_check_time"]
+        fields=["id","user","title","descriptions","cover_image","start_date","end_date","location","show","stage","visa","Equipment","sound_check_time"]
 
 class FlightSerializer(serializers.ModelSerializer):
     user_id= serializers.ReadOnlyField(source='user.id')
