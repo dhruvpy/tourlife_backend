@@ -62,7 +62,7 @@ class UserCreateAPIView(GenericAPIView):
                           )
 
         url = client.generate_presigned_url(ClientMethod='get_object',
-                                            Params={'Bucket': 'Music',
+                                            Params={'Bucket': 'tourlife_test',
                                                     'Key': 'User/user'+str(user.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
 
         
@@ -132,7 +132,7 @@ class UserUpdateAPIView(CreateAPIView):
                           )
 
         url = client.generate_presigned_url(ClientMethod='get_object',
-                                            Params={'Bucket': 'Music',
+                                            Params={'Bucket': 'tourlife_test',
                                                     'Key': 'User/user'+str(user.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
 
 
@@ -431,7 +431,7 @@ class GigsCreateAPIView(CreateAPIView):
                           )
 
         url = client.generate_presigned_url(ClientMethod='get_object',
-                                            Params={'Bucket': 'Music',
+                                            Params={'Bucket': 'tourlife_test',
                                                     'Key': 'Gigs/gig'+str(gigs.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
         # print(user,'=-=-=-=-=-=-=-=--=-=-=-=-=')
         # print(k)
@@ -518,7 +518,7 @@ class GigsUpdateAPIView(CreateAPIView):
                           )
 
         url = client.generate_presigned_url(ClientMethod='get_object',
-                                            Params={'Bucket': 'Music',
+                                            Params={'Bucket': 'tourlife_test',
                                                     'Key': 'Gigs/gig'+str(gigs.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
 
         
@@ -1871,7 +1871,7 @@ class DocumentCreateAPIView(CreateAPIView):
                           ContentType='image/png',
                           )
         url = client.generate_presigned_url(ClientMethod='get_object',
-                                            Params={'Bucket': 'Music',
+                                            Params={'Bucket': 'tourlife_test',
                                                     'Key': 'Documents/doc'+str(passes.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
         
         passes.document= url
@@ -1943,7 +1943,7 @@ class DocumentUpdateAPIView(CreateAPIView):
                           )
 
         url = client.generate_presigned_url(ClientMethod='get_object',
-                                            Params={'Bucket': 'Music',
+                                            Params={'Bucket': 'tourlife_test',
                                                     'Key': 'Documents/doc'+str(passes.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
 
         
