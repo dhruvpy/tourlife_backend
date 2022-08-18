@@ -1869,7 +1869,6 @@ class DocumentCreateAPIView(CreateAPIView):
                           Body=document,
                           ACL='public-read-write',
                           ContentType='image/png',
-                        #   ContentType= 'multipart/form-data',
                           )
         url = client.generate_presigned_url(ClientMethod='get_object',
                                             Params={'Bucket': 'Music',
