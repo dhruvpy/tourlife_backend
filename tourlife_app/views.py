@@ -53,7 +53,7 @@ class UserCreateAPIView(GenericAPIView):
         # put_object(Key=s3_path, Body=hostzone2)
         # profile_image=json.dumps(profile_image, ensure_ascii=False)
 
-        client.put_object(Bucket='Music',
+        client.put_object(Bucket='tourlife_test',
                           Key='User/user'+str(user.id)+'.png',
                         #   Body=bytes(json.dumps(profile_image).encode()),
                         Body= profile_image,
@@ -123,7 +123,7 @@ class UserUpdateAPIView(CreateAPIView):
         # put_object(Key=s3_path, Body=hostzone2)
         # profile_image=json.dumps(profile_image, ensure_ascii=False)
 
-        client.put_object(Bucket='Music',
+        client.put_object(Bucket='tourlife_test',
                           Key='User/user'+str(user.id)+'.png',
                         #   Body=bytes(json.dumps(profile_image).encode()),
                         Body= profile_image,
@@ -422,7 +422,7 @@ class GigsCreateAPIView(CreateAPIView):
         # put_object(Key=s3_path, Body=hostzone2)
         # profile_image=json.dumps(profile_image, ensure_ascii=False)
         
-        client.put_object(Bucket='Music',
+        client.put_object(Bucket='tourlife_test',
                           Key='Gigs/gig'+str(gigs.id)+'.png',
                         #   Body=bytes(json.dumps(profile_image).encode()),
                         Body= cover_image,
@@ -509,7 +509,7 @@ class GigsUpdateAPIView(CreateAPIView):
         # put_object(Key=s3_path, Body=hostzone2)
         # profile_image=json.dumps(profile_image, ensure_ascii=False)
 
-        client.put_object(Bucket='Music',
+        client.put_object(Bucket='tourlife_test',
                           Key='Gigs/gig'+str(gigs.id)+'.png',
                         #   Body=bytes(json.dumps(profile_image).encode()),
                         Body= cover_image,
@@ -1853,6 +1853,9 @@ class DocumentCreateAPIView(CreateAPIView):
         document = request.FILES.get("document")
 
         # document = request.FILES.get('document')
+        passes = Document.objects.create(
+            user=user, gig=gig, flight=flight, type=type)
+
 
         session = boto3.session.Session()
         client = session.client('s3',
@@ -1861,24 +1864,25 @@ class DocumentCreateAPIView(CreateAPIView):
                                 aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
                                 aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
 
-        client.put_object(Bucket='Music',
-                          Key=user.first_name+'.png',
+        client.put_object(Bucket='tourlife_test',
+                          Key='Documents/doc'+str(passes.id)+'.png',
                           Body=document,
                           ACL='public-read-write',
                           ContentType='image/png',
+                        #   ContentType= 'multipart/form-data',
                           )
         url = client.generate_presigned_url(ClientMethod='get_object',
                                             Params={'Bucket': 'Music',
-                                                    'Key': user.first_name+'.png'}, ExpiresIn=300, HttpMethod=None)
-        passe = Document.objects.create(
-            user=user, gig=gig, flight=flight, type=type, document=url)
-
+                                                    'Key': 'Documents/doc'+str(passes.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
+        
+        passes.document= url
+        passes.save()
         response_data = {
-            "id": passe.id,
-            "user": str(passe.user),
-            "gig": str(passe.gig),
-            "flight": str(passe.flight),
-            "type": passe.type,
+            "id": passes.id,
+            "user": str(passes.user),
+            "gig": str(passes.gig),
+            "flight": str(passes.flight),
+            "type": passes.type,
             "document": url
         }
         return Response(data={"status": status.HTTP_200_OK,
@@ -1911,7 +1915,14 @@ class DocumentUpdateAPIView(CreateAPIView):
         if not FlightBook.objects.filter(id=request.data["flight"]):
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Flight not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
-                            
+        id = self.kwargs["pk"]
+        
+        if not Document.objects.filter(id=id).exists():
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True,
+                                  "message": "Passes is not exists"}, status=status.HTTP_400_BAD_REQUEST)
+
+        passes = Document.objects.get(id=id)
+
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
         flight = FlightBook.objects.get(id=request.data["flight"])
@@ -1925,36 +1936,31 @@ class DocumentUpdateAPIView(CreateAPIView):
                                 aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
                                 aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
 
-        client.put_object(Bucket='Music',
-                          Key=user.first_name+'.png',
-                          Body=bytes(json.dumps(document).encode()),
+        client.put_object(Bucket='tourlife_test',
+                          Key='Documents/doc'+str(passes.id)+'.png',
+                          Body=document,
                           ACL='public-read-write',
                           ContentType='image/png',
                           )
 
         url = client.generate_presigned_url(ClientMethod='get_object',
                                             Params={'Bucket': 'Music',
-                                                    'Key': user.first_name+'.png'}, ExpiresIn=300, HttpMethod=None)
-        id = self.kwargs["pk"]
+                                                    'Key': 'Documents/doc'+str(passes.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
 
-        if not Document.objects.filter(id=id).exists():
-            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True,
-                                  "message": "Passes is not exists"}, status=status.HTTP_400_BAD_REQUEST)
-
-        passe = Document.objects.get(id=id)
-        passe.user = user
-        passe.gig = gig
-        passe.flight = flight
-        passe.type = type
-        passe.document = url
-        passe.save()
+        
+        passes.user = user
+        passes.gig = gig
+        passes.flight = flight
+        passes.type = type
+        passes.document = url
+        passes.save()
 
         response_data = {
-            "id": passe.id,
-            "user": str(passe.user),
-            "gig": str(passe.gig),
-            "flight": str(passe.flight),
-            "type": passe.type,
+            "id": passes.id,
+            "user": str(passes.user),
+            "gig": str(passes.gig),
+            "flight": str(passes.flight),
+            "type": passes.type,
             "passes": url
         }
         return Response(data={"status": status.HTTP_200_OK,
