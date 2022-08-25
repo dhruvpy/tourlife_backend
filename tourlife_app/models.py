@@ -9,7 +9,7 @@ class User(AbstractUser):
     email=models.EmailField(max_length=100,unique=True)
     password=models.CharField(max_length=200,null=True,blank=True)
     mobile_no=models.CharField(max_length=10,null=True,blank=True)
-    profile_image=models.CharField(max_length=1000,null=True,blank=True)
+    profile_image=models.CharField(max_length=5000,null=True,blank=True)
     is_manager=models.BooleanField(default=False)
     is_artist=models.BooleanField(default=False)
 
@@ -24,7 +24,7 @@ class Gigs(models.Model):
     title=models.CharField(max_length=20,null=True,blank=True)
     descriptions=models.CharField(max_length=100,null=True,blank=True)
     # profile_pic=models.CharField(max_length=200,null=True,blank=True)
-    cover_image=models.CharField(max_length=500,null=True,blank=True)
+    cover_image=models.CharField(max_length=5000,null=True,blank=True)
     location=models.CharField(max_length=200,null=True,blank=True)
     show=models.CharField(max_length=200,null=True,blank=True)
     stage=models.CharField(max_length=200,null=True,blank=True)
