@@ -65,7 +65,8 @@ class UserCreateAPIView(GenericAPIView):
                                             Params={'Bucket': 'tourlife_test',
                                                     'Key': 'User/user'+str(user.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
 
-        
+        url=url.split('?')
+        url=url[0]
         user.profile_image=url
         user.save()
 
@@ -136,7 +137,8 @@ class UserUpdateAPIView(CreateAPIView):
                                                     'Key': 'User/user'+str(user.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
 
 
-        
+        url=url.split('?')
+        url=url[0]
         user.username = username
         user.first_name = first_name
         user.last_name = last_name
@@ -167,15 +169,20 @@ class MyPaginator(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 1
 
-
 class UserListAPIView(ListAPIView):
     permission_classes = [AllowAny]
     pagination_class = CustomPagination
 
     serializer_class = ListUserSerializers
-    queryset = User.objects.all()
+    
+    queryset = User.objects.all().exclude(email='admin@gmail.com')
 
     def get(self, request, *args, **kwargs):
+        
+        # qs = super(UserAdmin, self).all(*args, **kwargs)
+        # if not request.user.is_superuser:
+        #     return qs.filter(is_superuser=False)
+        # print(qs)
         # if not request.user.is_manager:
         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
         #                     status=status.HTTP_400_BAD_REQUEST)
@@ -190,7 +197,8 @@ class GetAllUserAPIView(ListAPIView):
     permission_classes = [AllowAny]
 
     serializer_class = ListUserSerializers
-    queryset = User.objects.all()
+    queryset = User.objects.all().exclude(email='admin@gmail.com')
+
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
@@ -221,7 +229,19 @@ class UserDeleteAPIView(DestroyAPIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.get(id=id)
+
         user.delete()
+        print(id,"///////////////////////////////////////")
+        session = boto3.session.Session()
+        client = session.client('s3',
+                                region_name='fra1',
+                                endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
+                                aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
+                                aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
+        
+        client.delete_object(Bucket='tourlife_test', Key='User/user'+str(id)+'.png')
+        # print(u,"::::::::::::::::::::::::::::")
+
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
                               "message": "User deleted"},
@@ -433,13 +453,15 @@ class GigsCreateAPIView(CreateAPIView):
         url = client.generate_presigned_url(ClientMethod='get_object',
                                             Params={'Bucket': 'tourlife_test',
                                                     'Key': 'Gigs/gig'+str(gigs.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
-        # print(user,'=-=-=-=-=-=-=-=--=-=-=-=-=')
-        # print(k)
+        url=url.split('?')
+        url=url[0]
         gigs.cover_image=url
         print(gigs.id,'----------')
         gigs.save()
+
         for i in user:
             GigMaster.objects.create(gig=gigs,user=i)
+
         response_data = {
             "id": gigs.id,
             "user":  gigs.user.all().values_list('id', flat=True),
@@ -498,7 +520,11 @@ class GigsUpdateAPIView(CreateAPIView):
 
 
         gigs = Gigs.objects.get(id=id)
-
+        print(user,"/////////////////////////")
+        a = GigMaster.objects.filter(gig=gigs)
+        a.delete()
+        for i in user:
+            GigMaster.objects.create(gig=gigs,user=i)
 
         session = boto3.session.Session()
         client = session.client('s3',
@@ -521,7 +547,8 @@ class GigsUpdateAPIView(CreateAPIView):
                                             Params={'Bucket': 'tourlife_test',
                                                     'Key': 'Gigs/gig'+str(gigs.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
 
-        
+        url=url.split('?')
+        url=url[0]
         gigs.title = title
         gigs.descriptions = descriptions
         gigs.cover_image = url
@@ -612,11 +639,19 @@ class GigsDeleteAPIView(DestroyAPIView):
                             status=status.HTTP_400_BAD_REQUEST)
         gigs = Gigs.objects.get(id=id)
         gigs.delete()
+        session = boto3.session.Session()
+        client = session.client('s3',
+                                region_name='fra1',
+                                endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
+                                aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
+                                aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
+        
+        client.delete_object(Bucket='tourlife_test', Key='Gigs/gig'+str(id)+'.png')
+
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
                               "message": "Gigs deleted"},
                         status=status.HTTP_200_OK)
-
 
 class FlightBookCreateAPIView(CreateAPIView):
     permission_classes = [AllowAny]
@@ -1873,7 +1908,8 @@ class DocumentCreateAPIView(CreateAPIView):
         url = client.generate_presigned_url(ClientMethod='get_object',
                                             Params={'Bucket': 'tourlife_test',
                                                     'Key': 'Documents/doc'+str(passes.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
-        
+        url=url.split('?')
+        url=url[0]
         passes.document= url
         passes.save()
         response_data = {
@@ -1945,8 +1981,8 @@ class DocumentUpdateAPIView(CreateAPIView):
         url = client.generate_presigned_url(ClientMethod='get_object',
                                             Params={'Bucket': 'tourlife_test',
                                                     'Key': 'Documents/doc'+str(passes.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
-
-        
+        url=url.split('?')
+        url=url[0]
         passes.user = user
         passes.gig = gig
         passes.flight = flight
@@ -2003,6 +2039,15 @@ class DocumentDeleteAPIView(DestroyAPIView):
                             status=status.HTTP_400_BAD_REQUEST)
         passes = Document.objects.get(id=id)
         passes.delete()
+        session = boto3.session.Session()
+        client = session.client('s3',
+                                region_name='fra1',
+                                endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
+                                aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
+                                aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
+       
+        client.delete_object(Bucket='tourlife_test', Key='Documents/doc'+str(id)+'.png')
+
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
                               "message": "Passes deleted"},

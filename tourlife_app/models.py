@@ -156,7 +156,7 @@ class Document(models.Model):
     gig = models.ForeignKey(Gigs,related_name='passes_gig',on_delete=models.CASCADE)
     flight= models.ForeignKey(FlightBook,related_name='flight_passes',on_delete=models.CASCADE)
     type= models.CharField(max_length=100,choices=DOCUMENT_CHOICES,null=True,blank=True)
-    document = models.CharField(max_length=1000,null=True,blank=True)
+    document = models.CharField(max_length=5000,null=True,blank=True)
 
 class Emailotp(models.Model):
     email=models.EmailField(max_length=100)
