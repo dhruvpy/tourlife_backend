@@ -8,7 +8,7 @@ class User(AbstractUser):
     last_name=models.CharField(max_length=20, null=True,blank=True)
     email=models.EmailField(max_length=100,unique=True)
     password=models.CharField(max_length=200,null=True,blank=True)
-    mobile_no=models.CharField(max_length=10,null=True,blank=True)
+    mobile_no=models.CharField(max_length=14,null=True,blank=True)
     profile_image=models.CharField(max_length=5000,null=True,blank=True)
     is_manager=models.BooleanField(default=False)
     is_artist=models.BooleanField(default=False)

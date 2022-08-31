@@ -8,8 +8,8 @@ class CreateUserSerializers(serializers.ModelSerializer):
     email=serializers.EmailField(required=True)
     mobile_no=serializers.IntegerField(required=True)
     profile_image=serializers.FileField(required=False)
-    is_manager=serializers.BooleanField(required=True)
-    is_artist=serializers.BooleanField(required=True)
+    is_manager=serializers.BooleanField(required=False)
+    is_artist=serializers.BooleanField(required=False)
     class Meta:
         model= User
         fields= ["username","first_name","last_name","password","email","mobile_no","profile_image","is_manager","is_artist"]
@@ -38,7 +38,7 @@ class CreateGigsSerializer(serializers.ModelSerializer):
     stage = serializers.CharField(required=True)
     visa=serializers.CharField(required=True)
     Equipment =serializers.BooleanField(required=True)
-    sound_check_time = serializers.TimeField(required=True)
+    sound_check_time = serializers.TimeField(required=False)
     class Meta:
         model=Gigs
         fields=["user","title","descriptions","cover_image","start_date","end_date","location","show","stage","visa","Equipment","sound_check_time"]

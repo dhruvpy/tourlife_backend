@@ -14,7 +14,6 @@ from django.core.mail import send_mail
 from .pagination import CustomPagination
 from rest_framework.pagination import PageNumberPagination
 import json
-import datetime
 
 class UserCreateAPIView(GenericAPIView):
     permission_classes = [AllowAny]
@@ -35,14 +34,14 @@ class UserCreateAPIView(GenericAPIView):
         password = request.data["password"]
         mobile_no = request.data["mobile_no"]
         profile_image = request.FILES.get('profile_image')
-        # profile_image2 = request.FILES.get('profile_image2')
-        print(profile_image,"////////////////////")
-
+        is_manager = request.data["is_manager"]
+        is_artist = request.data["is_artist"]
 
         if User.objects.filter(username=username).exists() | User.objects.filter(email=email).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "This email or username is already exists"}, status=status.HTTP_400_BAD_REQUEST)
-        user = User.objects.create(username=username, first_name=first_name, last_name=last_name, password=password, email=email, mobile_no=mobile_no)
-
+        
+        user = User.objects.create(username=username, first_name=first_name, last_name=last_name, password=password, email=email, mobile_no=mobile_no,is_manager=is_manager,is_artist=is_artist)
+        print(profile_image,"////////////////////")
 
         session = boto3.session.Session()
         client = session.client('s3',
@@ -50,20 +49,17 @@ class UserCreateAPIView(GenericAPIView):
                                 endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
                                 aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
                                 aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
-        # put_object(Key=s3_path, Body=hostzone2)
-        # profile_image=json.dumps(profile_image, ensure_ascii=False)
 
         client.put_object(Bucket='tourlife_test',
                           Key='User/user'+str(user.id)+'.png',
-                        #   Body=bytes(json.dumps(profile_image).encode()),
-                        Body= profile_image,
+                          Body= profile_image,
                           ACL='public-read-write',
                           ContentType='image/png',
                           )
 
         url = client.generate_presigned_url(ClientMethod='get_object',
                                             Params={'Bucket': 'tourlife_test',
-                                                    'Key': 'User/user'+str(user.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
+                                                    'Key': 'User/user'+str(user.id)+'.png'}, HttpMethod=None)
 
         url=url.split('?')
         url=url[0]
@@ -79,10 +75,11 @@ class UserCreateAPIView(GenericAPIView):
             "email": user.email,
             "mobile_no": str(user.mobile_no),
             "profile_image": str(url),
-            # "profile_image2":url
+            "is_artist": user.is_artist,
+            "is_manager": user.is_manager
         }
         return Response(data={"status": status.HTTP_200_OK,
-                              "message": 'add new user',
+                              "message": 'Add new user',
                               "result": {'data': response_data}},
                         status=status.HTTP_200_OK)
 
@@ -105,14 +102,18 @@ class UserUpdateAPIView(CreateAPIView):
         email = request.data["email"]
         mobile_no = request.data["mobile_no"]
         profile_image = request.FILES.get('profile_image')
+        is_manager = request.data["is_manager"]
+        is_artist = request.data["is_artist"]
         id = self.kwargs["pk"]
 
         if not User.objects.filter(id=id).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
+        
         # if User.objects.filter(username=username).exists() | User.objects.filter(email=email).exists():
         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "This email or username is already exists"},
         #                     status=status.HTTP_400_BAD_REQUEST)
+        print(profile_image)
         user = User.objects.get(id=id)
 
         session = boto3.session.Session()
@@ -121,31 +122,31 @@ class UserUpdateAPIView(CreateAPIView):
                                 endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
                                 aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
                                 aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
-        # put_object(Key=s3_path, Body=hostzone2)
-        # profile_image=json.dumps(profile_image, ensure_ascii=False)
+        
+        if not profile_image== None:
+            client.put_object(Bucket='tourlife_test',
+                            Key='User/user'+str(user.id)+'.png',
+                            Body= profile_image,
+                            ACL='public-read-write',
+                            ContentType='image/png',
+                            )
 
-        client.put_object(Bucket='tourlife_test',
-                          Key='User/user'+str(user.id)+'.png',
-                        #   Body=bytes(json.dumps(profile_image).encode()),
-                        Body= profile_image,
-                          ACL='public-read-write',
-                          ContentType='image/png',
-                          )
+            url = client.generate_presigned_url(ClientMethod='get_object',
+                                                Params={'Bucket': 'tourlife_test',
+                                                'Key': 'User/user'+str(user.id)+'.png'}, HttpMethod=None)
 
-        url = client.generate_presigned_url(ClientMethod='get_object',
-                                            Params={'Bucket': 'tourlife_test',
-                                                    'Key': 'User/user'+str(user.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
-
-
-        url=url.split('?')
-        url=url[0]
+            url=url.split('?')
+            url=url[0]
+            user.profile_image = url 
+    
         user.username = username
         user.first_name = first_name
         user.last_name = last_name
         user.password = password
         user.email = email
         user.mobile_no = mobile_no
-        user.profile_image = url
+        user.is_manager = is_manager
+        user.is_artist = is_artist
         user.save()
 
         response_data = {
@@ -156,10 +157,12 @@ class UserUpdateAPIView(CreateAPIView):
             "password": user.password,
             "email": user.email,
             "mobile_no": user.mobile_no,
-            "profile_image": str(user.profile_image)
+            "profile_image": str(user.profile_image),
+            "is_manager": user.is_manager,
+            "is_artist": user.is_artist
         }
         return Response(data={"status": status.HTTP_200_OK,
-                              "message": "user updated",
+                              "message": "User updated",
                               "results": {'data': response_data}},
                         status=status.HTTP_200_OK)
 
@@ -178,11 +181,6 @@ class UserListAPIView(ListAPIView):
     queryset = User.objects.all().exclude(email='admin@gmail.com')
 
     def get(self, request, *args, **kwargs):
-        
-        # qs = super(UserAdmin, self).all(*args, **kwargs)
-        # if not request.user.is_superuser:
-        #     return qs.filter(is_superuser=False)
-        # print(qs)
         # if not request.user.is_manager:
         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
         #                     status=status.HTTP_400_BAD_REQUEST)
@@ -231,7 +229,6 @@ class UserDeleteAPIView(DestroyAPIView):
         user = User.objects.get(id=id)
 
         user.delete()
-        print(id,"///////////////////////////////////////")
         session = boto3.session.Session()
         client = session.client('s3',
                                 region_name='fra1',
@@ -240,7 +237,6 @@ class UserDeleteAPIView(DestroyAPIView):
                                 aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
         
         client.delete_object(Bucket='tourlife_test', Key='User/user'+str(id)+'.png')
-        # print(u,"::::::::::::::::::::::::::::")
 
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
@@ -426,12 +422,17 @@ class GigsCreateAPIView(CreateAPIView):
         Equipment = request.data["Equipment"]
         start_date = request.data["start_date"]
         end_date = request.data["end_date"]
-        sound_check_time = request.data["sound_check_time"]
+        sound_check_time = request.POST.get("sound_check_time")
+        # sound_check_time = request.data["sound_check_time"]
+        print(sound_check_time,"//////////////")
 
         gigs = Gigs.objects.create(title=title, descriptions=descriptions,
-        location=location, show=show, stage=stage, visa=visa, Equipment=Equipment, sound_check_time=sound_check_time, start_date=start_date, end_date=end_date)
+        location=location, show=show, stage=stage, visa=visa, Equipment=Equipment, start_date=start_date, end_date=end_date,sound_check_time=sound_check_time)
         gigs.user.set(user)
-
+      
+        if not sound_check_time== None:
+            user.sound_check_time=sound_check_time
+        #     user.sound_check_time=sound_check_time
 
         session = boto3.session.Session()
         client = session.client('s3',
@@ -452,7 +453,7 @@ class GigsCreateAPIView(CreateAPIView):
 
         url = client.generate_presigned_url(ClientMethod='get_object',
                                             Params={'Bucket': 'tourlife_test',
-                                                    'Key': 'Gigs/gig'+str(gigs.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
+                                                    'Key': 'Gigs/gig'+str(gigs.id)+'.png'},  HttpMethod=None)
         url=url.split('?')
         url=url[0]
         gigs.cover_image=url
@@ -512,7 +513,8 @@ class GigsUpdateAPIView(CreateAPIView):
         Equipment = request.data["Equipment"]
         start_date = request.data["start_date"]
         end_date = request.data["end_date"]
-        sound_check_time = request.data["sound_check_time"]
+        sound_check_time = request.POST.get("sound_check_time")
+        # sound_check_time= request.data["sound_check_time"]
         id = self.kwargs["pk"]
         if not Gigs.objects.filter(id=id).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gigs is not exists"},
@@ -525,33 +527,33 @@ class GigsUpdateAPIView(CreateAPIView):
         a.delete()
         for i in user:
             GigMaster.objects.create(gig=gigs,user=i)
-
+    
         session = boto3.session.Session()
         client = session.client('s3',
                                 region_name='fra1',
                                 endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
                                 aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
                                 aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
-        # put_object(Key=s3_path, Body=hostzone2)
-        # profile_image=json.dumps(profile_image, ensure_ascii=False)
+        
+        if not cover_image == None:
+            client.put_object(Bucket='tourlife_test',
+                            Key='Gigs/gig'+str(gigs.id)+'.png',
+                            # Body=bytes(json.dumps(cover_image).encode()),
+                            Body= cover_image,
+                            ACL='public-read-write',
+                            ContentType='image/png',
+                            )
 
-        client.put_object(Bucket='tourlife_test',
-                          Key='Gigs/gig'+str(gigs.id)+'.png',
-                        #   Body=bytes(json.dumps(profile_image).encode()),
-                        Body= cover_image,
-                          ACL='public-read-write',
-                          ContentType='image/png',
-                          )
-
-        url = client.generate_presigned_url(ClientMethod='get_object',
-                                            Params={'Bucket': 'tourlife_test',
-                                                    'Key': 'Gigs/gig'+str(gigs.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
-
-        url=url.split('?')
-        url=url[0]
+            url = client.generate_presigned_url(ClientMethod='get_object',
+                                                Params={'Bucket': 'tourlife_test',
+                                                        'Key': 'Gigs/gig'+str(gigs.id)+'.png'}, HttpMethod=None)
+            url=url.split('?')
+            url=url[0]
+            gigs.cover_image = url
+        if not sound_check_time==None:
+            gigs.sound_check_time=sound_check_time
         gigs.title = title
         gigs.descriptions = descriptions
-        gigs.cover_image = url
         gigs.location = location
         gigs.show = show
         gigs.stage = stage
@@ -559,7 +561,7 @@ class GigsUpdateAPIView(CreateAPIView):
         gigs.Equipment = Equipment
         gigs.start_date = start_date
         gigs.end_date = end_date
-        gigs.sound_check_time = sound_check_time
+        # gigs.sound_check_time = sound_check_time
         gigs.user.set(user)
         gigs.save()
 
@@ -639,6 +641,7 @@ class GigsDeleteAPIView(DestroyAPIView):
                             status=status.HTTP_400_BAD_REQUEST)
         gigs = Gigs.objects.get(id=id)
         gigs.delete()
+        print(gigs,"/////////////////////////////////")
         session = boto3.session.Session()
         client = session.client('s3',
                                 region_name='fra1',
@@ -647,6 +650,7 @@ class GigsDeleteAPIView(DestroyAPIView):
                                 aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
         
         client.delete_object(Bucket='tourlife_test', Key='Gigs/gig'+str(id)+'.png')
+
 
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
@@ -699,7 +703,7 @@ class FlightBookCreateAPIView(CreateAPIView):
                                                depart_time=depart_time, depart_terminal=depart_terminal, depart_gate=depart_gate, arrival_location=arrival_location,
                                                arrival_lat_long=arrival_lat_long, arrival_time=arrival_time, arrival_terminal=arrival_terminal,
                                                airlines=airlines, arrival_gate=arrival_gate, flight_number=flight_number, flight_class=flight_class, wather=wather)
-
+        
         response_data = {
             "id": flightbook.id,
             "user":  str(flightbook.user),
@@ -1344,6 +1348,7 @@ class HotelUpdateAPIView(CreateAPIView):
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
         address = request.data["address"]
+        hotel_name = request.data["hotel_name"]
         direction = request.data["direction"]
         website = request.data["website"]
         number = request.data["number"]
@@ -1358,6 +1363,7 @@ class HotelUpdateAPIView(CreateAPIView):
         hotel = Hotel.objects.get(id=id)
         hotel.user = user
         hotel.gig = gig
+        hotel.hotel_name = hotel_name
         hotel.address = address
         hotel.direction = direction
         hotel.website = website
@@ -1370,6 +1376,7 @@ class HotelUpdateAPIView(CreateAPIView):
             "id": hotel.id,
             "user": str(hotel.user),
             "gig": str(hotel.gig),
+            "hotel_name": hotel.hotel_name,
             "address": hotel.address,
             "direction": hotel.direction,
             "website": hotel.website,
@@ -1898,16 +1905,17 @@ class DocumentCreateAPIView(CreateAPIView):
                                 endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
                                 aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
                                 aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
-
-        client.put_object(Bucket='tourlife_test',
-                          Key='Documents/doc'+str(passes.id)+'.png',
-                          Body=document,
-                          ACL='public-read-write',
-                          ContentType='image/png',
-                          )
+        # client.upload_file(document, 'tourlife_test', 'Documents/doc'+str(passes.id)+'.pdf')
+        client.put_object(
+            Bucket= 'tourlife_test',
+            ACL='public-read-write',
+            Body=document,
+            Key='Documents/doc'+str(passes.id)+'.pdf',
+        )
+        
         url = client.generate_presigned_url(ClientMethod='get_object',
                                             Params={'Bucket': 'tourlife_test',
-                                                    'Key': 'Documents/doc'+str(passes.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
+                                                    'Key': 'Documents/doc'+str(passes.id)+'.pdf'}, HttpMethod=None)
         url=url.split('?')
         url=url[0]
         passes.document= url
@@ -1918,7 +1926,7 @@ class DocumentCreateAPIView(CreateAPIView):
             "gig": str(passes.gig),
             "flight": str(passes.flight),
             "type": passes.type,
-            "document": url
+            "document": str(url)
         }
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
@@ -1970,24 +1978,23 @@ class DocumentUpdateAPIView(CreateAPIView):
                                 endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
                                 aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
                                 aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
-
-        client.put_object(Bucket='tourlife_test',
-                          Key='Documents/doc'+str(passes.id)+'.png',
-                          Body=document,
-                          ACL='public-read-write',
-                          ContentType='image/png',
-                          )
-
-        url = client.generate_presigned_url(ClientMethod='get_object',
-                                            Params={'Bucket': 'tourlife_test',
-                                                    'Key': 'Documents/doc'+str(passes.id)+'.png'}, ExpiresIn=300, HttpMethod=None)
-        url=url.split('?')
-        url=url[0]
+        if not document==None:
+            client.put_object(
+            Bucket= 'tourlife_test',
+            ACL='public-read-write',
+            Body=document,
+            Key='Documents/doc'+str(passes.id)+'.pdf',
+        )
+            url = client.generate_presigned_url(ClientMethod='get_object',
+                                                Params={'Bucket': 'tourlife_test',
+                                                        'Key': 'Documents/doc'+str(passes.id)+'.pdf'}, HttpMethod=None)
+            url=url.split('?')
+            url=url[0]
+            passes.document = url
         passes.user = user
         passes.gig = gig
         passes.flight = flight
         passes.type = type
-        passes.document = url
         passes.save()
 
         response_data = {
@@ -1996,7 +2003,7 @@ class DocumentUpdateAPIView(CreateAPIView):
             "gig": str(passes.gig),
             "flight": str(passes.flight),
             "type": passes.type,
-            "passes": url
+            "document":str(passes.document)
         }
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
