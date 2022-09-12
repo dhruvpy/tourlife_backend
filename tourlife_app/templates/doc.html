@@ -1,0 +1,26 @@
+<html>
+<body>
+<div>
+    <h2>Document</h2>
+    <hr>
+    <div style="width: 90%;margin: auto;">
+        <div style="display: flex;align-items: center;justify-content: center;">
+            <div style="padding-bottom: 5px;width: 25%;text-align: end;">Document:</div>
+            <div style="padding-left: 10px;width: 75%;"><a href={{doc_list.document}} target="new">PDF</a></div>
+        </div>
+        <div style="display: flex;">
+            <div style="padding-bottom: 5px;width: 25%;text-align: end;">User name: </div>
+            <div style="padding-left: 5px;width: 75%;">{{doc_list.user.username}}</div>
+        </div>
+        <div style="display: flex;">
+            <div style="padding-bottom: 5px;width: 25%;text-align: end;">Gig title: </div>
+            <div style="padding-left: 10px;width: 75%;">{{doc_list.gig.title}}</div>
+        </div>
+        <div style="display: flex;">
+            <div style="padding-bottom: 5px;width: 25%;text-align: end;">Flight name: </div>
+            <div style="padding-left: 10px;width: 75%;">{{doc_list.flight.airlines}}</div>
+        </div>
+    </div>  
+</div>  
+</body>
+</html>

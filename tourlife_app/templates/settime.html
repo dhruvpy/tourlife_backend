@@ -1,0 +1,40 @@
+
+<html>
+    <body>
+    <div>
+        <h2>Contacts</h2>
+        <hr>
+      
+        <div style="width: 90%;margin: auto;">
+            <div style="display: flex;align-items: center;justify-content: center;">
+                <div style="padding-bottom: 5px;width: 25%;text-align: end;">User name:</div>
+                <div style="padding-left: 10px;width: 75%;">{{settime_list.user.username}}</div>
+            </div>
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 25%;text-align: end;">Gig title: </div>
+                <div style="padding-left: 5px;width: 75%;">{{settime_list.gig.title}}</div>
+            </div>
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 25%;text-align: end;">Venue: </div>
+                <div style="padding-left: 10px;width: 75%;">{{settime_list.venue.venue_name}}</div>
+            </div>
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 25%;text-align: end;">Depart time: </div>
+                <div style="padding-left: 10px;width: 75%;">{{settime_list.depart_time}}</div>
+            </div>
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 25%;text-align: end;">Arrival time: </div>
+                <div style="padding-left: 10px;width: 75%;">{{settime_list.arrival_time}}</div>
+            </div>
+            
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 25%;text-align: end;">Add: </div>
+                {% for x in settime_list.add %}
+                <div style="padding-left: 10px;width: 75%;">name:{{x.name}}</div>
+                {% endfor %}
+            </div>
+           
+        </div>
+    </div>
+    </body>
+    </html>

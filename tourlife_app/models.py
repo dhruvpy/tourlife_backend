@@ -1,3 +1,4 @@
+from pyclbr import Class
 from time import time
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -8,7 +9,7 @@ class User(AbstractUser):
     last_name=models.CharField(max_length=20, null=True,blank=True)
     email=models.EmailField(max_length=100,unique=True)
     password=models.CharField(max_length=200,null=True,blank=True)
-    mobile_no=models.CharField(max_length=14,null=True,blank=True)
+    mobile_no=models.CharField(max_length=20,null=True,blank=True)
     profile_image=models.CharField(max_length=5000,null=True,blank=True)
     is_manager=models.BooleanField(default=False)
     is_artist=models.BooleanField(default=False)
@@ -33,12 +34,13 @@ class Gigs(models.Model):
     start_date=models.DateTimeField(null=True,blank=True)
     end_date=models.DateTimeField(null=True,blank=True)
     sound_check_time = models.TimeField(null=True,blank=True)
+    Equipment_email =models.EmailField(max_length=50)
 
     # def save(self, *args, **kwargs):
     #     print(self,'--------------')
 
-    def __str__ (self):
-        return f"{self.title}"
+    # def __str__ (self):
+    #     return f"{self.title}"
 
 class GigMaster(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -81,8 +83,8 @@ class CabBook(models.Model):
     driver_number = models.CharField(max_length=100,null=True,blank=True)
     wather = models.CharField(max_length=100,null=True,blank=True)
 
-    def __str__ (self):
-        return f"{self.arrival_location}"
+    # def __str__ (self):
+    #     return f"{self.arrival_location}"
 
     # 1d416dd6f1f006195c0aa4bd9685b88d
 class Venue(models.Model):
@@ -115,7 +117,6 @@ class Hotel(models.Model):
     direction = models.CharField(max_length=100,null=True,blank=True)
     website =models.CharField(max_length=100,null=True,blank=True)
     number =models.CharField(max_length=100,null=True,blank=True)
-    wifi_paid_for = models.BooleanField(null=True,blank=True)
     room_buyout = models.CharField(max_length=100,null=True,blank=True)
 
 CONTACT_CHOICES=(
@@ -138,13 +139,24 @@ class GuestList(models.Model):
     gig = models.ForeignKey(Gigs,related_name='guest_gig',on_delete=models.CASCADE)
     guestlist_detail=models.TextField(null=True,blank=True)
     guestlist= models.BooleanField(null=True,blank=True)
+    name = models.CharField(max_length=50,null=True)
+    email = models.EmailField(max_length=50)
+    contact_no = models.CharField(max_length=20,null=True,blank=True)
 
+# class Add(models.Model):
+#     name=models.CharField(max_length=34)
+from jsonfield import JSONField
 class SetTime(models.Model):
     user = models.ForeignKey(User,related_name='settime_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='settime_gig',on_delete=models.CASCADE)
     venue = models.ForeignKey(Venue,related_name='settime_venue',on_delete=models.CASCADE)
     depart_time=models.DateTimeField(null=True,blank=True)
     arrival_time=models.DateTimeField(null=True,blank=True)
+    # add = models.CharField(max_length=200,null=True,blank=True)
+    add = JSONField()
+    # add = models.ArrayField(
+    #     model_container=Add,
+    # )
 
 DOCUMENT_CHOICES=(
     ('BOARDING_PASSES','BOARDING_PASSES'),

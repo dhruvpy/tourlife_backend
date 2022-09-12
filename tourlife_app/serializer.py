@@ -3,7 +3,7 @@ from .models import *
 class CreateUserSerializers(serializers.ModelSerializer):
     username=serializers.CharField(required=True)
     first_name=serializers.CharField(required=True)
-    last_name=serializers.CharField(required=True)
+    last_name=serializers.CharField(required=False)
     password=serializers.CharField(required=True)
     email=serializers.EmailField(required=True)
     mobile_no=serializers.IntegerField(required=True)
@@ -39,9 +39,10 @@ class CreateGigsSerializer(serializers.ModelSerializer):
     visa=serializers.CharField(required=True)
     Equipment =serializers.BooleanField(required=True)
     sound_check_time = serializers.TimeField(required=False)
+    Equipment_email = serializers.EmailField(required=True)
     class Meta:
         model=Gigs
-        fields=["user","title","descriptions","cover_image","start_date","end_date","location","show","stage","visa","Equipment","sound_check_time"]
+        fields=["user","title","descriptions","cover_image","start_date","end_date","location","show","stage","visa","Equipment","sound_check_time","Equipment_email"]
         # fields="__all__"
 
 class UserS(serializers.ModelSerializer):
@@ -53,7 +54,7 @@ class ListGigSerializer(serializers.ModelSerializer):
     user = UserS(read_only=True,many=True)
     class Meta:
         model= Gigs
-        fields=["id","user","title","descriptions","cover_image","start_date","end_date","location","show","stage","visa","Equipment","sound_check_time"]
+        fields=["id","user","title","descriptions","cover_image","start_date","end_date","location","show","stage","visa","Equipment","sound_check_time","Equipment_email"]
 
 class FlightSerializer(serializers.ModelSerializer):
     user_id= serializers.ReadOnlyField(source='user.id')
@@ -175,11 +176,10 @@ class HotelSerializer(serializers.ModelSerializer):
     direction = serializers.CharField(required=True)
     website = serializers.CharField(required=True)
     number = serializers.CharField(required=True)
-    wifi_paid_for = serializers.BooleanField(required=True)
     room_buyout = serializers.CharField(required=True)
     class Meta:
         model=Hotel
-        fields=["user","gig","hotel_name","address","direction","website","number","wifi_paid_for","room_buyout"]
+        fields=["user","gig","hotel_name","address","direction","website","number","room_buyout"]
 
 class HotelListSerializer(serializers.ModelSerializer):
     user_id= serializers.ReadOnlyField(source='user.id')
@@ -188,7 +188,7 @@ class HotelListSerializer(serializers.ModelSerializer):
     gig_title= serializers.ReadOnlyField(source='gig.title')
     class Meta:
         model=Hotel
-        fields=["id","user_id","user_name","gig_id","gig_title","hotel_name","address","direction","website","number","wifi_paid_for","room_buyout"]
+        fields=["id","user_id","user_name","gig_id","gig_title","hotel_name","address","direction","website","number","room_buyout"]
 
 
 class ContactSerializer(serializers.ModelSerializer):
@@ -217,9 +217,13 @@ class GuestListSerializer(serializers.ModelSerializer):
     gig=serializers.IntegerField(required=True)
     guestlist_detail= serializers.CharField(required=True)
     guestlist=serializers.BooleanField(required=True)
+    name = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
+    contact_no = serializers.IntegerField(required=True)
+
     class Meta:
         model=GuestList
-        fields=["user","gig","guestlist_detail","guestlist"]
+        fields=["user","gig","guestlist_detail","guestlist","name","email","contact_no"]
 
 class GuestSerializer(serializers.ModelSerializer):
     user_id= serializers.ReadOnlyField(source='user.id')
@@ -228,7 +232,7 @@ class GuestSerializer(serializers.ModelSerializer):
     gig_title= serializers.ReadOnlyField(source='gig.title')
     class Meta:
         model=GuestList
-        fields=["id","user_id","user_name","gig_id","gig_title","guestlist_detail","guestlist"]
+        fields=["id","user_id","user_name","gig_id","gig_title","guestlist_detail","guestlist","name","email","contact_no"]
 
 class SetTimeSerialiazer(serializers.ModelSerializer):
     user=serializers.IntegerField(required=True)
@@ -236,10 +240,16 @@ class SetTimeSerialiazer(serializers.ModelSerializer):
     venue=serializers.IntegerField(required=True)
     depart_time=serializers.DateTimeField(required=True)
     arrival_time=serializers.DateTimeField(required=True)
+    add = serializers.ListField(child=serializers.ReadOnlyField())
+    # add = serializers.CharField(required=True)
+
     class Meta:
         model=SetTime
-        fields= ["user","gig","venue","depart_time","arrival_time"]
+        fields= ["user","gig","venue","depart_time","arrival_time","add"]
 
+# class Settime(object):
+#     def __init__(self, add):
+#         self.add = add
 class SetTimeListSerializer(serializers.ModelSerializer):
     user_id= serializers.ReadOnlyField(source='user.id')
     user_name= serializers.ReadOnlyField(source='user.username')
@@ -247,9 +257,17 @@ class SetTimeListSerializer(serializers.ModelSerializer):
     gig_title= serializers.ReadOnlyField(source='gig.title')
     venue_id= serializers.ReadOnlyField(source='venue.id')
     venue_name= serializers.ReadOnlyField(source='venue.venue_name')
+    
+    add = serializers.ListField(child=serializers.ReadOnlyField())
+    # add = serializers.JSONField()
+    # add = serializers.ListField(
+    # child = serializers.CharField()
+    # )
+    
     class Meta:
         model=SetTime
-        fields= ["id","user_id","user_name","gig_id","gig_title","venue_id","venue_name","depart_time","arrival_time"]
+        fields= ["id","user_id","user_name","gig_id","gig_title","venue_id","venue_name","depart_time",
+        "arrival_time","add"]
 
 
 class DocumentSerializer(serializers.ModelSerializer):
