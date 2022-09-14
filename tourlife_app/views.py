@@ -1244,10 +1244,10 @@ class VenueCreateAPIView(CreateAPIView):
         hospitality_email = request.data["hospitality_email"]
         catring = request.data["catring"]
         catring_detail = request.data["catring_detail"]
-        if Venue.objects.filter(user=user, gig=gig).exists():
-            return Response(data={"status": status.HTTP_400_BAD_REQUEST,
-                                  "message": "Venue is already add this gig", },
-                            status=status.HTTP_400_BAD_REQUEST)
+        # if Venue.objects.filter(user=user, gig=gig).exists():
+        #     return Response(data={"status": status.HTTP_400_BAD_REQUEST,
+        #                           "message": "Venue is already add this gig", },
+        #                     status=status.HTTP_400_BAD_REQUEST)
 
         venue = Venue.objects.create(user=user, gig=gig, venue_name=venue_name,address=address, direction=direction, website=website, number=number,
                                      indoor=indoor, covered=covered,capacity=capacity, credential_collection=credential_collection, dressing_room=dressing_room, 
@@ -1434,11 +1434,11 @@ class GetVenueAPIView(ListAPIView):
 
         gig = Gigs.objects.get(id=id1,user=user)
 
-        venue= Venue.objects.get(user=user,gig=gig)
+        venue= Venue.objects.filter(user=user,gig=gig).all()
         print(venue,">><<>><<>>")
         
         # # queryset = self.get_queryset()
-        serializer = self.get_serializer(venue)
+        serializer = self.get_serializer(venue,many=True)
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
                               "message": "get venue",
@@ -1504,10 +1504,10 @@ class HotelCreateAPIView(CreateAPIView):
         website = request.data["website"]
         number = request.data["number"]
         room_buyout = request.data["room_buyout"]
-        if Hotel.objects.filter(user=user, gig=gig).exists():
-            return Response(data={"status": status.HTTP_400_BAD_REQUEST,
-                                  "message": "hotel is already add this user and gig", },
-                            status=status.HTTP_400_BAD_REQUEST)
+        # if Hotel.objects.filter(user=user, gig=gig).exists():
+        #     return Response(data={"status": status.HTTP_400_BAD_REQUEST,
+        #                           "message": "hotel is already add this user and gig", },
+        #                     status=status.HTTP_400_BAD_REQUEST)
 
         hotel = Hotel.objects.create(user=user, gig=gig, hotel_name=hotel_name, address=address, direction=direction, website=website, number=number,
                                       room_buyout=room_buyout,)
@@ -1633,11 +1633,11 @@ class GetHotelAPIView(ListAPIView):
 
         gig = Gigs.objects.get(id=id1,user=user)
 
-        hotel= Hotel.objects.get(user=user,gig=gig)
+        hotel= Hotel.objects.filter(user=user,gig=gig).all()
         print(hotel,">><<>><<>>")
         
         # # queryset = self.get_queryset()
-        serializer = self.get_serializer(hotel)
+        serializer = self.get_serializer(hotel,many=True)
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
                               "message": "get hotel",
@@ -2915,8 +2915,25 @@ class alllistApiView(GenericAPIView):
 
         allgigs = Gigs.objects.all()
         a=list(allgigs).index(gig)
-        pregig= allgigs[a-1]
-        nextgig = allgigs[a+1]
+        x= len(allgigs)-1
+        
+        nextgig=None
+        pregig=None
+        if not a==x:
+            nextgig=allgigs[a+1]
+            print(allgigs[a+1],":;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;")
+        if not a==0:
+            pregig=allgigs[a-1]
+
+            print(allgigs[a-1],":;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;")
+
+
+        # print(x,"////><><><><><><><><>")
+    
+        
+        
+        # print(a,"::::::::")
+        # pregig= allgigs[a-1]
         # starttime= gig.start_date.time()
         # endtime= gig.end_date.time()
         # date = gig.start_date.date()
@@ -2976,46 +2993,47 @@ class alllistApiView(GenericAPIView):
         if not settime==None:
             all.extend(settime)
         print(all,"?>?>?>?>?>?>")
+        if all==[]:
+            all=None 
 
         if Venue.objects.filter(user__in=users,gig=gig).exists():
-            venue = Venue.objects.get(user__in=users,gig=gig)
+            venue = Venue.objects.filter(user__in=users,gig=gig).all()
             print(venue,"]]]]]]]]]]]]]]]]]]]")
-            if venue.indoor==True:
-                venue.indoor='Yes'
-            else:
-                venue.indoor='No'
-            if venue.covered==True:
-                venue.covered='Yes'
-            else:
-                venue.covered='No'
-            if venue.hospitality==True:
-                venue.hospitality='Confirmed'
-            else:
-                venue.hospitality='Unconfirmed'
-            if venue.catring==True:
-                venue.catring='Confirmed'
-            else:
-                venue.catring='Unconfirmed'
+            for ven in venue:
+                if ven.indoor==True:
+                    ven.indoor='Yes'
+                else:
+                    ven.indoor='No'
+                if ven.covered==True:
+                    ven.covered='Yes'
+                else:
+                    ven.covered='No'
+                if ven.hospitality==True:
+                    ven.hospitality='Confirmed'
+                else:
+                    ven.hospitality='Unconfirmed'
+                if ven.catring==True:
+                    ven.catring='Confirmed'
+                else:
+                    ven.catring='Unconfirmed'
         
         else:
             venue=None 
 
         if Hotel.objects.filter(user__in=users,gig=gig).exists():
-            hotel = Hotel.objects.get(user__in=users,gig=gig)
+            hotel = Hotel.objects.filter(user__in=users,gig=gig).all()
         else:
             hotel=None
-
-        
-
+        cont=[]
         if Contacts.objects.filter(user__in=users,gig=gig).exists():
             contact = Contacts.objects.filter(user__in=users,gig=gig).all()
             
+            for con in contact:
+                cont.append(con.travelling_party)
+            print(cont,"??????????>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
         else:
             contact=None
-        cont=[]
-        for con in contact:
-            cont.append(con.travelling_party)
-        print(cont,"??????????>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+            
 
         if GuestList.objects.filter(user__in=users,gig=gig).exists():
             guestlist = GuestList.objects.filter(user__in=users,gig=gig).all()
@@ -3105,11 +3123,11 @@ class alldataApiView(GenericAPIView):
         print(gigs.user.all().values_list('username', flat=True),"????????????????????????????????")
 
         allgigs = Gigs.objects.all()
+        print(allgigs,"////////////////////////")
         a=list(allgigs).index(gig)
         pregig= allgigs[a-1]
         nextgig = allgigs[a+1]
-        starttime= gig.start_date.time()
-        endtime= gig.end_date.time()
+        
 
         # print(s,"?>?>")
         # g=gig.id-1

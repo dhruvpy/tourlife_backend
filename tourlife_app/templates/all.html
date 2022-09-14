@@ -85,8 +85,9 @@
             </div>
             {% endif %}
             {% endfor %}
-            
+            {% if True in cont %}
             <h3>Travelling party</h3>
+            {% endif %}
             {% for contact in contact_list %}
             {% if contact.travelling_party is True%}
             <div style="margin: auto;width: 90%;">
@@ -138,68 +139,70 @@
 
         {% endif %} -->
         {% if not venue_list is None %}
-
+            {% for venue in venue_list%}
             <h2>Venue</h2>
             <hr>
             <div style="width: 90%;margin: auto;padding-bottom: 20px;">
                 
                 <div style="display: flex;">
                     <div style="padding-bottom: 5px;width: 30%;text-align: end;">Name: </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue_list.venue_name}}</div>
+                    <div style="padding-left: 10px;width: 70%;">{{venue.venue_name}}</div>
                 </div>
                 <div style="display: flex;">
                     <div style="padding-bottom: 5px;width: 30%;text-align: end;">Website: </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue_list.website}}</div>
+                    <div style="padding-left: 10px;width: 70%;">{{venue.website}}</div>
                 </div>
                 <div style="display: flex;">
                     <div style="padding-bottom: 5px;width: 30%;text-align: end;">Phone: </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue_list.number}}</div>
+                    <div style="padding-left: 10px;width: 70%;">{{venue.number}}</div>
                 </div>
                 <div style="display: flex;">
                     <div style="padding-bottom: 5px;width: 30%;text-align: end;">Address: </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue_list.address}}</div>
+                    <div style="padding-left: 10px;width: 70%;">{{venue.address}}</div>
                 </div>
                 
                 <div style="display: flex;">
                     <div style="padding-bottom: 5px;width: 30%;text-align: end;">Details: </div>
-                    <div style="padding-left: 10px;width: 70%;">Indoor:{{venue_list.indoor}}</div>
+                    <div style="padding-left: 10px;width: 70%;">Indoor:{{venue.indoor}}</div>
                 </div>
                 <div style="display: flex;">
                     <div style="padding-bottom: 5px;width: 30%;text-align: end;"> </div>
-                    <div style="padding-left: 10px;width: 70%;padding-bottom: 5px;">Covered:{{venue_list.covered}}</div>
+                    <div style="padding-left: 10px;width: 70%;padding-bottom: 5px;">Covered:{{venue.covered}}</div>
                 </div>
                 <div style="display: flex;">
                     <div style="padding-bottom: 5px;width: 30%;text-align: end;">Credential collection: </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue_list.credential_collection}}</div>
+                    <div style="padding-left: 10px;width: 70%;">{{venue.credential_collection}}</div>
                 </div>
                 
                 <div style="display: flex;">
                     <div style="padding-bottom: 5px;width: 30%;text-align: end;">Dressing room: </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue_list.dressing_room}}</div>
+                    <div style="padding-left: 10px;width: 70%;">{{venue.dressing_room}}</div>
                 </div>
                 <div style="display: flex;">
                     <div style="width: 30%;text-align: end;">Hospitality: </div>
-                    <div style="padding-left: 10px;width: 70%;"><b>{{venue_list.hospitality}}</b></div>
+                    <div style="padding-left: 10px;width: 70%;"><b>{{venue.hospitality}}</b></div>
                 </div>
                 <div style="display: flex;">
                     <div style="padding-bottom: 5px;width: 30%;text-align: end;"> </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue_list.hospitality_detail}}</div>
+                    <div style="padding-left: 10px;width: 70%;">{{venue.hospitality_detail}}</div>
                 </div>
                 <div style="display: flex;">
                     <div style="padding-bottom: 5px;width: 30%;text-align: end;"> </div>
-                    <div style="padding-left: 10px;width: 70%;padding-bottom: 5px">{{venue_list.hospitality_email}}</div>
+                    <div style="padding-left: 10px;width: 70%;padding-bottom: 5px">{{venue.hospitality_email}}</div>
                 </div>
                 <div style="display: flex;">
                     <div style="width: 30%;text-align: end;">Catring: </div>
-                    <div style="padding-left: 10px;width: 70%;"><b>{{venue_list.catring}}</b></div>
+                    <div style="padding-left: 10px;width: 70%;"><b>{{venue.catring}}</b></div>
                 </div>
                 <div style="display: flex;">
                     <div style="padding-bottom: 5px;width: 30%;text-align: end;"> </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue_list.catring_detail}}</div>
+                    <div style="padding-left: 10px;width: 70%;">{{venue.catring_detail}}</div>
                 </div>
             </div>
+            {% endfor %}
         {% endif %}
         {% if not hotel_list is None %}
+        {% for hotel in hotel_list %}
 
         <h2>Hotel</h2>
         <hr>
@@ -207,31 +210,34 @@
            
             <div style="display: flex;">
                 <div style="padding-bottom: 5px;width: 30%;text-align: end;">Name: </div>
-                <div style="padding-left: 10px;width: 70%;">{{hotel_list.hotel_name}}</div>
+                <div style="padding-left: 10px;width: 70%;">{{hotel.hotel_name}}</div>
             </div>
             <div style="display: flex;">
                 <div style="padding-bottom: 5px;width: 30%;text-align: end;">Phone: </div>
-                <div style="padding-left: 10px;width: 70%;">{{hotel_list.number}}</div>
+                <div style="padding-left: 10px;width: 70%;">{{hotel.number}}</div>
             </div>
             <div style="display: flex;">
                 <div style="padding-bottom: 5px;width: 30%;text-align: end;">Address: </div>
-                <div style="padding-left: 10px;width: 70%;">{{hotel_list.address}}</div>
+                <div style="padding-left: 10px;width: 70%;">{{hotel.address}}</div>
             </div>
             <div style="display: flex;">
                 <div style="padding-bottom: 5px;width: 30%;text-align: end;">Website: </div>
-                <div style="padding-left: 10px;width: 70%;">{{hotel_list.website}}</div>
+                <div style="padding-left: 10px;width: 70%;">{{hotel.website}}</div>
             </div>
             <div style="display: flex;">
                 <div style="padding-bottom: 5px;width: 30%;text-align: end;">Room buyout: </div>
-                <div style="padding-left: 10px;width: 70%;">{{hotel_list.room_buyout}}</div>
+                <div style="padding-left: 10px;width: 70%;">{{hotel.room_buyout}}</div>
             </div>
             
         </div>
+        {% endfor %}
         {% endif %}
-        
+        {% if not all is None %}
         <h2>Schedule</h2>
         <hr>
+        {% endif %}
         <!-- {{settime_list}} -->
+        
         {% for a in all|dictsort:"depart_time" %}
         {% if not cab_list is None %}
         {% if a in cab_list %}
