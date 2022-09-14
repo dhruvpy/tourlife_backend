@@ -6,7 +6,7 @@ class CreateUserSerializers(serializers.ModelSerializer):
     last_name=serializers.CharField(required=False)
     password=serializers.CharField(required=True)
     email=serializers.EmailField(required=True)
-    mobile_no=serializers.IntegerField(required=True)
+    mobile_no=serializers.CharField(required=True)
     profile_image=serializers.FileField(required=False)
     is_manager=serializers.BooleanField(required=False)
     is_artist=serializers.BooleanField(required=False)
@@ -219,7 +219,7 @@ class GuestListSerializer(serializers.ModelSerializer):
     guestlist=serializers.BooleanField(required=True)
     name = serializers.CharField(required=True)
     email = serializers.EmailField(required=True)
-    contact_no = serializers.IntegerField(required=True)
+    contact_no = serializers.CharField(required=True)
 
     class Meta:
         model=GuestList

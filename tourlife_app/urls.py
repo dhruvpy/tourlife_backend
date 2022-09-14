@@ -27,41 +27,41 @@ urlpatterns = [
      path('flightbook_list',views.FlightBookListAPIView.as_view(),name='flightbook_list'),
      path('flightbook_delete/<int:pk>',views.FlightBookDeleteAPIView.as_view(),name='flightbook_delete'),
      path('all_flight',views.GetallFlightAPIView.as_view(),name='all_flight'), 
-     path('get_flight/<int:pk>',views.GetFlightAPIView.as_view(),name='get_flight'),
+     path('get_flight/<int:pk>/<int:pk1>',views.GetFlightAPIView.as_view(),name='get_flight'),
      
      
      path('cabbook_create',views.CabBookCreateAPIView.as_view(),name='cabbook_create'),
      path('cabbook_update/<int:pk>',views.CabBookUpdateAPIView.as_view(),name='cabbook_update'),
      path('cabbook_list',views.CabBookListAPIView.as_view(),name='cabbook_list'),
      path('cabbook_delete/<int:pk>',views.CabBookDeleteAPIView.as_view(),name='cabbook_delete'),
-     path('get_cab/<int:pk>',views.GetCabAPIView.as_view(),name='get_cab'),
+     path('get_cab/<int:pk>/<int:pk1>',views.GetCabAPIView.as_view(),name='get_cab'),
      
      path('venue_create',views.VenueCreateAPIView.as_view(),name='venue_create'),
      path('venue_update/<int:pk>',views.VenueUpdateAPIView.as_view(),name='venue_update'),
      path('venue_list',views.VenueListAPIView.as_view(),name='venue_list'),
      path('venue_delete/<int:pk>',views.VenueDeleteAPIView.as_view(),name='venue_delete'),
      path('all_venue',views.GetallVenueAPIView.as_view(),name='all_venue'),
-     path('get_venue/<int:pk>',views.GetVenueAPIView.as_view(),name='get_venue'),
+     path('get_venue/<int:pk>/<int:pk1>',views.GetVenueAPIView.as_view(),name='get_venue'),
 
      path('hotel_create',views.HotelCreateAPIView.as_view(),name='hotel_create'),
      path('hotel_update/<int:pk>',views.HotelUpdateAPIView.as_view(),name='hotel_update'),
      path('hotel_list',views.HotelListAPIView.as_view(),name='hotel_list'),
      path('hotel_delete/<int:pk>',views.HotelDeleteAPIView.as_view(),name='hotel_delete'),
-     path('get_hotel/<int:pk>',views.GetHotelAPIView.as_view(),name='get_hotel'),
+     path('get_hotel/<int:pk>/<int:pk1>',views.GetHotelAPIView.as_view(),name='get_hotel'),
 
  
      path('contact_create',views.ContactCreateAPIView.as_view(),name='contact_create'),
      path('contact_update/<int:pk>',views.ContactUpdateAPIView.as_view(),name='contact_update'),
      path('contact_list',views.ContactListAPIView.as_view(),name='contact_list'),
      path('contact_delete/<int:pk>',views.ContactDeleteAPIView.as_view(),name='contact_delete'),
-     path('get_contact/<int:pk>',views.GetContactsAPIView.as_view(),name='get_contact'),
+     path('get_contact/<int:pk>/<int:pk1>',views.GetContactsAPIView.as_view(),name='get_contact'),
  
 
      path('guestlist_create',views.GuestListCreateAPIView.as_view(),name='guestlist_create'),
      path('guestlist_update/<int:pk>',views.GuestListUpdateAPIView.as_view(),name='guestlist_update'),
      path('guestlist_list',views.GuestListListAPIView.as_view(), name="guestlist_list"),
      path('guestlist_delete/<int:pk>',views.GuestListDeleteAPIView.as_view(),name='guestlist_delete'),
-     path('get_guestlist/<int:pk>',views.GetGuestlistAPIView.as_view(),name='get_guestlist'),
+     path('get_guestlist/<int:pk>/<int:pk1>',views.GetGuestlistAPIView.as_view(),name='get_guestlist'),
 
      
      path('settime_create',views.SetTimeCreateAPIView.as_view(),name='settime_create'),
@@ -69,13 +69,13 @@ urlpatterns = [
      path('settime_list',views.SetTimeListAPIView.as_view(), name="settime_list"),
      path('settime_delete/<int:pk>',views.SetTimeDeleteAPIView.as_view(),name='settime_delete'),
      path('all_set',views.GetAllSettimeAPIView.as_view(), name="all_set"),
-     path('get_settime/<int:pk>',views.GetSettimeAPIView.as_view(),name='get_settime'),
+     path('get_settime/<int:pk>/<int:pk1>',views.GetSettimeAPIView.as_view(),name='get_settime'),
 
      path('document_create',views.DocumentCreateAPIView.as_view(),name='document_create'),
      path('document_update/<int:pk>',views.DocumentUpdateAPIView.as_view(),name='document_update'),
      path('document_list',views.DocumentListAPIView.as_view(), name="document_list"),
      path('document_delete/<int:pk>',views.DocumentDeleteAPIView.as_view(),name='document_delete'),
-     path('get_document/<int:pk>',views.GetDocumentAPIView.as_view(), name="get_document"),
+     path('get_document/<int:pk>/<int:pk1>',views.GetDocumentAPIView.as_view(), name="get_document"),
 
 
      path('forgot_password',views.ForgotPasswordAPIView.as_view(),name='forgot_password'),
