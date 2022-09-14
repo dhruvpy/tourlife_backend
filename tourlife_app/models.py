@@ -67,8 +67,8 @@ class FlightBook(models.Model):
     flight_class = models.CharField(max_length=100,null=True,blank=True)
     wather = models.CharField(max_length=100,null=True,blank=True)
 
-    def __str__ (self):
-        return f"{self.flight_number}"
+    # def __str__ (self):
+    #     return f"{self.flight_number}"
 
 class CabBook(models.Model):
     user = models.ForeignKey(User,related_name='cab_user',on_delete=models.CASCADE)

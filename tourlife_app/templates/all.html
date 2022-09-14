@@ -9,7 +9,7 @@
         <div style="width: 90%;margin: auto;">
             <div style="display: flex;">
                 <div style="padding-bottom: 5px;width: 30%;text-align: end;">Act: </div>
-                <div style="padding-left: 10px;width: 70%;">{{user.username}}</div>
+                <div style="padding-left: 10px;width: 70%;"><b>{{user.username}}</b></div>
             </div>
             <div style="display: flex;">
                 <div style="padding-bottom: 5px;width: 30%;text-align: end;">Name: </div>
@@ -43,7 +43,7 @@
             <div style="display: flex;">
                
                 <div style="width: 30%;text-align: end;">Equipment: </div>
-                <div style="padding-left: 10px;width: 70%;">{{gig_list.Equipment}}</div>
+                <div style="padding-left: 10px;width: 70%;"><b>{{gig_list.Equipment}}</b></div>
             </div>
             <div style="display: flex;">
                 <div style="padding-bottom: 5px;width: 30%;text-align: end;"></div>
@@ -68,7 +68,7 @@
         </div>
         
         <div>
-        {% if not contact_list is None %}
+            {% if not contact_list is None %}
             <h2>Contacts</h2>
             <hr>
             {% for contact in contact_list %}
@@ -103,6 +103,40 @@
             {% endfor %}
 
         {% endif %}
+        <!-- {% if not contact_list is None %}
+            <h2>Contacts</h2>
+            <hr>
+            {% for contact in contact_list %}
+            {% if contact.travelling_party is False%}
+            <div style="margin: auto;width: 90%;">
+                <div style="display: flex;">
+                    <div style="width: 30%;text-align: end;padding-right: 10px;">{{contact.type}}</div>
+                    <div style="width: 70%;"><b>{{contact.name}}</b> 
+                    <span>Tel:{{contact.number}}</span>
+                    <span>Email:{{contact.email}}</span>
+
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+            <h3>Travelling party</h3>
+            {% for contact in contact_list %}
+            {% if contact.travelling_party is True%}
+            <div style="margin: auto;width: 90%;">
+                <div style="display: flex;">
+                    <div style="width: 30%;text-align: end;padding-right: 10px;">{{contact.type}}</div>
+                    <div style="width: 70%;"><b>{{contact.name}}</b> 
+                    <span>Tel:{{contact.number}}</span>
+                    <span>Email:{{contact.email}}</span>
+
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+
+        {% endif %} -->
         {% if not venue_list is None %}
 
             <h2>Venue</h2>
@@ -201,10 +235,104 @@
         
         <h2>Schedule</h2>
         <hr>
-   
-        
-
+        <!-- {{settime_list}} -->
+        {% for a in all|dictsort:"depart_time" %}
         {% if not cab_list is None %}
+        {% if a in cab_list %}
+        <h2>Car</h2>
+        <div style="width: 90%;margin: auto;padding-bottom: 20px;">
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Departs at: </div>
+                <div style="padding-left: 10px;width: 70%;">{{a.depart_time}}</div>
+            </div>
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Arrives at: </div>
+                <div style="padding-left: 10px;width: 70%;">{{a.arrival_time}}</div>
+            </div>
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 30%;text-align: end;">From: </div>
+                <div style="padding-left: 10px;width: 70%;">{{a.depart_location}}</div>
+            </div>
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 30%;text-align: end;">To: </div>
+                <div style="padding-left: 10px;width: 70%;">{{a.arrival_location}}</div>
+            </div>
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 30%;text-align: end;">People travelling: </div>
+                <div style="padding-left: 10px;width: 70%;">{{a.user.username}}</div>
+            </div>
+        </div> 
+        
+        {% endif %}
+        {% endif %}
+        {% if not flight_list is None %}
+        {% if a in flight_list %}
+        <h2>Flight</h2>
+        <div style="width: 90%;margin: auto;padding-bottom: 20px;">
+            
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Departs at: </div>
+                <div style="padding-left: 10px;width: 70%;">{{a.depart_time}}</div>
+            </div>
+            
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Arrives at: </div>
+                <div style="padding-left: 10px;width: 70%;">{{a.arrival_time}}</div>
+            </div>
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 30%;text-align: end;">From: </div>
+                <div style="padding-left: 10px;width: 70%;">{{a.depart_location}}</div>
+            </div>
+           
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 30%;text-align: end;">To: </div>
+                <div style="padding-left: 10px;width: 70%;">{{a.arrival_location}}</div>
+            </div>
+            
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Flight number: </div>
+                <div style="padding-left: 10px;width: 70%;">{{a.flight_number}}</div>
+            </div>
+            <div style="display: flex;">
+               
+                <div style="padding-bottom: 5px;width: 30%;text-align: end;"> Class: </div>
+                <div style="padding-left: 10px;width: 70%;">{{a.flight_class}}</div>
+            </div>
+            <div style="display: flex;">
+               
+                <div style="padding-bottom: 5px;width: 30%;text-align: end;"> People travelling: </div>
+                <div style="padding-left: 10px;width: 70%;">{{a.user.username}}</div>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+        {% if not settime_list is None %}
+        {% if a in settime_list %}
+        <h2>Settime</h2>
+        <div style="width: 90%;margin: auto;padding-bottom: 20px;">
+        
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Starts at: </div>
+                <div style="padding-left: 10px;width: 70%;">{{a.depart_time}}</div>
+            </div>
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Finishes at: </div>
+                <div style="padding-left: 10px;width: 70%;">{{a.arrival_time}}</div>
+            </div>
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Location: </div>
+                <div style="padding-left: 10px;width: 70%;">{{a.venue.venue_name}}</div>
+            </div>
+            <div style="display: flex;">
+                <div style="padding-bottom: 5px;width: 30%;text-align: end;">People included: </div>
+                <div style="padding-left: 10px;width: 70%;">{{a.user.username}}</div>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+
+        <!-- {% if not cab_list is None %}
         {% for cab in cab_list|dictsort:"depart_time" %}
         
         <h2>Car</h2>
@@ -283,7 +411,7 @@
         {% endif %}
         {% if not settime_list is None %}
         
-        {% for settime in settime_list or [] %}
+        {% for settime in settime_list%}
         <h2>Settime</h2>
         <div style="width: 90%;margin: auto;padding-bottom: 20px;">
         
@@ -307,7 +435,7 @@
             
         </div>
         {% endfor %}
-        {% endif %}
+        {% endif %} -->
     </div>
         
     </body>
