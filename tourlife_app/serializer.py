@@ -10,6 +10,7 @@ class CreateUserSerializers(serializers.ModelSerializer):
     profile_image=serializers.FileField(required=False)
     is_manager=serializers.BooleanField(required=False)
     is_artist=serializers.BooleanField(required=False)
+    # is_delete= serializers.BooleanField(required=False)
     class Meta:
         model= User
         fields= ["username","first_name","last_name","password","email","mobile_no","profile_image","is_manager","is_artist"]

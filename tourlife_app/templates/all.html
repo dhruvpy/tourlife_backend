@@ -75,7 +75,7 @@
             {% if contact.travelling_party is False%}
             <div style="margin: auto;width: 90%;">
                 <div style="display: flex;">
-                    <div style="width: 30%;text-align: end;padding-right: 10px;">{{contact.type}}</div>
+                    <div style="width: 30%;text-align: end;padding-right: 10px;">{{contact.type}}:</div>
                     <div style="width: 70%;"><b>{{contact.name}}</b> 
                     <span>Tel:{{contact.number}}</span>
                     <span>Email:{{contact.email}}</span>
@@ -92,7 +92,7 @@
             {% if contact.travelling_party is True%}
             <div style="margin: auto;width: 90%;">
                 <div style="display: flex;">
-                    <div style="width: 30%;text-align: end;padding-right: 10px;">{{contact.type}}</div>
+                    <div style="width: 30%;text-align: end;padding-right: 10px;">{{contact.type}}:</div>
                     <div style="width: 70%;"><b>{{contact.name}}</b> 
                     <span>Tel:{{contact.number}}</span>
                     <span>Email:{{contact.email}}</span>
@@ -139,9 +139,12 @@
 
         {% endif %} -->
         {% if not venue_list is None %}
-            {% for venue in venue_list%}
-            <h2>Venue</h2>
+        <h2>Venue</h2>
             <hr>
+            {% for venue in venue_list%}
+            {% if venue_list|length >= 2 %}
+            <h3>Venue {{forloop.counter}}</h3>
+            {% endif %}
             <div style="width: 90%;margin: auto;padding-bottom: 20px;">
                 
                 <div style="display: flex;">
@@ -202,10 +205,13 @@
             {% endfor %}
         {% endif %}
         {% if not hotel_list is None %}
-        {% for hotel in hotel_list %}
-
         <h2>Hotel</h2>
         <hr>
+
+        {% for hotel in hotel_list %}
+        {% if hotel_list|length >= 2 %}
+        <h3>Hotel{{forloop.counter}}</h3>
+        {% endif %}
         <div style="width: 90%;margin: auto;padding-bottom: 20px;">
            
             <div style="display: flex;">

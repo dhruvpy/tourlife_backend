@@ -1,5 +1,3 @@
-import email
-from unicodedata import name
 from .models import *
 from .serializer import *
 from rest_framework.generics import GenericAPIView, ListAPIView, CreateAPIView, UpdateAPIView, RetrieveAPIView, DestroyAPIView
@@ -17,15 +15,12 @@ from .pagination import CustomPagination
 from rest_framework.pagination import PageNumberPagination
 import json
 from django.template.loader import get_template 
-import pdfkit
 from django.template.loader import render_to_string
 from rest_framework.renderers import JSONRenderer
 from django.shortcuts import render
 from django.http import HttpResponse
 
 from django.http import HttpResponse
-from django.views.generic import View
-from .process import html_to_pdf 
 import pdfkit  
 import datetime
 class UserCreateAPIView(GenericAPIView):
@@ -49,14 +44,16 @@ class UserCreateAPIView(GenericAPIView):
         profile_image = request.FILES.get('profile_image')
         is_manager = request.data["is_manager"]
         is_artist = request.data["is_artist"]
+        # is_delete = request.data["is_delete"]
 
         if User.objects.filter(username=username).exists() | User.objects.filter(email=email).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "This email or username is already exists"}, status=status.HTTP_400_BAD_REQUEST)
         
-        user = User.objects.create(username=username, first_name=first_name,  password=password, email=email, mobile_no=mobile_no,is_manager=is_manager,is_artist=is_artist)
+        user = User.objects.create(username=username, first_name=first_name,  password=password, email=email, mobile_no=mobile_no,is_manager=is_manager,is_artist=is_artist,is_delete=False)
         print(profile_image,"////////////////////")
         if not last_name==None:
             user.last_name=last_name
+
         session = boto3.session.Session()
         client = session.client('s3',
                                 region_name='fra1',
@@ -66,7 +63,7 @@ class UserCreateAPIView(GenericAPIView):
         today= datetime.datetime.now()
         print(today,"???????????????????????????????")
         client.put_object(Bucket='tourlife_test',
-                          Key='User/user/'+str(user.id)+'/'+str(today)+'.png',
+                          Key='User/user'+str(user.id)+str(today)+'.png',
                           Body= profile_image,
                           ACL='public-read-write',
                           ContentType='image/png',
@@ -74,7 +71,7 @@ class UserCreateAPIView(GenericAPIView):
 
         url = client.generate_presigned_url(ClientMethod='get_object',
                                             Params={'Bucket': 'tourlife_test',
-                                                    'Key': 'User/user/'+str(user.id)+'/'+str(today)+'.png'}, HttpMethod=None)
+                                                    'Key': 'User/user/'+str(user.id)+str(today)+'.png'}, HttpMethod=None)
 
         url=url.split('?')
         url=url[0]
@@ -91,7 +88,8 @@ class UserCreateAPIView(GenericAPIView):
             "mobile_no": str(user.mobile_no),
             "profile_image": str(url),
             "is_artist": user.is_artist,
-            "is_manager": user.is_manager
+            "is_manager": user.is_manager,
+            "is_delete":user.is_delete
         }
         return Response(data={"status": status.HTTP_200_OK,
                               "message": 'Add new user',
@@ -141,7 +139,7 @@ class UserUpdateAPIView(CreateAPIView):
         
         if not profile_image== None:
             client.put_object(Bucket='tourlife_test',
-                            Key='User/user/'+str(user.id)+'/'+str(today)+'.png',
+                            Key='User/user'+str(user.id)+str(today)+'.png',
                             Body= profile_image,
                             ACL='public-read-write',
                             ContentType='image/png',
@@ -149,7 +147,7 @@ class UserUpdateAPIView(CreateAPIView):
 
             url = client.generate_presigned_url(ClientMethod='get_object',
                                                 Params={'Bucket': 'tourlife_test',
-                                                'Key': 'User/user/'+str(user.id)+'/'+str(today)+'.png'}, HttpMethod=None)
+                                                'Key': 'User/user'+str(user.id)+str(today)+'.png'}, HttpMethod=None)
 
             url=url.split('?')
             url=url[0]
@@ -195,13 +193,16 @@ class UserListAPIView(ListAPIView):
 
     serializer_class = ListUserSerializers
     
-    queryset = User.objects.all().exclude(email='admin@gmail.com')
+    queryset = User.objects.all().exclude(email='admin@gmail.com').exclude(is_delete=True)
+
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
         #                     status=status.HTTP_400_BAD_REQUEST)
         queryset = self.get_queryset()
+        
+            
         serializer = self.get_serializer(queryset, many=True)
         page = self.paginate_queryset(serializer.data)
 
@@ -212,7 +213,7 @@ class GetAllUserAPIView(ListAPIView):
     permission_classes = [AllowAny]
 
     serializer_class = ListUserSerializers
-    queryset = User.objects.all().exclude(email='admin@gmail.com')
+    queryset = User.objects.all().exclude(email='admin@gmail.com').exclude(is_delete=True)
 
 
     def get(self, request, *args, **kwargs):
@@ -242,7 +243,13 @@ class GetUserAPIView(ListAPIView):
         if not User.objects.filter(id=id).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "user is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
+
         user = User.objects.get(id=id)
+        if user.is_delete == True:
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "user is not exists"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        
+
         
         # queryset = self.get_queryset()
         serializer = self.get_serializer(user)
@@ -252,32 +259,38 @@ class GetUserAPIView(ListAPIView):
                               "data": serializer.data},
                         status=status.HTTP_200_OK,)
 
-class UserDeleteAPIView(DestroyAPIView):
+class UserDeleteAPIView(GenericAPIView):
     permission_classes = [AllowAny]
 
     serializer_class = CreateUserSerializers
 
-    def delete(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         # if not request.user.is_manager:
         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
         #                     status=status.HTTP_400_BAD_REQUEST)
+        # is_delete=request.data["is_delete"]
+        # print(is_delete,"////////////////////////////")
+
         id = self.kwargs["pk"]
         if not User.objects.filter(id=id).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.get(id=id)
-
-        user.delete()
-        session = boto3.session.Session()
-        client = session.client('s3',
-                                region_name='fra1',
-                                endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
-                                aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
-                                aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
-        today= datetime.datetime.now()
+        # if is_delete==True:
+        #     user.delete()
+        user.is_delete=True
+        user.save()
+        # session = boto3.session.Session()
+        # client = session.client('s3',
+        #                         region_name='fra1',
+        #                         endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
+        #                         aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
+        #                         aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
+        # today= datetime.datetime.now()
+        # if is_delete==True:
         
-        client.delete_object(Bucket='tourlife_test', Key='User/user/'+str(id)+'/'+str(today)+'.png')
+        #     client.delete_object(Bucket='tourlife_test', Key='User/user/'+str(id)+'/'+str(today)+'.png')
 
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
@@ -486,7 +499,8 @@ class GigsCreateAPIView(CreateAPIView):
         today= datetime.datetime.now()
         
         client.put_object(Bucket='tourlife_test',
-                          Key='Gigs/gig/'+str(gigs.id)+'/'+str(today)+'.png',
+                          Key='Gigs/gig'+str(gigs.id)+str(today)+'.png',
+                          
                         #   Body=bytes(json.dumps(profile_image).encode()),
                         Body= cover_image,
                         ACL='public-read-write',
@@ -495,11 +509,13 @@ class GigsCreateAPIView(CreateAPIView):
 
         url = client.generate_presigned_url(ClientMethod='get_object',
                                             Params={'Bucket': 'tourlife_test',
-                                                    'Key': 'Gigs/gig/'+str(gigs.id)+'/'+str(today)+'.png'},  HttpMethod=None)
+                                                    'Key': 'Gigs/gig'+str(gigs.id)+str(today)+'.png'},  HttpMethod=None)
+        
         url=url.split('?')
         url=url[0]
         gigs.cover_image=url
         print(gigs.id,'----------')
+        
         gigs.save()
 
         for i in user:
@@ -566,11 +582,21 @@ class GigsUpdateAPIView(CreateAPIView):
 
         gigs = Gigs.objects.get(id=id)
         print(user,"/////////////////////////")
+        session = boto3.session.Session()
+        client = session.client('s3',
+                                region_name='fra1',
+                                endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
+                                aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
+                                aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
+        # key=gigs.cover_image.split('.com/')
+        # print(key,";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;")
+        # client.delete_object(Bucket='tourlife_test', Key=key[1])
+        # # print(gat,"::::::::::::::::::::::::")
         a = GigMaster.objects.filter(gig=gigs)
         a.delete()
         for i in user:
             GigMaster.objects.create(gig=gigs,user=i)
-    
+        print(gigs.cover_image,"/////////////////////////////////////////////////////////////////////////////")
         session = boto3.session.Session()
         client = session.client('s3',
                                 region_name='fra1',
@@ -581,7 +607,7 @@ class GigsUpdateAPIView(CreateAPIView):
         
         if not cover_image == None:
             client.put_object(Bucket='tourlife_test',
-                            Key='Gigs/gig/'+str(gigs.id)+'/'+str(today)+'.png',
+                            Key='Gigs/gig'+str(gigs.id)+str(today)+'.png',
                             # Body=bytes(json.dumps(cover_image).encode()),
                             Body= cover_image,
                             ACL='public-read-write',
@@ -590,7 +616,7 @@ class GigsUpdateAPIView(CreateAPIView):
 
             url = client.generate_presigned_url(ClientMethod='get_object',
                                                 Params={'Bucket': 'tourlife_test',
-                                                        'Key': 'Gigs/gig/'+str(gigs.id)+'/'+str(today)+'.png'}, HttpMethod=None)
+                                                        'Key': 'Gigs/gig'+str(gigs.id)+str(today)+'.png'}, HttpMethod=None)
             url=url.split('?')
             url=url[0]
             gigs.cover_image = url
@@ -686,12 +712,26 @@ class GetGigsAPIView(ListAPIView):
         # if not request.user.is_manager:
         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
         #                     status=status.HTTP_400_BAD_REQUEST)
+    
         id = self.kwargs["pk"]
         if not Gigs.objects.filter(id=id).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gigs is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
         gig = Gigs.objects.get(id=id)
-        
+
+        # session = boto3.session.Session()
+        # client = session.client('s3',
+        #                         region_name='fra1',
+        #                         endpoint_url='https://notificationimages.fra1.digitaloceanspaces.com',
+        #                         aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
+        #                         aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
+
+        # key=gig.cover_image.split('.com')
+        # print(gig.cover_image,";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;")
+        # print('Gigs/gig'+str(gig.id)+'.png')
+        # print(key,";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;")
+        # obj=client.delete_object(Bucket='tourlife_test', Key=gig.cover_image)
+        # print(obj,":::::::::::::::::::::::::::::::::")
         # queryset = self.get_queryset()
         serializer = self.get_serializer(gig)
         print(gig.id,"?///////////////////////////")
@@ -1677,6 +1717,7 @@ class HotelDeleteAPIView(DestroyAPIView):
         # if not request.user.is_manager:
         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
         #                     status=status.HTTP_400_BAD_REQUEST)
+        
         id = self.kwargs["pk"]
         if not Hotel.objects.filter(id=id).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Hotel is not exists"}, status=status.HTTP_400_BAD_REQUEST)
@@ -2311,12 +2352,12 @@ class DocumentCreateAPIView(CreateAPIView):
             Bucket= 'tourlife_test',
             ACL='public-read-write',
             Body=document,
-            Key='Documents/doc/'+str(passes.id)+'/'+str(today)+'.pdf',
+            Key='Documents/doc'+str(passes.id)+str(today)+'.pdf',
         )
         
         url = client.generate_presigned_url(ClientMethod='get_object',
                                             Params={'Bucket': 'tourlife_test',
-                                                    'Key': 'Documents/doc/'+str(passes.id)+'/'+str(today)+'.pdf'}, HttpMethod=None)
+                                                    'Key': 'Documents/doc'+str(passes.id)+str(today)+'.pdf'}, HttpMethod=None)
         url=url.split('?')
         url=url[0]
         passes.document= url
@@ -2386,11 +2427,11 @@ class DocumentUpdateAPIView(CreateAPIView):
             Bucket= 'tourlife_test',
             ACL='public-read-write',
             Body=document,
-            Key='Documents/doc/'+str(passes.id)+'/'+str(today)+'.pdf',
+            Key='Documents/doc'+str(passes.id)+str(today)+'.pdf',
         )
             url = client.generate_presigned_url(ClientMethod='get_object',
                                                 Params={'Bucket': 'tourlife_test',
-                                                        'Key': 'Documents/doc/'+str(passes.id)+'/'+str(today)+'.pdf'}, HttpMethod=None)
+                                                        'Key': 'Documents/doc'+str(passes.id)+str(today)+'.pdf'}, HttpMethod=None)
             url=url.split('?')
             url=url[0]
             passes.document = url
@@ -2410,7 +2451,7 @@ class DocumentUpdateAPIView(CreateAPIView):
         }
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
-                              "message": "Passes updated",
+                              "message": "document updated",
                               "result": {'data': response_data}},
                         status=status.HTTP_200_OK)
 
@@ -2432,8 +2473,6 @@ class DocumentListAPIView(ListAPIView):
         page = self.paginate_queryset(serializer.data)
 
         return self.get_paginated_response(page)
-import pandas as pd
-import requests
 
 
 class GetDocumentAPIView(ListAPIView):
@@ -2466,7 +2505,7 @@ class GetDocumentAPIView(ListAPIView):
         serializer = self.get_serializer(document,many=True)
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
-                              "message": "get settime",
+                              "message": "get document",
                               "data": serializer.data},
                         status=status.HTTP_200_OK,)
 
@@ -2493,11 +2532,11 @@ class DocumentDeleteAPIView(DestroyAPIView):
                                 aws_access_key_id='GWA6S3ACCBWG66EWNHW3',
                                 aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
        
-        client.delete_object(Bucket='tourlife_test', Key='Documents/doc/'+str(passes.id)+'/'+str(today)+'.pdf')
+        client.delete_object(Bucket='tourlife_test', Key='Documents/doc'+str(passes.id)+str(today)+'.pdf')
 
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
-                              "message": "Passes deleted"},
+                              "message": "document deleted"},
                         status=status.HTTP_200_OK)
 
 
@@ -2642,7 +2681,7 @@ class allListView(ListAPIView):
     def get(self, request, *args, **kwrgs):
         if request.method == 'GET':
             
-            users = User.objects.all()
+            users = User.objects.all().exclude(email='admin@gmail.com').exclude(is_delete=True)
             # gigs = Gigs.objects.filter(start_date__gte = datetime.datetime.now())
             gigs = Gigs.objects.all()
             # gig_master = GigMaster.objects.filter(gig__start_date__gte = datetime.datetime.now())
@@ -2884,7 +2923,7 @@ class ScheduleAPIView(GenericAPIView):
 #         }
 #         pdf = render_to_pdf('pdf/datatable.html', data)
 #         return HttpResponse(pdf, content_type='application/pdf')
-
+from itertools import chain
 class alllistApiView(GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class_UserSerializer = UserListSerializer
@@ -2956,8 +2995,10 @@ class alllistApiView(GenericAPIView):
         else:
             gig.Equipment='Unconfirmed'
         a=0
-        if CabBook.objects.filter(user__in=users,gig=gig).exists():
-            cab = CabBook.objects.filter(user__in=users,gig=gig).all()
+        if CabBook.objects.filter(user=user,gig=gig).exists():
+            # cab = CabBook.objects.filter(user__in=users,gig=gig).all()
+            cab = CabBook.objects.filter(user=user,gig=gig).all()
+
             # b='cab',a
             c=len(cab)
             # print(c,":::::::::::::::::::::::::::::::::::::::")
@@ -2970,12 +3011,12 @@ class alllistApiView(GenericAPIView):
             print('-=-=-=-=-=-=-=-=-=-=-=-=')
             cab=None
 
-        if FlightBook.objects.filter(user__in=users,gig=gig).exists():
-            flight = FlightBook.objects.filter(user__in=users,gig=gig).all()
+        if FlightBook.objects.filter(user=user,gig=gig).exists():
+            flight = FlightBook.objects.filter(user=user,gig=gig).all()
         else:
             flight=None
-        if SetTime.objects.filter(user__in=users,gig=gig).exists():
-            settime = SetTime.objects.filter(user__in=users,gig=gig).all()
+        if SetTime.objects.filter(user=user,gig=gig).exists():
+            settime = SetTime.objects.filter(user=user,gig=gig).all()
         else:
             settime=None 
         # for x, y in map(flight, cab, settime):
@@ -2995,9 +3036,10 @@ class alllistApiView(GenericAPIView):
         print(all,"?>?>?>?>?>?>")
         if all==[]:
             all=None 
-
-        if Venue.objects.filter(user__in=users,gig=gig).exists():
-            venue = Venue.objects.filter(user__in=users,gig=gig).all()
+        # all = sorted(chain( cab, flight,settime), key=lambda obj: obj.depart_time)
+        print(all,":::::::::::::::::::::::::::::::::")
+        if Venue.objects.filter(user=user,gig=gig).exists():
+            venue = Venue.objects.filter(user=user,gig=gig).all()
             print(venue,"]]]]]]]]]]]]]]]]]]]")
             for ven in venue:
                 if ven.indoor==True:
@@ -3020,13 +3062,13 @@ class alllistApiView(GenericAPIView):
         else:
             venue=None 
 
-        if Hotel.objects.filter(user__in=users,gig=gig).exists():
-            hotel = Hotel.objects.filter(user__in=users,gig=gig).all()
+        if Hotel.objects.filter(user=user,gig=gig).exists():
+            hotel = Hotel.objects.filter(user=user,gig=gig).all()
         else:
             hotel=None
         cont=[]
         if Contacts.objects.filter(user__in=users,gig=gig).exists():
-            contact = Contacts.objects.filter(user__in=users,gig=gig).all()
+            contact = Contacts.objects.filter(user=user,gig=gig).all()
             
             for con in contact:
                 cont.append(con.travelling_party)
@@ -3035,22 +3077,22 @@ class alllistApiView(GenericAPIView):
             contact=None
             
 
-        if GuestList.objects.filter(user__in=users,gig=gig).exists():
-            guestlist = GuestList.objects.filter(user__in=users,gig=gig).all()
-            print(guestlist,".......................")
-            for guest in guestlist:
-                if guest.guestlist==True:
-                        guest.guestlist='Confirmed'
-                else:
-                    guest.guestlist='Unconfirmed'
-        else:
-            guestlist=None
+        # if GuestList.objects.filter(user__in=users,gig=gig).exists():
+        #     guestlist = GuestList.objects.filter(user__in=users,gig=gig).all()
+        #     print(guestlist,".......................")
+        #     for guest in guestlist:
+        #         if guest.guestlist==True:
+        #                 guest.guestlist='Confirmed'
+        #         else:
+        #             guest.guestlist='Unconfirmed'
+        # else:
+        #     guestlist=None
 
-        if Document.objects.filter(user__in=users,gig=gig).exists():
-            document = Document.objects.filter(user__in=users,gig=gig).all()
-            print(document,"///////////////////////////////////////////////////////////////////////////")
-        else:
-            document=None
+        # if Document.objects.filter(user__in=users,gig=gig).exists():
+        #     document = Document.objects.filter(user__in=users,gig=gig).all()
+        #     print(document,"///////////////////////////////////////////////////////////////////////////")
+        # else:
+        #     document=None
         
 
         print(contact,"////////////////////////////////")
@@ -3062,31 +3104,46 @@ class alllistApiView(GenericAPIView):
             "hotel_list":hotel,
             "settime_list":settime,
             "contact_list":contact,
-            "guest_list":guestlist,
-            "document_list":document,
+            # "guest_list":guestlist,
+            # "document_list":document,
             "user":user,
             "pregig":pregig,
             "nextgig":nextgig,
-            # "c":c,
             "users":users,
             "all":all,
             "cont":cont,
-            # "starttime":starttime,
-            # "endtime":endtime,
-            # "date":date,
-            # "a":a,
+           
             }
-        
+        options = {
+        'page-size': 'Letter',
+        'margin-top': '0.5in',
+        'margin-right': '0.75in',
+        'margin-bottom': '0.5in',
+        'margin-left': '0.75in',
+        'encoding': "UTF-8",
+        'footer-left': "This is a footer",
+        'footer-line':'',
+        'footer-font-size':'7',
+        'footer-right': '[page] of [topage]',
+
+        'custom-header' : [
+            ('Accept-Encoding', 'gzip')
+        ],
+        'no-outline': None,
+    }
         # for venue in venue:
         # print(len(cab),"::::::::::::::::::::::::::::::::::::::::::")
         
-        return render(request,'all.html',context)
-        html = get_template("all_list.html").render(context)
+        # return render(request,'all.html',context)
+        html = get_template("all.html").render(context)
        
-        html=render_to_string('all_list.html', context)
+        html=render_to_string('all.html', context)
        
-        pdf= pdfkit.from_string(html)
+        pdf= pdfkit.from_string(html,options=options)
         
+        # url=pdfkit.from_url(pdf)
+        # print(url,"//////////>>>>>>>>>>>>")
+        # print(type(pdf),"::::::::::::::::::::::::::::::::::::::")
         return HttpResponse(pdf, content_type='application/pdf')
         return Response(data={"status": status.HTTP_200_OK,
                                       "error": False,
@@ -3186,7 +3243,6 @@ class alldataApiView(GenericAPIView):
                     ven.catring='Confirmed'
                 else:
                     ven.catring='Unconfirmed'
-        
         else:
             venue=None 
 
@@ -3222,7 +3278,6 @@ class alldataApiView(GenericAPIView):
         else:
             document=None
 
-
         print(contact,"////////////////////////////////")
         context={
             "gig_list": gig,
@@ -3238,8 +3293,7 @@ class alldataApiView(GenericAPIView):
             "pregig":pregig,
             "nextgig":nextgig,
             "c":c,
-            "starttime":starttime,
-            "endtime":endtime,
+            
             # "a":a,
             }
         
