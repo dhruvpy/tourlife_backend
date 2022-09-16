@@ -86,5 +86,6 @@ urlpatterns = [
      path('all_data',views.allListView.as_view(),name='all_data'),
      path('all_data2',views.AllDataAPIView.as_view(),name='all_data2'),
      path('all_list/<int:pk>/<int:pk1>',views.alllistApiView.as_view(),name='all_list'),
+     # path('weather',views.show_weather_report,name='weather'),
     
 ]
