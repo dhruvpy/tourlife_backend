@@ -1,3 +1,5 @@
+# from asyncio.windows_events import NULL
+from tempfile import tempdir
 from .models import *
 from .serializer import *
 from rest_framework.generics import GenericAPIView, ListAPIView, CreateAPIView, UpdateAPIView, RetrieveAPIView, DestroyAPIView
@@ -23,6 +25,9 @@ from django.http import HttpResponse
 from django.http import HttpResponse
 import pdfkit  
 import datetime
+def get_user_queryset():
+    return User.objects.all().exclude(is_delete=True)
+
 class UserCreateAPIView(GenericAPIView):
     permission_classes = [AllowAny]
 
@@ -142,12 +147,16 @@ class UserUpdateAPIView(CreateAPIView):
 
         today = today.strftime("%Y-%m-%d-%H-%M-%S")
 
-        key=user.profile_image.split('test/')
-        client.delete_object(Bucket='tourlife_test',
-         Key=key[1],
-         )
         
+        if not user.profile_image== None:
+        
+            key=user.profile_image.split('test/')
+            client.delete_object(Bucket='tourlife_test',
+            Key=key[1],
+            )
+
         if not profile_image== None:
+            
             client.put_object(Bucket='tourlife_test',
                             Key='User/user'+str(user.id)+str(today)+'.png',
                             Body= profile_image,
@@ -608,14 +617,17 @@ class GigsUpdateAPIView(CreateAPIView):
                                 aws_secret_access_key='jLOt2aNGIZFuDjAP37Q54sJnt+x7lK7FhvkGcrHvftU',)
         
         today = datetime.datetime.now()
-
+    
         today = today.strftime("%Y-%m-%d-%H-%M-%S")
+        print(gigs.cover_image,"::::::::::::::::::::::::::::")
+        if not gigs.cover_image == None:
 
-        key=gigs.cover_image.split('test/')
-        client.delete_object(Bucket='tourlife_test',
-         Key=key[1],
-         )
+            key=gigs.cover_image.split('test/')
+            client.delete_object(Bucket='tourlife_test',
+            Key=key[1],
+            )
         if not cover_image == None:
+            
             client.put_object(Bucket='tourlife_test',
                             Key='Gigs/gig'+str(gigs.id)+str(today)+'.png',
                             # Body=bytes(json.dumps(cover_image).encode()),
@@ -676,13 +688,31 @@ class GigsListAPIView(ListAPIView):
 
     serializer_class = ListGigSerializer
     
+    user=get_user_queryset()
+
     queryset = Gigs.objects.all()
-    # print(queryset)
+    for x in queryset:
+        # print(x.user.all(),"qqqqqqqqqqqqqqqqqqqqqqqq")
+
+        users=x.user.all()
+        # print(user,":::::::::::::::::::::::::")
+        # print(users,";;;;;;;;;;;;;;;;;;;;;;;")
+        
+        check=[i for i in users if i in get_user_queryset()]
+        # print(check,"dddddddddddddddddddd")
+        
+        x.user.set(check)
+        # print(x.user.all(),"000000000000000000000000000")
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
         #                     status=status.HTTP_400_BAD_REQUEST)
+        # user = User.objects.get(id=id)
+        # if user.is_delete == True:
+        #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "user is not exists"},
+        #                     status=status.HTTP_400_BAD_REQUEST)
+
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         page = self.paginate_queryset(serializer.data)
@@ -695,16 +725,30 @@ class GetallGigsAPIView(ListAPIView):
     # renderer_classes = [JSONRenderer]
 
     serializer_class = ListGigSerializer
+    user = get_user_queryset()
+    # print(user,"user")
     queryset = Gigs.objects.all()
-    # queryset={media_type:text/html}
+    # queryset=[]
+    for x in queryset:
+        # print(x.user.all(),"qqqqqqqqqqqqqqqqqqqqqqqq")
+
+        users=x.user.all()
+        # print(user,":::::::::::::::::::::::::")
+        # print(users,";;;;;;;;;;;;;;;;;;;;;;;")
+        
+        check=[i for i in users if i in get_user_queryset()]
+        # print(check,"dddddddddddddddddddd")
+        
+        x.user.set(check)
+        # print(x.user.all(),"000000000000000000000000000")
+    
     def get(self, request, *args, **kwargs):
-        # if not request.user.is_manager:
-        #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
-        #                     status=status.HTTP_400_BAD_REQUEST)
+       
         queryset = self.get_queryset()
 
         serializer = self.get_serializer(queryset, many=True)
-        # return HttpResponse(serializer.data, content_type='application/pdf')
+        # print(queryset,"::::::::::::::::::::::")
+
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
                               "message": "All gigs list",
@@ -722,9 +766,9 @@ class GetGigsAPIView(ListAPIView):
         # if not request.user.is_manager:
         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User not allowed"},
         #                     status=status.HTTP_400_BAD_REQUEST)
-    
+        user= get_user_queryset()
         id = self.kwargs["pk"]
-        if not Gigs.objects.filter(id=id).exists():
+        if not Gigs.objects.filter(id=id,user__in=user).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Gigs is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
         gig = Gigs.objects.get(id=id)
@@ -936,7 +980,10 @@ class FlightBookListAPIView(ListAPIView):
     pagination_class = CustomPagination
 
     serializer_class = FlightSerializer
-    queryset = FlightBook.objects.all()
+    user=get_user_queryset()
+    print(user,"user")
+    queryset = FlightBook.objects.filter(user__in=user)
+    print(queryset,"queryset")
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
@@ -953,7 +1000,9 @@ class GetallFlightAPIView(ListAPIView):
     permission_classes = [AllowAny]
 
     serializer_class = FlightSerializer
-    queryset = FlightBook.objects.all()
+    user=get_user_queryset()
+
+    queryset = FlightBook.objects.filter(user__in=user)
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
@@ -974,15 +1023,19 @@ class GetFlightAPIView(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         id = self.kwargs["pk"]
-        if not User.objects.filter(id=id).exists():
+        user = User.objects.get(id=id)
+        if user.is_delete == True:
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "user is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
+
+        
 
         user = User.objects.get(id=id)
         # user = User.objects.all()
         print(user,"::::::")
         print(user,"//////////////////////")
         id1 = self.kwargs["pk1"]
+
         if not Gigs.objects.filter(id=id1,user=user).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "gig is not exists or not this user gig"},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -1055,6 +1108,9 @@ class CabBookCreateAPIView(CreateAPIView):
         driver_name = request.data["driver_name"]
         driver_number = request.data["driver_number"]
         wather = request.data["wather"]
+        # w=depart_lat_long.split('-')
+        # wather = get_weather_report(w[1])
+
 
         cabbook = CabBook.objects.create(user=user, gig=gig, depart_location=depart_location, depart_lat_long=depart_lat_long,
                                          depart_time=depart_time, arrival_location=arrival_location,
@@ -1161,7 +1217,9 @@ class CabBookListAPIView(ListAPIView):
     pagination_class = CustomPagination
 
     serializer_class = CabSerializer
-    queryset = CabBook.objects.all()
+    user=get_user_queryset()
+
+    queryset = CabBook.objects.filter(user__in=user)
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
@@ -1181,7 +1239,8 @@ class GetCabAPIView(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         id = self.kwargs["pk"]
-        if not User.objects.filter(id=id).exists():
+        user = User.objects.get(id=id)
+        if user.is_delete == True:
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "user is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -1407,7 +1466,9 @@ class VenueListAPIView(ListAPIView):
     pagination_class = CustomPagination
 
     serializer_class = VenueListSerializer
-    queryset = Venue.objects.all()
+    user=get_user_queryset()
+
+    queryset = Venue.objects.filter(user__in=user)
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
@@ -1423,7 +1484,9 @@ class GetallVenueAPIView(ListAPIView):
     permission_classes = [AllowAny]
 
     serializer_class = VenueListSerializer
-    queryset = Venue.objects.all()
+    user=get_user_queryset()
+
+    queryset = Venue.objects.filter(user__in=user)
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
@@ -1445,7 +1508,8 @@ class GetVenueAPIView(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         id = self.kwargs["pk"]
-        if not User.objects.filter(id=id).exists():
+        user = User.objects.get(id=id)
+        if user.is_delete == True:
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "user is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -1624,7 +1688,9 @@ class HotelListAPIView(ListAPIView):
     pagination_class = CustomPagination
 
     serializer_class = HotelListSerializer
-    queryset = Hotel.objects.all()
+    user=get_user_queryset()
+
+    queryset = Hotel.objects.filter(user__in=user)
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
@@ -1644,7 +1710,8 @@ class GetHotelAPIView(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         id = self.kwargs["pk"]
-        if not User.objects.filter(id=id).exists():
+        user = User.objects.get(id=id)
+        if user.is_delete == True:
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "user is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -1832,7 +1899,9 @@ class ContactListAPIView(ListAPIView):
     pagination_class = CustomPagination
 
     serializer_class = ContactListSerializer
-    queryset = Contacts.objects.all()
+    user=get_user_queryset()
+
+    queryset = Contacts.objects.filter(user__in=user)
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
@@ -1852,7 +1921,8 @@ class GetContactsAPIView(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         id = self.kwargs["pk"]
-        if not User.objects.filter(id=id).exists():
+        user = User.objects.get(id=id)
+        if user.is_delete == True:
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "user is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -2019,7 +2089,9 @@ class GuestListListAPIView(ListAPIView):
     pagination_class = CustomPagination
 
     serializer_class = GuestSerializer
-    queryset = GuestList.objects.all()
+    user=get_user_queryset()
+
+    queryset = GuestList.objects.filter(user__in=user)
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
@@ -2039,7 +2111,8 @@ class GetGuestlistAPIView(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         id = self.kwargs["pk"]
-        if not User.objects.filter(id=id).exists():
+        user = User.objects.get(id=id)
+        if user.is_delete == True:
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "user is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -2205,7 +2278,9 @@ class SetTimeListAPIView(ListAPIView):
     pagination_class = CustomPagination
 
     serializer_class = SetTimeListSerializer
-    queryset = SetTime.objects.all()
+    user=get_user_queryset()
+
+    queryset = SetTime.objects.filter(user__in=user)
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
@@ -2221,7 +2296,9 @@ class GetAllSettimeAPIView(ListAPIView):
     permission_classes = [AllowAny]
 
     serializer_class = SetTimeListSerializer
-    queryset = SetTime.objects.all()
+    user=get_user_queryset()
+
+    queryset = SetTime.objects.filter(user__in=user)
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
@@ -2244,7 +2321,8 @@ class GetSettimeAPIView(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         id = self.kwargs["pk"]
-        if not User.objects.filter(id=id).exists():
+        user = User.objects.get(id=id)
+        if user.is_delete == True:
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "user is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -2416,11 +2494,11 @@ class DocumentUpdateAPIView(CreateAPIView):
         today = datetime.datetime.now()
 
         today = today.strftime("%Y-%m-%d-%H-%M-%S")
-
-        key=passes.document.split('test/')
-        client.delete_object(Bucket='tourlife_test',
-         Key=key[1],
-         )
+        if not passes.document == None:
+            key=passes.document.split('test/')
+            client.delete_object(Bucket='tourlife_test',
+            Key=key[1],
+            )
         if not document==None:
             client.put_object(
             Bucket= 'tourlife_test',
@@ -2460,7 +2538,9 @@ class DocumentListAPIView(ListAPIView):
     pagination_class = CustomPagination
 
     serializer_class = DocumentsListSerializer
-    queryset = Document.objects.all()
+    user=get_user_queryset()
+
+    queryset = Document.objects.filter(user__in=user)
 
     def get(self, request, *args, **kwargs):
 
@@ -2482,7 +2562,8 @@ class GetDocumentAPIView(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         id = self.kwargs["pk"]
-        if not User.objects.filter(id=id).exists():
+        user = User.objects.get(id=id)
+        if user.is_delete == True:
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "user is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -3005,6 +3086,7 @@ class alllistApiView(GenericAPIView):
         # all = np.concatenate((con,settime))
         # all = np.concatenate([cab,flight,settime])
         # all.sorted("depart_time")
+
         all=[]
         if not cab==None:
             all.extend(cab)
@@ -3015,8 +3097,9 @@ class alllistApiView(GenericAPIView):
         print(all,"?>?>?>?>?>?>")
         if all==[]:
             all=None 
-        
-        # all = sorted(chain( cab, flight,settime), key=lambda obj: obj.depart_time)
+        # all=None
+        # if not(cab==None or flight==None or settime==None):
+        #     all = sorted(chain( cab, flight,settime), key=lambda obj: obj.depart_time)
         print(all,":::::::::::::::::::::::::::::::::")
         if Venue.objects.filter(user=user,gig=gig).exists():
             venue = Venue.objects.filter(user=user,gig=gig).all()

@@ -104,40 +104,7 @@
             {% endfor %}
 
         {% endif %}
-        <!-- {% if not contact_list is None %}
-            <h2>Contacts</h2>
-            <hr>
-            {% for contact in contact_list %}
-            {% if contact.travelling_party is False%}
-            <div style="margin: auto;width: 90%;">
-                <div style="display: flex;">
-                    <div style="width: 30%;text-align: end;padding-right: 10px;">{{contact.type}}</div>
-                    <div style="width: 70%;"><b>{{contact.name}}</b> 
-                    <span>Tel:{{contact.number}}</span>
-                    <span>Email:{{contact.email}}</span>
-
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            {% endfor %}
-            <h3>Travelling party</h3>
-            {% for contact in contact_list %}
-            {% if contact.travelling_party is True%}
-            <div style="margin: auto;width: 90%;">
-                <div style="display: flex;">
-                    <div style="width: 30%;text-align: end;padding-right: 10px;">{{contact.type}}</div>
-                    <div style="width: 70%;"><b>{{contact.name}}</b> 
-                    <span>Tel:{{contact.number}}</span>
-                    <span>Email:{{contact.email}}</span>
-
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            {% endfor %}
-
-        {% endif %} -->
+        
         {% if not venue_list is None %}
         <h2>Venue</h2>
             <hr>
