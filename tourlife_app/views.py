@@ -457,7 +457,6 @@ class SetNewPasswordAPIView(GenericAPIView):
         new_password = request.data['new_password']
 
         user = User.objects.filter(email=email).last()
-        print(user,"////////////////////")
 
         if not user:
             return Response(data={"Status": status.HTTP_400_BAD_REQUEST, 'error': True, 'message': 'please enter valid email'}, status=status.HTTP_400_BAD_REQUEST)
@@ -603,7 +602,6 @@ class GigsUpdateAPIView(CreateAPIView):
 
 
         gigs = Gigs.objects.get(id=id)
-        print(user,"/////////////////////////")
 
         a = GigMaster.objects.filter(gig=gigs)
         a.delete()
@@ -692,17 +690,9 @@ class GigsListAPIView(ListAPIView):
 
     queryset = Gigs.objects.all()
     for x in queryset:
-        # print(x.user.all(),"qqqqqqqqqqqqqqqqqqqqqqqq")
-
         users=x.user.all()
-        # print(user,":::::::::::::::::::::::::")
-        # print(users,";;;;;;;;;;;;;;;;;;;;;;;")
-        
         check=[i for i in users if i in get_user_queryset()]
-        # print(check,"dddddddddddddddddddd")
-        
         x.user.set(check)
-        # print(x.user.all(),"000000000000000000000000000")
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
@@ -726,28 +716,20 @@ class GetallGigsAPIView(ListAPIView):
 
     serializer_class = ListGigSerializer
     user = get_user_queryset()
-    # print(user,"user")
     queryset = Gigs.objects.all()
     # queryset=[]
     for x in queryset:
-        # print(x.user.all(),"qqqqqqqqqqqqqqqqqqqqqqqq")
 
         users=x.user.all()
-        # print(user,":::::::::::::::::::::::::")
-        # print(users,";;;;;;;;;;;;;;;;;;;;;;;")
-        
         check=[i for i in users if i in get_user_queryset()]
-        # print(check,"dddddddddddddddddddd")
         
         x.user.set(check)
-        # print(x.user.all(),"000000000000000000000000000")
     
     def get(self, request, *args, **kwargs):
        
         queryset = self.get_queryset()
 
         serializer = self.get_serializer(queryset, many=True)
-        # print(queryset,"::::::::::::::::::::::")
 
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
@@ -852,7 +834,6 @@ class FlightBookCreateAPIView(CreateAPIView):
         flight_number = request.data["flight_number"]
         flight_class = request.data["flight_class"]
         wather = request.data["wather"]
-        print(user,"/////////////////////")
         # if not FlightBook.objects.filter(user=user).exists():
         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User or gig not exists "},
         #      status=status.HTTP_400_BAD_REQUEST)
@@ -981,9 +962,7 @@ class FlightBookListAPIView(ListAPIView):
 
     serializer_class = FlightSerializer
     user=get_user_queryset()
-    print(user,"user")
     queryset = FlightBook.objects.filter(user__in=user)
-    print(queryset,"queryset")
 
     def get(self, request, *args, **kwargs):
         # if not request.user.is_manager:
@@ -1032,8 +1011,6 @@ class GetFlightAPIView(ListAPIView):
 
         user = User.objects.get(id=id)
         # user = User.objects.all()
-        print(user,"::::::")
-        print(user,"//////////////////////")
         id1 = self.kwargs["pk1"]
 
         if not Gigs.objects.filter(id=id1,user=user).exists():
@@ -1246,8 +1223,6 @@ class GetCabAPIView(ListAPIView):
 
         user = User.objects.get(id=id)
         # user = User.objects.all()
-        print(user,"::::::")
-        print(user,"//////////////////////")
         id1 = self.kwargs["pk1"]
         if not Gigs.objects.filter(id=id1,user=user).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "gig is not exists or not this user gig"},
@@ -1256,11 +1231,8 @@ class GetCabAPIView(ListAPIView):
         gig = Gigs.objects.get(id=id1,user=user)
 
         cab= CabBook.objects.filter(user=user,gig=gig).all()
-        print(cab,">><<>><<>>")
         
-        # # queryset = self.get_queryset()
         serializer = self.get_serializer(cab,many=True)
-        # print(gig.id,"?///////////////////////////")
         return Response(data={"status": status.HTTP_200_OK,
                               "error": False,
                               "message": "get cabbook",
@@ -1515,8 +1487,6 @@ class GetVenueAPIView(ListAPIView):
 
         user = User.objects.get(id=id)
         # user = User.objects.all()
-        print(user,"::::::")
-        print(user,"//////////////////////")
         id1 = self.kwargs["pk1"]
         if not Gigs.objects.filter(id=id1,user=user).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "gig is not exists or not this user gig"},
@@ -1525,7 +1495,6 @@ class GetVenueAPIView(ListAPIView):
         gig = Gigs.objects.get(id=id1,user=user)
 
         venue= Venue.objects.filter(user=user,gig=gig).all()
-        print(venue,">><<>><<>>")
         
         # # queryset = self.get_queryset()
         serializer = self.get_serializer(venue,many=True)
@@ -1717,8 +1686,6 @@ class GetHotelAPIView(ListAPIView):
 
         user = User.objects.get(id=id)
         # user = User.objects.all()
-        print(user,"::::::")
-        print(user,"//////////////////////")
         id1 = self.kwargs["pk1"]
         if not Gigs.objects.filter(id=id1,user=user).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "gig is not exists or not this user gig"},
@@ -1727,7 +1694,6 @@ class GetHotelAPIView(ListAPIView):
         gig = Gigs.objects.get(id=id1,user=user)
 
         hotel= Hotel.objects.filter(user=user,gig=gig).all()
-        print(hotel,">><<>><<>>")
         
         # # queryset = self.get_queryset()
         serializer = self.get_serializer(hotel,many=True)
@@ -1928,8 +1894,6 @@ class GetContactsAPIView(ListAPIView):
 
         user = User.objects.get(id=id)
         # user = User.objects.all()
-        print(user,"::::::")
-        print(user,"//////////////////////")
         id1 = self.kwargs["pk1"]
         if not Gigs.objects.filter(id=id1,user=user).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "gig is not exists or not this user gig"},
@@ -1938,7 +1902,6 @@ class GetContactsAPIView(ListAPIView):
         gig = Gigs.objects.get(id=id1,user=user)
 
         contact= Contacts.objects.filter(user=user,gig=gig).all()
-        print(contact,">><<>><<>>")
         
         # # queryset = self.get_queryset()
         serializer = self.get_serializer(contact,many=True)
@@ -2118,8 +2081,6 @@ class GetGuestlistAPIView(ListAPIView):
 
         user = User.objects.get(id=id)
         # user = User.objects.all()
-        print(user,"::::::")
-        print(user,"//////////////////////")
         id1 = self.kwargs["pk1"]
         if not Gigs.objects.filter(id=id1,user=user).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "gig is not exists or not this user gig"},
@@ -2128,7 +2089,6 @@ class GetGuestlistAPIView(ListAPIView):
         gig = Gigs.objects.get(id=id1,user=user)
 
         guest= GuestList.objects.filter(user=user,gig=gig).all()
-        print(guest,">><<>><<>>")
         
         # # queryset = self.get_queryset()
         serializer = self.get_serializer(guest,many=True)
@@ -2328,8 +2288,6 @@ class GetSettimeAPIView(ListAPIView):
 
         user = User.objects.get(id=id)
         # user = User.objects.all()
-        print(user,"::::::")
-        print(user,"//////////////////////")
         id1 = self.kwargs["pk1"]
         if not Gigs.objects.filter(id=id1,user=user).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "gig is not exists or not this user gig"},
@@ -2338,7 +2296,6 @@ class GetSettimeAPIView(ListAPIView):
         gig = Gigs.objects.get(id=id1,user=user)
 
         settime= SetTime.objects.filter(user=user,gig=gig).all()
-        print(settime,">><<>><<>>")
         
         # # queryset = self.get_queryset()
         serializer = self.get_serializer(settime,many=True)
@@ -2569,8 +2526,6 @@ class GetDocumentAPIView(ListAPIView):
 
         user = User.objects.get(id=id)
         # user = User.objects.all()
-        print(user,"::::::")
-        print(user,"//////////////////////")
         id1 = self.kwargs["pk1"]
         if not Gigs.objects.filter(id=id1,user=user).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "gig is not exists or not this user gig"},
@@ -2579,7 +2534,6 @@ class GetDocumentAPIView(ListAPIView):
         gig = Gigs.objects.get(id=id1,user=user)
 
         document= Document.objects.filter(user=user,gig=gig).all()
-        print(document,">><<>><<>>")
         
         # # queryset = self.get_queryset()
         serializer = self.get_serializer(document,many=True)
@@ -2897,8 +2851,6 @@ class allListView(ListAPIView):
 
             dates = [*set(dates)]
 
-            print(f)
-            print(user_list)
             a = {}
             for date in dates:
                 f.append({date: []})
@@ -3025,8 +2977,6 @@ class alllistApiView(GenericAPIView):
 
         user = User.objects.get(id=id)
         # user = User.objects.all()
-        print(user,"::::::")
-        print(user,"//////////////////////")
         id1 = self.kwargs["pk1"]
         if not Gigs.objects.filter(id=id1,user=user).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "gig is not exists or not this user gig"},
@@ -3035,9 +2985,7 @@ class alllistApiView(GenericAPIView):
         gig = Gigs.objects.get(id=id1,user=user)
         gigs= Gigs.objects.get(id=id1)
         # p=gigs.User.filter(user=gigs)
-        # print(p,">>>")
         users =gigs.user.all().values_list('id', flat=True)
-        print(users)
         print(gigs.user.all().values_list('username', flat=True),"????????????????????????????????")
 
         allgigs = Gigs.objects.all()

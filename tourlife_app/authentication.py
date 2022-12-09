@@ -37,12 +37,10 @@ class MyLoginTokenAuthentications(TokenAuthentication):
         model = self.get_model()
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms="HS256")
-            # # print(pa)
             email = payload['email']
             password = payload['password']
             try:
                 user = User.objects.get(email=email, password=password, is_active=True)
-                # print(user,'----------------------')
             except:
                 msg = {'Error':'User not found','status':'400'}
                 raise exceptions.AuthenticationFailed(msg)
@@ -52,8 +50,6 @@ class MyLoginTokenAuthentications(TokenAuthentication):
         except jwt.InvalidTokenError:
             msg = {'Error': "Token is Invalid", 'status':'403'}
             raise exceptions.AuthenticationFailed(msg)
-        # print(user)
-        # print(token)
         return (user, token)
 
     def authenticate_header(self, request):

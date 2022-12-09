@@ -35,10 +35,8 @@ class Gigs(models.Model):
     start_date=models.DateTimeField(null=True,blank=True)
     end_date=models.DateTimeField(null=True,blank=True)
     sound_check_time = models.TimeField(null=True,blank=True)
-    Equipment_email =models.EmailField(max_length=50)
+    Equipment_email =models.EmailField(max_length=50,null=True,blank=True)
 
-    # def save(self, *args, **kwargs):
-    #     print(self,'--------------')
 
     # def __str__ (self):
     #     return f"{self.title}"
