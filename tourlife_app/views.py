@@ -334,6 +334,10 @@ class LoginAPIView(GenericAPIView):
         if not user:
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, 'error': True, 'message': "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
 
+        if not user.is_delete == True:
+            return Response(data={'status': status.HTTP_400_BAD_REQUEST, 'error': True, 'message': "User not exists"}, status=status.HTTP_400_BAD_REQUEST)
+
+
         payload = {"email": user.email, "password": user.password}
 
         jwt_token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
@@ -364,8 +368,12 @@ class AdminLoginAPIView(GenericAPIView):
 
         if not user:
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, 'error': True, 'message': "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
+
         if not user.is_manager == True:
             return Response(data={'status': status.HTTP_400_BAD_REQUEST, 'error': True, 'message': "User is not allow"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not user.is_delete == True:
+            return Response(data={'status': status.HTTP_400_BAD_REQUEST, 'error': True, 'message': "User not exists"}, status=status.HTTP_400_BAD_REQUEST)
 
         payload = {"email": user.email, "password": user.password}
 
@@ -2826,7 +2834,7 @@ class allListView(ListAPIView):
                 gig_response.append({
                     "id": int(gig.gig.id),
                     "title": gig.gig.title,
-                    "descriptions": gig.gig.descriptions,
+                    "description": gig.gig.descriptions,
                     "profile_pic": gig.user.profile_image,
                     "cover_image": gig.gig.cover_image,
                     "location": gig.gig.location,
@@ -2841,6 +2849,7 @@ class allListView(ListAPIView):
                     "schedule_count": schedule,
                     "contact_count": contact,
                     "document_count": document,
+                    "equipment_email": gig.gig.Equipment_email,
                 })
             dates = []
             user_list = []
