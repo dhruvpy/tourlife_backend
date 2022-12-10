@@ -334,7 +334,7 @@ class LoginAPIView(GenericAPIView):
         if not user:
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, 'error': True, 'message': "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not user.is_delete == True:
+        if user.is_delete == True:
             return Response(data={'status': status.HTTP_400_BAD_REQUEST, 'error': True, 'message': "User not exists"}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -372,7 +372,7 @@ class AdminLoginAPIView(GenericAPIView):
         if not user.is_manager == True:
             return Response(data={'status': status.HTTP_400_BAD_REQUEST, 'error': True, 'message': "User is not allow"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not user.is_delete == True:
+        if user.is_delete == True:
             return Response(data={'status': status.HTTP_400_BAD_REQUEST, 'error': True, 'message': "User not exists"}, status=status.HTTP_400_BAD_REQUEST)
 
         payload = {"email": user.email, "password": user.password}
