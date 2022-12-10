@@ -2764,7 +2764,7 @@ class allListView(ListAPIView):
                 documents, many=True)
 
             final = []
-            users = User.objects.all()
+            users = User.objects.all().exclude(email='admin@gmail.com').exclude(is_delete=True)
 
             # flights = FlightBook.objects.filter(gig__start_date__gte = datetime.datetime.now())
             # cabs = CabBook.objects.filter(gig__start_date__gte = datetime.datetime.now())
