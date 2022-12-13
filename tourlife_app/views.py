@@ -384,6 +384,7 @@ class AdminLoginAPIView(GenericAPIView):
                               "result": {'id': user.id,
                                          'first_name': user.first_name,
                                          'last_name': user.last_name,
+                                         'profile_image': user.profile_image,
                                          'token': jwt_token,
                                          'is_manager': user.is_manager}},
                         status=status.HTTP_200_OK)
