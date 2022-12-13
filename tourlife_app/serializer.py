@@ -30,13 +30,13 @@ class LoginUserSerializers(serializers.ModelSerializer):
 class CreateGigsSerializer(serializers.ModelSerializer):
     user=serializers.CharField(required=True)
     title=serializers.CharField(required=True)
-    descriptions=serializers.CharField(required=True)
+    descriptions=serializers.CharField(required=False)
     cover_image=serializers.FileField(required=False)
     start_date=serializers.DateTimeField(required=True)
     end_date=serializers.DateTimeField(required=True)
     location = serializers.CharField(required=True)
-    show = serializers.CharField(required=True)
-    stage = serializers.CharField(required=True)
+    show = serializers.CharField(required=False)
+    stage = serializers.CharField(required=False)
     visa=serializers.CharField(required=True)
     Equipment =serializers.BooleanField(required=True)
     sound_check_time = serializers.TimeField(required=False)
@@ -110,7 +110,7 @@ class FlightBookSerializer(serializers.ModelSerializer):
     airlines = serializers.CharField(required=True)
     flight_number = serializers.CharField(required=True)
     flight_class = serializers.CharField(required=True)
-    wather = serializers.CharField(required=True)
+    wather = serializers.CharField(required=False)
     class Meta:
         model=FlightBook
         fields=["user","gig","depart_location","depart_lat_long","depart_time","depart_terminal","depart_gate","arrival_location",
@@ -127,7 +127,7 @@ class CabBookSerializer(serializers.ModelSerializer):
     arrival_time = serializers.DateTimeField(required=True)
     driver_name = serializers.CharField(required=True)
     driver_number = serializers.CharField(required=True)
-    wather = serializers.CharField(required=True)
+    wather = serializers.CharField(required=False)
     class Meta:
         model=CabBook
         fields=["user","gig","depart_location","depart_lat_long","depart_time","arrival_location","arrival_lat_long","arrival_time"
@@ -143,15 +143,15 @@ class VenueSerializer(serializers.ModelSerializer):
     number=serializers.CharField(required=True)
     indoor=serializers.BooleanField(required=True)
     covered=serializers.BooleanField(required=True)
-    capacity=serializers.IntegerField(required=True)
-    wather=serializers.CharField(required=True)
-    credential_collection=serializers.CharField(required=True)
-    dressing_room=serializers.CharField(required=True)
+    capacity=serializers.IntegerField(required=False)
+    wather=serializers.CharField(required=False)
+    credential_collection=serializers.CharField(required=False)
+    dressing_room=serializers.CharField(required=False)
     hospitality=serializers.BooleanField(required=True)
-    hospitality_detail=serializers.CharField(required=True)
+    hospitality_detail=serializers.CharField(required=False)
     hospitality_email=serializers.CharField(required=True)
     catring=serializers.BooleanField(required=True)
-    catring_detail=serializers.CharField(required=True)
+    catring_detail=serializers.CharField(required=False)
     
     class Meta:
         model=Venue

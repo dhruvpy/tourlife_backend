@@ -175,7 +175,6 @@ class UserUpdateAPIView(CreateAPIView):
             user.last_name=last_name
         user.username = username
         user.first_name = first_name
-        user.last_name = last_name
         user.password = password
         user.email = email
         user.mobile_no = mobile_no
@@ -508,14 +507,21 @@ class GigsCreateAPIView(CreateAPIView):
         Equipment_email = request.data["Equipment_email"]
         print(sound_check_time,"//////////////")
 
-        gigs = Gigs.objects.create(title=title, descriptions=descriptions,
-        location=location, show=show, stage=stage, visa=visa, Equipment=Equipment, start_date=start_date, end_date=end_date,Equipment_email=Equipment_email)
+        gigs = Gigs.objects.create(title=title,
+        location=location, visa=visa, Equipment=Equipment, start_date=start_date, end_date=end_date)
         gigs.user.set(user)
       
         if not sound_check_time== None:
             gigs.sound_check_time=sound_check_time
         #     user.sound_check_time=sound_check_time
-
+        if not stage==None:
+            gigs.stage=stage
+        if not show==None:
+            gigs.show=show
+        if not descriptions==None:
+            gigs.descriptions=descriptions
+        if not Equipment_email==None:
+            gigs.Equipment_email=Equipment_email
         session = boto3.session.Session()
         client = session.client('s3',
                                 region_name='fra1',
@@ -649,19 +655,24 @@ class GigsUpdateAPIView(CreateAPIView):
             url=url.split('?')
             url=url[0]
             gigs.cover_image = url
+
         if not sound_check_time==None:
             gigs.sound_check_time=sound_check_time
-       
+        if not stage==None:
+            gigs.stage=stage
+        if not show==None:
+            gigs.show=show
+        if not descriptions==None:
+            gigs.descriptions=descriptions
+        if not Equipment_email==None:
+            gigs.Equipment_email=Equipment_email
+
         gigs.title = title
-        gigs.descriptions = descriptions
         gigs.location = location
-        gigs.show = show
-        gigs.stage = stage
         gigs.visa = visa
         gigs.Equipment = Equipment
         gigs.start_date = start_date
         gigs.end_date = end_date
-        gigs.Equipment_email=Equipment_email
         # gigs.sound_check_time = sound_check_time
         gigs.user.set(user)
         gigs.save()
@@ -849,8 +860,9 @@ class FlightBookCreateAPIView(CreateAPIView):
         flightbook = FlightBook.objects.create(user=user, gig=gig, depart_location=depart_location, depart_lat_long=depart_lat_long,
                                                depart_time=depart_time, depart_terminal=depart_terminal, depart_gate=depart_gate, arrival_location=arrival_location,
                                                arrival_lat_long=arrival_lat_long, arrival_time=arrival_time, arrival_terminal=arrival_terminal,
-                                               airlines=airlines, arrival_gate=arrival_gate, flight_number=flight_number, flight_class=flight_class, wather=wather)
-        
+                                               airlines=airlines, arrival_gate=arrival_gate, flight_number=flight_number, flight_class=flight_class)
+        if not wather==None:
+            flightbook.wather=wather
         response_data = {
             "id": flightbook.id,
             "user":  str(flightbook.user),
@@ -870,6 +882,7 @@ class FlightBookCreateAPIView(CreateAPIView):
             "flight_class": flightbook.flight_class,
             "wather": flightbook.wather,
         }
+
         return Response(data={"status": status.HTTP_200_OK,
                               "message": "Flightbook created",
                               "results": {'data': response_data}},
@@ -921,6 +934,8 @@ class FlightBookUpdateAPIView(CreateAPIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
         flightbook = FlightBook.objects.get(id=id)
+        if not wather==None:
+            flightbook.wather=wather
         flightbook.user = user
         flightbook.gig = gig
         flightbook.depart_location = depart_location
@@ -936,7 +951,6 @@ class FlightBookUpdateAPIView(CreateAPIView):
         flightbook.airlines = airlines
         flightbook.flight_number = flight_number
         flightbook.flight_class = flight_class
-        flightbook.wather = wather
         flightbook.save()
 
         response_data = {
@@ -1101,8 +1115,9 @@ class CabBookCreateAPIView(CreateAPIView):
         cabbook = CabBook.objects.create(user=user, gig=gig, depart_location=depart_location, depart_lat_long=depart_lat_long,
                                          depart_time=depart_time, arrival_location=arrival_location,
                                          arrival_lat_long=arrival_lat_long, arrival_time=arrival_time,
-                                         driver_name=driver_name, driver_number=driver_number, wather=wather)
-
+                                         driver_name=driver_name, driver_number=driver_number)
+        if not wather==None:
+            cabbook.wather=wather
         response_data = {
             "id": cabbook.id,
             "user":  str(cabbook.user),
@@ -1162,8 +1177,9 @@ class CabBookUpdateAPIView(CreateAPIView):
         if not CabBook.objects.filter(id=id).exists():
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Cabbook is not exists"},
                             status=status.HTTP_400_BAD_REQUEST)
-
         cabbook = CabBook.objects.get(id=id)
+        if not wather==None:
+            cabbook.wather=wather
         cabbook.user = user
         cabbook.gig = gig
         cabbook.depart_location = depart_location
@@ -1174,7 +1190,6 @@ class CabBookUpdateAPIView(CreateAPIView):
         cabbook.arrival_time = arrival_time
         cabbook.driver_name = driver_name
         cabbook.driver_number = driver_number
-        cabbook.wather = wather
         cabbook.save()
 
         response_data = {
@@ -1316,9 +1331,20 @@ class VenueCreateAPIView(CreateAPIView):
         #                     status=status.HTTP_400_BAD_REQUEST)
 
         venue = Venue.objects.create(user=user, gig=gig, venue_name=venue_name,address=address, direction=direction, website=website, number=number,
-                                     indoor=indoor, covered=covered,capacity=capacity, credential_collection=credential_collection, dressing_room=dressing_room, 
-                                     hospitality=hospitality, hospitality_detail=hospitality_detail,hospitality_email=hospitality_email ,catring=catring, catring_detail=catring_detail, wather=wather)
-
+                                     indoor=indoor, covered=covered,   
+                                     hospitality=hospitality, hospitality_email=hospitality_email ,catring=catring, )
+        if not dressing_room==None:
+            venue.dressing_room=dressing_room
+        if not credential_collection==None:
+            venue.credential_collection=credential_collection
+        if not capacity==None:
+            venue.capacity=capacity
+        if not hospitality_detail==None:
+            venue.hospitality_detail=hospitality_detail
+        if not catring_detail==None:
+            venue.catring_detail=catring_detail
+        if not wather==None:
+            venue.wather=wather
         response_data = {
             "user": str(venue.user),
             "gig": str(venue.gig),
@@ -1394,6 +1420,18 @@ class VenueUpdateAPIView(CreateAPIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
         vanue = Venue.objects.get(id=id)
+        if not dressing_room==None:
+            vanue.dressing_room=dressing_room
+        if not credential_collection==None:
+            vanue.credential_collection=credential_collection
+        if not capacity==None:
+            vanue.capacity=capacity
+        if not hospitality_detail==None:
+            vanue.hospitality_detail=hospitality_detail
+        if not catring_detail==None:
+            vanue.catring_detail=catring_detail
+        if not wather==None:
+            vanue.wather=wather
         vanue.user = user
         vanue.gig = gig
         vanue.venue_name=venue_name
@@ -1659,7 +1697,7 @@ class HotelUpdateAPIView(CreateAPIView):
                               "message": "Hotel Updated",
                               "results": {'data': response_data}},
                         status=status.HTTP_200_OK)
-from xhtml2pdf import pisa
+# from xhtml2pdf import pisa
 
 class HotelListAPIView(ListAPIView):
     permission_classes = [AllowAny]
@@ -3156,11 +3194,17 @@ class alllistApiView(GenericAPIView):
         # print(len(cab),"::::::::::::::::::::::::::::::::::::::::::")
         
         # return render(request,'all.html',context)
-        html = get_template("all.html").render(context)
+        # WKHTMLTOPDF_PATH = '/usr/local/bin/wkhtmltopdf'
+        # config = pdfkit.configuration(wkhtmltopdf=WKHTMLTOPDF_PATH)
+        # config = pdfkit.configuration(wkhtmltopdf="C:\Program Files (x86)\wkhtmltopdf")
+        # html = get_template("all.html").render(context)
        
-        html=render_to_string('all.html', context)
+        # html=render_to_string('all.html', context)
        
-        pdf= pdfkit.from_string(html,options=options)
+        # pdf= pdfkit.from_string(html,options=options)
+        html = render_to_string('all.html', context)
+        pdf = pdfkit.from_string(html,options=options)
+        print(pdf,"pdf")
         
         # url=pdfkit.from_url(pdf)
         # print(url,"//////////>>>>>>>>>>>>")
