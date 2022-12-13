@@ -40,7 +40,7 @@ class CreateGigsSerializer(serializers.ModelSerializer):
     visa=serializers.CharField(required=True)
     Equipment =serializers.BooleanField(required=True)
     sound_check_time = serializers.TimeField(required=False)
-    Equipment_email = serializers.EmailField(required=True)
+    Equipment_email = serializers.EmailField(required=False)
     class Meta:
         model=Gigs
         fields=["user","title","descriptions","cover_image","start_date","end_date","location","show","stage","visa","Equipment","sound_check_time","Equipment_email"]
@@ -149,7 +149,7 @@ class VenueSerializer(serializers.ModelSerializer):
     dressing_room=serializers.CharField(required=False)
     hospitality=serializers.BooleanField(required=True)
     hospitality_detail=serializers.CharField(required=False)
-    hospitality_email=serializers.CharField(required=True)
+    hospitality_email=serializers.CharField(required=False)
     catring=serializers.BooleanField(required=True)
     catring_detail=serializers.CharField(required=False)
     

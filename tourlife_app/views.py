@@ -1332,7 +1332,7 @@ class VenueCreateAPIView(CreateAPIView):
 
         venue = Venue.objects.create(user=user, gig=gig, venue_name=venue_name,address=address, direction=direction, website=website, number=number,
                                      indoor=indoor, covered=covered,   
-                                     hospitality=hospitality, hospitality_email=hospitality_email ,catring=catring, )
+                                     hospitality=hospitality ,catring=catring, )
         if not dressing_room==None:
             venue.dressing_room=dressing_room
         if not credential_collection==None:
@@ -1343,6 +1343,8 @@ class VenueCreateAPIView(CreateAPIView):
             venue.hospitality_detail=hospitality_detail
         if not catring_detail==None:
             venue.catring_detail=catring_detail
+        if not hospitality_email==None:
+            venue.hospitality_email=hospitality_email
         if not wather==None:
             venue.wather=wather
         response_data = {
@@ -1430,6 +1432,8 @@ class VenueUpdateAPIView(CreateAPIView):
             vanue.hospitality_detail=hospitality_detail
         if not catring_detail==None:
             vanue.catring_detail=catring_detail
+        if not hospitality_email==None:
+            vanue.hospitality_email=hospitality_email
         if not wather==None:
             vanue.wather=wather
         vanue.user = user
@@ -1447,7 +1451,6 @@ class VenueUpdateAPIView(CreateAPIView):
         vanue.dressing_room = dressing_room
         vanue.hospitality = hospitality
         vanue.hospitality_detail = hospitality_detail
-        vanue.hospitality_email = hospitality_email
         vanue.catring = catring
         vanue.catring_detail = catring_detail
         vanue.save()
