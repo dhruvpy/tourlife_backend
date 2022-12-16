@@ -303,3 +303,9 @@ class SetNewPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model= SetNewPassword
         fields="__all__"
+
+class FlightDelaySerializer(serializers.ModelSerializer):
+   
+    class Meta:
+        model=FlightBook
+        fields=[]

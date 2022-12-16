@@ -3300,9 +3300,10 @@ def get_weather_report(city):
         
 class FlightDelayApiView(GenericAPIView):
     permission_classes = [AllowAny]
+    serializer_class = FlightDelaySerializer
     
     def post(self, request, *args, **kwargs):
-        flightno = request.data["flightno"]
+        flightno = request.POST.get("flightno")
         today = datetime.datetime.now()
     
         today_year = today.strftime("%Y")
@@ -3316,7 +3317,8 @@ class FlightDelayApiView(GenericAPIView):
         url1 = f'{url}airlinecode={flightno[:2]}&airplanecode={flightno[2:]}&year={today_year}&month={today_month}&day={today_day}'
         print(url1,"url")
         print(params,"params")
-        res=requests.get(url1)
+        # res=requests.get(url, params=params)
+        res= requests.get(url1)
         return Response(res.json())
 # print(report)
 # show_weather_report(report)
