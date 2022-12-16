@@ -3303,30 +3303,33 @@ class FlightDelayApiView(GenericAPIView):
     serializer_class = FlightDelaySerializer
     
     def post(self, request, *args, **kwargs):
-        try:
-            flightno = request.POST.get("flightno")
-            if flightno == None:
-                return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Please enter flightno"},
-                                status=status.HTTP_400_BAD_REQUEST)
-            today = datetime.datetime.now()
-        
-            today_year = today.strftime("%Y")
-            today_month = today.strftime("%m")
-            today_day = today.strftime("%d")
+        flightno = request.POST.get("flightno")
+        if flightno == None:
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Please enter flightno"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        today = datetime.datetime.now()
+    
+        today_year = today.strftime("%Y")
+        today_month = today.strftime("%m")
+        today_day = today.strftime("%d")
 
-            print(flightno,"today")
-            params={"airlinecode":flightno[:2], "airplanecode":flightno[2:],"year":2022, "month":12, "day":16}
-            url="https://api.flightapi.io/flighttrack/639c107849594391ceba156a?"
-            # url1=url.append(params)
-            # url1 = f'{url}airlinecode={flightno[:2]}&airplanecode={flightno[2:]}&year={today_year}&month={today_month}&day={today_day}'
-            # print(url1,"url")
-            print(params,"params")
-            res=requests.get(url, params=params)
-            # res= requests.get(url1)
-            return Response(res.json())
+        print(flightno,"today")
+        params={"airlinecode":flightno[:2], "airplanecode":flightno[2:],"year":today_year, "month":today_month, "day":today_day}
+        url="https://api.flightapi.io/flighttrack/639c107849594391ceba156a?"
         
-        except:
-            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Please enter valid flightno"},
+            
+        try:
+            res=requests.get(url, params=params)
+            type(res,"res")
+            
+            return Response(data={"status": status.HTTP_200_OK,
+                                      "error": False,
+                                      "message": "success!",
+                                      "result": res.json()},
+                                status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": str(e)},
                                 status=status.HTTP_400_BAD_REQUEST)
         
 
