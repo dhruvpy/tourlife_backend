@@ -1,314 +1,538 @@
-
+<!DOCTYPE html>
 <html>
-    <body>
-        <h1>Itinerary</h1>
+
+<head>
+    <style>
+        h1 {
+            font-size: 32px;
+        }
+
+        div {
+            font-size: 16px;
+        }
+
+
+         td.left-td-style {
+            width: 250px;
+            vertical-align: top;
+
+        }
+
+        div.left-div-style {
+            text-align: right;
+
+        }
+
+        
+
+         td.right-td-style {
+            text-align: left;
+            padding-left: 5px;
+        }
+
+
+        @page {
+            size: a4 portrait;
+            margin: 1cm;
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <h1>Itinerary</h1>
     <div>
         <h2>Gig</h2>
-        <!-- {{gig_list.user}} -->
         <hr>
-        <div style="width: 90%;margin: auto;">
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Act: </div>
-                <div style="padding-left: 10px;width: 70%;">{{user.username}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Name: </div>
-                <div style="padding-left: 5px;width: 70%;">{{gig_list.title}}</div>
-            </div>
+
+        <!-- style="width: 90%;margin-left: 150px;" -->
+        <table>
+            <tr>
+                <td class="left-td-style">
+                    <div class="left-div-style"> Act :</div>
+                </td>
+                
+                <td class="right-td-style">
+                    {{user.username}}
+                </td>
+            </tr>
+            <tr>
+                <td class="left-td-style">
+                    <div class="left-div-style"> Name :</div>
+                </td> 
+                
+                <td class="right-td-style">
+                    {{gig_list.title}}
+                </td>
+            </tr>
+            <tr>
+                <td class="left-td-style">
+                    <div class="left-div-style"> Date :</div>
+                </td> 
+                
+                <td class="right-td-style">
+                    {{ gig_list.start_date|date:"l d M Y"}}
+                </td>
+            </tr>
+            <tr>
+                <td class="left-td-style">
+                    <div class="left-div-style"> Doors open/close :</div>
+                </td> 
+                
+                <td class="right-td-style">
+                    {{gig_list.start_date|date:"H:i" }} to {{gig_list.end_date|date:"H:i" }}
+                </td>
+            </tr>
+            <tr>
+                <td class="left-td-style">
+                    <div class="left-div-style"> Show type :</div>
+                </td> 
+                
+                <td class="right-td-style">
+                    {{gig_list.show}}
+                </td>
+            </tr>
+            <tr>
+                <td class="left-td-style">
+                    <div class="left-div-style"> Stage :</div>
+                </td> 
+                
+                <td class="right-td-style">
+                    {{gig_list.stage}}
+                </td>
+            </tr>
+            <tr>
+                <td class="left-td-style">
+                    <div class="left-div-style"> Visa :</div>
+                </td> 
+                
+                <td class="right-td-style">
+                    {{gig_list.visa}}
+                </td>
+            </tr>
+            <tr>
+                <td class="left-td-style">
+                    <div class="left-div-style"> Equipment :</div>
+                </td> 
+                
+                <td class="right-td-style">
+                    <div><b>{{gig_list.Equipment}}</b></div>
+                    <div>{{gig_list.Equipment_email}}</div>
+                    <div>{{gig_list.descriptions}}</div>  
+                </td>
+            </tr>
+            <tr>
+                <td class="left-td-style">
+                    <div class="left-div-style"> Sound check :</div>
+                </td> 
+                
+                <td class="right-td-style">
+                    {{gig_list.sound_check_time}}
+                </td>
+            </tr>
+            {% if not pregig.title is None %}
+            <tr>
+                <td class="left-td-style">
+                    <div class="left-div-style"> Previous act :</div>
+                </td> 
+                
+                <td class="right-td-style">
+                    {{pregig.title}}
+                </td>
+            </tr>
+            {% endif %}
+            {% if not nextgig.title is None %}
             
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Date: </div>
-                <div style="padding-left: 10px;width: 70%;">{{ gig_list.start_date|date:"l d M Y" }}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Doors open/close: </div>
-                <div style="padding-left: 10px;width: 70%;">{{gig_list.start_date|date:"H:i" }} to {{gig_list.end_date|date:"H:i" }}</div>
-            </div>
-            <!-- <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Location: </div>
-                <div style="padding-left: 10px;width: 70%;">{{gig_list.location}}</div>
-            </div> -->
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Show type: </div>
-                <div style="padding-left: 10px;width: 70%;">{{gig_list.show}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Stage: </div>
-                <div style="padding-left: 10px;width: 70%;">{{gig_list.stage}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Visa: </div>
-                <div style="padding-left: 10px;width: 70%;">{{gig_list.visa}}</div>
-            </div>
-            <div style="display: flex;">
-               
-                <div style="width: 30%;text-align: end;">Equipment: </div>
-                <div style="padding-left: 10px;width: 70%;">{{gig_list.Equipment}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;"></div>
-                <div style="padding-left: 10px;width: 70%;">{{gig_list.Equipment_email}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;"> </div>
-                <div style="padding-left: 10px;width: 70%;padding-bottom: 5px;">{{gig_list.descriptions}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Sound check: </div>
-                <div style="padding-left: 10px;width: 70%;">{{gig_list.sound_check_time}}</div>
-            </div>   
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Previous act: </div>
-                <div style="padding-left: 10px;width: 70%;">{{pregig.title}}</div>
-            </div> 
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Next act: </div>
-                <div style="padding-left: 10px;width: 70%;">{{nextgig.title}}</div>
-            </div> 
-        </div>
-        
+            {% endif %}
+        </table>
+       
+
         <div>
-        {% if not contact_list is None %}
+            {% if not contact_list is None %}
             <h2>Contacts</h2>
             <hr>
             {% for contact in contact_list %}
             {% if contact.travelling_party is False%}
-            <div style="margin: auto;width: 90%;">
-                <div style="display: flex;">
-                    <div style="width: 30%;text-align: end;padding-right: 10px;">{{contact.type}}</div>
-                    <div style="width: 70%;"><b>{{contact.name}}</b> 
-                    <span>Tel:{{contact.number}}</span>
-                    <span>Email:{{contact.email}}</span>
 
-                    </div>
-                </div>
-            </div>
+            <table>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> {{contact.type}} :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        <b>{{contact.name}}</b>
+                        <span>  Tel: {{contact.number}}</span>
+                        <span>  Email: {{contact.email}}</span>
+                    </td>
+                </tr>
+            </table>
             {% endif %}
             {% endfor %}
+
             
+            {% if True in cont %}
             <h3>Travelling party</h3>
+            {% endif %}
             {% for contact in contact_list %}
             {% if contact.travelling_party is True%}
-            <div style="margin: auto;width: 90%;">
-                <div style="display: flex;">
-                    <div style="width: 30%;text-align: end;padding-right: 10px;">{{contact.type}}</div>
-                    <div style="width: 70%;"><b>{{contact.name}}</b> 
-                    <span>Tel:{{contact.number}}</span>
-                    <span>Email:{{contact.email}}</span>
+            <table>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> {{contact.type}} :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        <b>{{contact.name}}</b>
+                        <span>  Tel: {{contact.number}}</span>
+                        <span>  Email: {{contact.email}}</span>
+                    </td>
+                </tr>
+            </table>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
 
-                    </div>
-                </div>
-            </div>
+            {% if not venue_list is None %}
+            <h2>Venue</h2>
+            <hr>
+            {% for venue in venue_list%}
+            {% if venue_list|length >= 2 %}
+            <h3>Venue {{forloop.counter}}</h3>
+            {% endif %}
+            <table>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Name :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{venue.venue_name}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Website :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{venue.website}}
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Phone :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{venue.number}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Address :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{venue.address}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Details :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        <div>Indoor: {{venue.indoor}}</div>
+                        <div>Covered: {{venue.covered}}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Credential collection :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{venue.credential_collection}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Dressing room :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{venue.dressing_room}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Hospitality :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        <div><b>{{venue.hospitality}}</b></div>
+                        <div>{{venue.hospitality_detail}}</div>
+                        <div>{{venue.hospitality_email}}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Catring :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        <div><b>{{venue.catring}}</b></div>
+                        <div>{{venue.catring_detail}}</div>
+                    </td>
+                </tr>
+            </table>
+            {% endfor %}
+            {% endif %}
+
+            {% if not hotel_list is None %}
+            <h2>Hotel</h2>
+            <hr>
+
+            {% for hotel in hotel_list %}
+            {% if hotel_list|length >= 2 %}
+            <h3>Hotel{{forloop.counter}}</h3>
+            {% endif %}
+            <table>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Name :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{hotel.hotel_name}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Phone :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{hotel.number}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Address :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{hotel.address}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Website :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{hotel.website}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Room buyout :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{hotel.room_buyout}}
+                    </td>
+                </tr>
+            </table>
+            
+            {% endfor %}
+            {% endif %}
+
+
+            {% if not all is None %}
+            <h2>Schedule</h2>
+            <hr>
+            {% endif %}
+            <!-- {{settime_list}} -->
+
+            {% for a in all|dictsort:"depart_time" %}
+            {% if not cab_list is None %}
+            {% if a in cab_list %}
+            <h2>Car</h2>
+            <table>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Departs at :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{a.depart_time}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Arrives at :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{a.arrival_time}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> From :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{a.depart_location}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> To :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{a.arrival_location}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> People travelling :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        <b>{{a.user.username}}</b>
+                    </td>
+                </tr>
+            </table>
+
+            {% endif %}
+            {% endif %}
+
+            {% if not flight_list is None %}
+            {% if a in flight_list %}
+            <h2>Flight</h2>
+            <table>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Departs at :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{a.depart_time}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Arrives at :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{a.arrival_time}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> From :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{a.depart_location}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> To :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{a.arrival_location}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Flight number :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{a.flight_number}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Class :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{a.flight_class}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> People travelling :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        <b>{{a.user.username}}</b>
+                    </td>
+                </tr>
+            </table>
+            {% endif %}
+            {% endif %}
+
+            {% if not settime_list is None %}
+            {% if a in settime_list %}
+            <h2>Settime</h2>
+            <table>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Starts at :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{a.depart_time}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Finishes at :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{a.arrival_time}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> Location :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        {{a.venue.venue_name}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left-td-style">
+                        <div class="left-div-style"> People included :</div>
+                    </td> 
+                    
+                    <td class="right-td-style">
+                        <b>{{a.user.username}}</b>
+                    </td>
+                </tr>
+            </table>
+        
+            {% endif %}
             {% endif %}
             {% endfor %}
 
-        {% endif %}
-        {% if not venue_list is None %}
-
-            <h2>Venue</h2>
-            <hr>
-            {% for venue in venue_list %}
-            <div style="width: 90%;margin: auto;padding-bottom: 20px;">
-                
-                <div style="display: flex;">
-                    <div style="padding-bottom: 5px;width: 30%;text-align: end;">Name: </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue.venue_name}}</div>
-                </div>
-                <div style="display: flex;">
-                    <div style="padding-bottom: 5px;width: 30%;text-align: end;">Website: </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue.website}}</div>
-                </div>
-                <div style="display: flex;">
-                    <div style="padding-bottom: 5px;width: 30%;text-align: end;">Phone: </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue.number}}</div>
-                </div>
-                <div style="display: flex;">
-                    <div style="padding-bottom: 5px;width: 30%;text-align: end;">Address: </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue.address}}</div>
-                </div>
-                
-                <div style="display: flex;">
-                    <div style="padding-bottom: 5px;width: 30%;text-align: end;">Details: </div>
-                    <div style="padding-left: 10px;width: 70%;">Inddor:{{venue.indoor}}</div>
-                </div>
-                <div style="display: flex;">
-                    <div style="padding-bottom: 5px;width: 30%;text-align: end;"> </div>
-                    <div style="padding-left: 10px;width: 70%;padding-bottom: 5px;">Covered:{{venue.covered}}</div>
-                </div>
-                <div style="display: flex;">
-                    <div style="padding-bottom: 5px;width: 30%;text-align: end;">Credential collection: </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue.credential_collection}}</div>
-                </div>
-                
-                <div style="display: flex;">
-                    <div style="padding-bottom: 5px;width: 30%;text-align: end;">Dressing room: </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue.dressing_room}}</div>
-                </div>
-                <div style="display: flex;">
-                    <div style="width: 30%;text-align: end;">Hospitality: </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue.hospitality}}</div>
-                </div>
-                <div style="display: flex;">
-                    <div style="padding-bottom: 5px;width: 30%;text-align: end;"> </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue.hospitality_detail}}</div>
-                </div>
-                <div style="display: flex;">
-                    <div style="padding-bottom: 5px;width: 30%;text-align: end;"> </div>
-                    <div style="padding-left: 10px;width: 70%;padding-bottom: 5px">{{venue.hospitality_email}}</div>
-                </div>
-                <div style="display: flex;">
-                    <div style="width: 30%;text-align: end;">Catring: </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue.catring}}</div>
-                </div>
-                <div style="display: flex;">
-                    <div style="padding-bottom: 5px;width: 30%;text-align: end;"> </div>
-                    <div style="padding-left: 10px;width: 70%;">{{venue.catring_detail}}</div>
-                </div>
-            </div>
-            {% endfor %}
-        {% endif %}
-        {% if not hotel_list is None %}
-
-        <h2>Hotel</h2>
-        <hr>
-        {% for hotel in hotel_list %}
-        <div style="width: 90%;margin: auto;padding-bottom: 20px;">
            
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Name: </div>
-                <div style="padding-left: 10px;width: 70%;">{{hotel.hotel_name}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Phone: </div>
-                <div style="padding-left: 10px;width: 70%;">{{hotel.number}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Address: </div>
-                <div style="padding-left: 10px;width: 70%;">{{hotel.address}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Website: </div>
-                <div style="padding-left: 10px;width: 70%;">{{hotel.website}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Room buyout: </div>
-                <div style="padding-left: 10px;width: 70%;">{{hotel.room_buyout}}</div>
-            </div>
-            
         </div>
-        {% endfor %}
-        {% endif %}
-        
-        <h2>Schedule</h2>
-        <hr>
-   
-        
 
-        {% if not cab_list is None %}
-        {% for cab in cab_list|dictsort:"depart_time" %}
-        
-        <h2>Car</h2>
-        <div style="width: 90%;margin: auto;padding-bottom: 20px;">
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Departs at: </div>
-                <div style="padding-left: 10px;width: 70%;">{{cab.depart_time}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Arrives at: </div>
-                <div style="padding-left: 10px;width: 70%;">{{cab.arrival_time}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">From: </div>
-                <div style="padding-left: 10px;width: 70%;">{{cab.depart_location}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">To: </div>
-                <div style="padding-left: 10px;width: 70%;">{{cab.arrival_location}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">People travelling: </div>
-                <div style="padding-left: 10px;width: 70%;">{{cab.user.username}}</div>
-            </div>
+</body>
 
-           
-        </div> 
-        {% endfor %}
-        
-        {% endif %}
-
-
-        
-        {% if not flight_list is None %}
-        {% for flight in flight_list %}
-        <h2>Flight</h2>
-        <div style="width: 90%;margin: auto;padding-bottom: 20px;">
-            
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Departs at: </div>
-                <div style="padding-left: 10px;width: 70%;">{{flight.depart_time}}</div>
-            </div>
-            
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Arrives at: </div>
-                <div style="padding-left: 10px;width: 70%;">{{flight.arrival_time}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">From: </div>
-                <div style="padding-left: 10px;width: 70%;">{{flight.depart_location}}</div>
-            </div>
-            
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">To: </div>
-                <div style="padding-left: 10px;width: 70%;">{{flight.arrival_location}}</div>
-            </div>
-            
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Flight number: </div>
-                <div style="padding-left: 10px;width: 70%;">{{flight.flight_number}}</div>
-            </div>
-            <div style="display: flex;">
-               
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;"> Class: </div>
-                <div style="padding-left: 10px;width: 70%;">{{flight.flight_class}}</div>
-            </div>
-            <div style="display: flex;">
-               
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;"> People travelling: </div>
-                <div style="padding-left: 10px;width: 70%;">{{flight.user.username}}</div>
-            </div>
-            
-        </div>
-        {% endfor %}
-       
-        {% endif %}
-        {% if not settime_list is None %}
-        
-        {% for settime in settime_list %}
-        <h2>Settime</h2>
-        <div style="width: 90%;margin: auto;padding-bottom: 20px;">
-        
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Starts at: </div>
-                <div style="padding-left: 10px;width: 70%;">{{settime.depart_time}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Finishes at: </div>
-                <div style="padding-left: 10px;width: 70%;">{{settime.arrival_time}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">Location: </div>
-                <div style="padding-left: 10px;width: 70%;">{{settime.venue.venue_name}}</div>
-            </div>
-            <div style="display: flex;">
-                <div style="padding-bottom: 5px;width: 30%;text-align: end;">People included: </div>
-                <div style="padding-left: 10px;width: 70%;">{{settime.user.username}}</div>
-        
-            </div>
-            
-        </div>
-        {% endfor %}
-        {% endif %}
-    </div>
-        
-    </body>
-    </html>
+</html>

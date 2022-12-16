@@ -3015,6 +3015,54 @@ class ScheduleAPIView(GenericAPIView):
 #         pdf = render_to_pdf('pdf/datatable.html', data)
 #         return HttpResponse(pdf, content_type='application/pdf')
 from itertools import chain
+# from fpdf import FPDF,HTMLMixin
+import html
+from fpdf import FPDF, HTMLMixin
+from unittest import result
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from io import BytesIO
+from xhtml2pdf import pisa 
+import io as StringIO 
+from django.template.loader import get_template 
+from django.template import Context 
+# def html_to_pdf_directly(template_source, context_dict={}): 
+#     template_path = template_source
+#     context = context_dict
+#     template = get_template(template_path)
+#     html = template.render(context) 
+#     result = StringIO.StringIO() 
+#     pdf = pisa.pisaDocument(StringIO.StringIO(html), dest=result) 
+#     if not pdf.err: 
+#         return HttpResponse(result.getvalue(), content_type='application/pdf') 
+#     else: return HttpResponse('Errors')
+
+
+def xhtml2pdf(template_source, context_dict={}):
+    template_path = template_source
+    context = context_dict
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+    template = get_template(template_path)
+    html = template.render(context)
+
+    pisa_status = pisa.CreatePDF(
+       html, dest=response)
+    if pisa_status.err:
+       return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
+
+
+
+
+    # template = get_template(template_source)
+    # html = template.render(context_dict)
+    # result = BytesIO()
+    # pdf= pisa.pisaDocument(BytesIO(html.encode("cp1252")),result)
+    # if not pdf.err():
+    #     return HttpResponse(result.getvalue(),context_type="application/pdf")
+    # return None
+
 class alllistApiView(GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class_UserSerializer = UserListSerializer
@@ -3193,30 +3241,40 @@ class alllistApiView(GenericAPIView):
         ],
         'no-outline': None,
     }
-        # for venue in venue:
-        # print(len(cab),"::::::::::::::::::::::::::::::::::::::::::")
+       
+
+        # html.unescape(test)
+        # html.escape(test)
+        # print(test,"html")
+        # class MyFPDF(FPDF, HTMLMixin):
+        #         pass
+
+        # pdf = MyFPDF()
+        #First page
+        # pdf.add_page()
+        # html = render_to_string('a.html', context)
+
+        # pdf.write_html(test, options=options)
+        # pdf.output('html.pdf')
         
-        # return render(request,'all.html',context)
-        # WKHTMLTOPDF_PATH = '/usr/local/bin/wkhtmltopdf'
-        # config = pdfkit.configuration(wkhtmltopdf=WKHTMLTOPDF_PATH)
-        # config = pdfkit.configuration(wkhtmltopdf="C:\Program Files (x86)\wkhtmltopdf")
-        # html = get_template("all.html").render(context)
+        # config = pdfkit.configuration(wkhtmltopdf=r"C:\Users\nensi\Pictures\wkhtmltopdf")
        
-        # html=render_to_string('all.html', context)
-       
-        # pdf= pdfkit.from_string(html,options=options)
-        html = render_to_string('all.html', context)
-        pdf = pdfkit.from_string(html,options=options)
+        pdf = xhtml2pdf("all_list.html", context)
         print(pdf,"pdf")
+
         
-        # url=pdfkit.from_url(pdf)
-        # print(url,"//////////>>>>>>>>>>>>")
-        # print(type(pdf),"::::::::::::::::::::::::::::::::::::::")
+        # html = render_to_string('all.html', context)
+        # pdf = pdfkit.from_string(html,options=options, configuration=config)
+        # print(pdf,"pdf")
+        # return HttpResponse(pdf, content_type='application/pdf')
+        # return render(request,"all.html", context=context)
         return HttpResponse(pdf, content_type='application/pdf')
+
+
         return Response(data={"status": status.HTTP_200_OK,
                                       "error": False,
                                       "message": "Schedule list",
-                                      "result": final},
+                                      "result": pdf},
                                 status=status.HTTP_200_OK)
 
 import requests
