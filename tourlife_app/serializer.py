@@ -111,6 +111,7 @@ class FlightBookSerializer(serializers.ModelSerializer):
     flight_number = serializers.CharField(required=True)
     flight_class = serializers.CharField(required=True)
     wather = serializers.CharField(required=False)
+    # status = serializers.CharField(required=False)
     class Meta:
         model=FlightBook
         fields=["user","gig","depart_location","depart_lat_long","depart_time","depart_terminal","depart_gate","arrival_location",

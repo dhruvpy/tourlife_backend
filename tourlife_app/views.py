@@ -3298,7 +3298,26 @@ def get_weather_report(city):
     return weather_dict
     
         
+class FlightDelayApiView(GenericAPIView):
+    permission_classes = [AllowAny]
+    
+    def post(self, request, *args, **kwargs):
+        flightno = request.data["flightno"]
+        today = datetime.datetime.now()
+    
+        today_year = today.strftime("%Y")
+        today_month = today.strftime("%m")
+        today_day = today.strftime("%d")
 
-
+        print(today_month,today_day,"today")
+        params={"airlinecode":flightno[:2], "airplanecode":flightno[2:],"year":2022, "month":12, "day":16}
+        url="https://api.flightapi.io/flighttrack/639c107849594391ceba156a?"
+        # url1=url.append(params)
+        url1 = f'{url}airlinecode={flightno[:2]}&airplanecode={flightno[2:]}&year={today_year}&month={today_month}&day={today_day}'
+        print(url1,"url")
+        print(params,"params")
+        res=requests.get(url1)
+        return Response(res.json())
 # print(report)
 # show_weather_report(report)
+
