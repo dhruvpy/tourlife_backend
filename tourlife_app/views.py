@@ -3304,7 +3304,7 @@ class FlightDelayApiView(GenericAPIView):
     
     def post(self, request, *args, **kwargs):
         flightno = request.POST.get("flightno")
-        if flightno == None:
+        if not flightno:
             return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "Please enter flightno"},
                             status=status.HTTP_400_BAD_REQUEST)
         today = datetime.datetime.now()
@@ -3312,28 +3312,16 @@ class FlightDelayApiView(GenericAPIView):
         today_year = today.strftime("%Y")
         today_month = today.strftime("%m")
         today_day = today.strftime("%d")
-
-        print(flightno,"today")
-        params={"airlinecode":flightno[:2], "airplanecode":flightno[2:],"year":today_year, "month":today_month, "day":today_day}
-        url="https://api.flightapi.io/flighttrack/639c107849594391ceba156a?"
+        # params={"airlinecode":flightno[:2], "airplanecode":flightno[2:],"year":today_year, "month":today_month, "day":today_day}
         
-            
-        try:
-            res=requests.get(url, params=params)
-            type(res,"res")
-            
-            return Response(data={"status": status.HTTP_200_OK,
-                                      "error": False,
-                                      "message": "success!",
-                                      "result": res.json()},
-                                status=status.HTTP_200_OK)
+        # url="https://api.flightapi.io/flighttrack/639c107849594391ceba156a?"
+        url=f"https://api.flightapi.io/flighttrack/639c107849594391ceba156a?airlinecode={flightno[:2]}&airplanecode={flightno[2:]}&year={today_year}&month={today_month}&day={today_day}"
+        print(url)
+        res=requests.get(url).json()
         
-        except Exception as e:
-            return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": str(e)},
-                                status=status.HTTP_400_BAD_REQUEST)
+        return Response(data={"status": status.HTTP_200_OK,
+                                    "error": False,
+                                    "message": "success!",
+                                    "result": res},
+                            status=status.HTTP_200_OK)
         
-
-        
-# print(report)
-# show_weather_report(report)
-
