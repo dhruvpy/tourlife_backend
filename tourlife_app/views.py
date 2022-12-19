@@ -3315,10 +3315,9 @@ class FlightDelayApiView(GenericAPIView):
         # params={"airlinecode":flightno[:2], "airplanecode":flightno[2:],"year":today_year, "month":today_month, "day":today_day}
         
         # url="https://api.flightapi.io/flighttrack/639c107849594391ceba156a?"
-        url=f"https://api.flightapi.io/flighttrack/639c107849594391ceba156a?airlinecode={flightno[:2]}&airplanecode={flightno[2:]}&year={today_year}&month={today_month}&day={today_day}"
+        url=f"https://api.flightapi.io/flighttrack/63a00c7149594391ceba215f?airlinecode={flightno[:2]}&airplanecode={flightno[2:]}&year={today_year}&month={today_month}&day={today_day}"
         print(url)
         res=requests.get(url).json()
-        
         return Response(data={"status": status.HTTP_200_OK,
                                     "error": False,
                                     "message": "success!",
