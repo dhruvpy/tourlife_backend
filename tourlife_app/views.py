@@ -2864,7 +2864,8 @@ class allListView(ListAPIView):
                     "gig": settime.gig.id,
                     "venue": settime.venue.direction,
                     "depart_time": settime.depart_time,
-                    "arrival_time": settime.arrival_time
+                    "arrival_time": settime.arrival_time,
+                    "add":settime.add
                 })
             gig_response = []
             for gig in gig_master:
