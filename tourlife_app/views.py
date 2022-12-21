@@ -854,13 +854,15 @@ class FlightBookCreateAPIView(CreateAPIView):
         flight_number = request.data["flight_number"]
         flight_class = request.data["flight_class"]
         wather = request.data["wather"]
+        flight_details = request.data["flight_details"]
+        flight_details = json.loads(flight_details)
         # if not FlightBook.objects.filter(user=user).exists():
         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User or gig not exists "},
         #      status=status.HTTP_400_BAD_REQUEST)
         flightbook = FlightBook.objects.create(user=user, gig=gig, depart_location=depart_location, depart_lat_long=depart_lat_long,
                                                depart_time=depart_time, depart_terminal=depart_terminal, depart_gate=depart_gate, arrival_location=arrival_location,
                                                arrival_lat_long=arrival_lat_long, arrival_time=arrival_time, arrival_terminal=arrival_terminal,
-                                               airlines=airlines, arrival_gate=arrival_gate, flight_number=flight_number, flight_class=flight_class)
+                                               airlines=airlines, arrival_gate=arrival_gate, flight_number=flight_number, flight_class=flight_class,flight_details=flight_details)
         if not wather==None:
             flightbook.wather=wather
         response_data = {
@@ -881,6 +883,7 @@ class FlightBookCreateAPIView(CreateAPIView):
             "flight_number": flightbook.flight_number,
             "flight_class": flightbook.flight_class,
             "wather": flightbook.wather,
+            "flight_details":flightbook.flight_details
         }
 
         return Response(data={"status": status.HTTP_200_OK,
@@ -926,6 +929,8 @@ class FlightBookUpdateAPIView(CreateAPIView):
         flight_number = request.data["flight_number"]
         flight_class = request.data["flight_class"]
         wather = request.data["wather"]
+        flight_details = request.data["flight_details"]
+        flight_details = json.loads(flight_details)
 
         id = self.kwargs["pk"]
 
@@ -951,6 +956,7 @@ class FlightBookUpdateAPIView(CreateAPIView):
         flightbook.airlines = airlines
         flightbook.flight_number = flight_number
         flightbook.flight_class = flight_class
+        flightbook.flight_details = flight_details
         flightbook.save()
 
         response_data = {
@@ -971,6 +977,7 @@ class FlightBookUpdateAPIView(CreateAPIView):
             "flight_number": flightbook.flight_number,
             "flight_class": flightbook.flight_class,
             "wather": flightbook.wather,
+            "flight_details":flightbook.flight_details
         }
         return Response(data={"status": status.HTTP_200_OK,
                               "message": "Flightbook Updated",

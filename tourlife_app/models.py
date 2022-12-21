@@ -1,3 +1,4 @@
+from jsonfield import JSONField
 from pyclbr import Class
 from time import time
 from django.db import models
@@ -66,6 +67,7 @@ class FlightBook(models.Model):
     flight_class = models.CharField(max_length=100,null=True,blank=True)
     wather = models.CharField(max_length=100,null=True,blank=True)
     # status = models.CharField(max_length=100,null=True,blank=True)
+    flight_details = JSONField()
 
     # def __str__ (self):
     #     return f"{self.flight_number}"
@@ -145,7 +147,6 @@ class GuestList(models.Model):
 
 # class Add(models.Model):
 #     name=models.CharField(max_length=34)
-from jsonfield import JSONField
 class SetTime(models.Model):
     user = models.ForeignKey(User,related_name='settime_user',on_delete=models.CASCADE)
     gig = models.ForeignKey(Gigs,related_name='settime_gig',on_delete=models.CASCADE)
