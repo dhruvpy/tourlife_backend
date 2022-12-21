@@ -2864,7 +2864,7 @@ class allListView(ListAPIView):
                     "settime_id": settime.id,
                     "user": settime.user.id,
                     "user_name": settime.user.username,
-                    "gig_id": settime.gig.id,
+                    "gig": settime.gig.id,
                     "venue": settime.venue.direction,
                     "depart_time": settime.depart_time,
                     "arrival_time": settime.arrival_time,
