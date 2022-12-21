@@ -841,28 +841,26 @@ class FlightBookCreateAPIView(CreateAPIView):
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
         depart_location = request.data["depart_location"]
-        depart_lat_long = request.data["depart_lat_long"]
-        depart_time = request.data["depart_time"]
-        depart_terminal = request.data["depart_terminal"]
-        depart_gate = request.data["depart_gate"]
+        # depart_lat_long = request.data["depart_lat_long"]
+        # depart_time = request.data["depart_time"]
+        # depart_terminal = request.data["depart_terminal"]
+        # depart_gate = request.data["depart_gate"]
         arrival_location = request.data["arrival_location"]
-        arrival_lat_long = request.data["arrival_lat_long"]
-        arrival_time = request.data["arrival_time"]
-        arrival_terminal = request.data["arrival_terminal"]
-        arrival_gate = request.data["arrival_gate"]
-        airlines = request.data["airlines"]
+        # arrival_lat_long = request.data["arrival_lat_long"]
+        # arrival_time = request.data["arrival_time"]
+        # arrival_terminal = request.data["arrival_terminal"]
+        # arrival_gate = request.data["arrival_gate"]
+        # airlines = request.data["airlines"]
         flight_number = request.data["flight_number"]
-        flight_class = request.data["flight_class"]
+        # flight_class = request.data["flight_class"]
         wather = request.data["wather"]
         flight_details = request.data["flight_details"]
         flight_details = json.loads(flight_details)
         # if not FlightBook.objects.filter(user=user).exists():
         #     return Response(data={"status": status.HTTP_400_BAD_REQUEST, "error": True, "message": "User or gig not exists "},
         #      status=status.HTTP_400_BAD_REQUEST)
-        flightbook = FlightBook.objects.create(user=user, gig=gig, depart_location=depart_location, depart_lat_long=depart_lat_long,
-                                               depart_time=depart_time, depart_terminal=depart_terminal, depart_gate=depart_gate, arrival_location=arrival_location,
-                                               arrival_lat_long=arrival_lat_long, arrival_time=arrival_time, arrival_terminal=arrival_terminal,
-                                               airlines=airlines, arrival_gate=arrival_gate, flight_number=flight_number, flight_class=flight_class,flight_details=flight_details)
+        flightbook = FlightBook.objects.create(user=user, gig=gig, depart_location=depart_location, arrival_location=arrival_location,
+                                                flight_number=flight_number, flight_details=flight_details)
         if not wather==None:
             flightbook.wather=wather
         response_data = {
@@ -870,18 +868,18 @@ class FlightBookCreateAPIView(CreateAPIView):
             "user":  str(flightbook.user),
             "gig": str(flightbook.gig),
             "depart_location": flightbook.depart_location,
-            "depart_lat_long": flightbook.depart_lat_long,
-            "depart_time": flightbook.depart_time,
-            "depart_terminal": flightbook.depart_terminal,
-            "depart_gate": flightbook.depart_gate,
+            # "depart_lat_long": flightbook.depart_lat_long,
+            # "depart_time": flightbook.depart_time,
+            # "depart_terminal": flightbook.depart_terminal,
+            # "depart_gate": flightbook.depart_gate,
             "arrival_location": flightbook.arrival_location,
-            "arrival_lat_long": flightbook.arrival_lat_long,
-            "arrival_time": flightbook.arrival_time,
-            "arrival_terminal": flightbook.arrival_terminal,
-            "arrival_gate": flightbook.arrival_gate,
-            "airlines": flightbook.airlines,
+            # "arrival_lat_long": flightbook.arrival_lat_long,
+            # "arrival_time": flightbook.arrival_time,
+            # "arrival_terminal": flightbook.arrival_terminal,
+            # "arrival_gate": flightbook.arrival_gate,
+            # "airlines": flightbook.airlines,
             "flight_number": flightbook.flight_number,
-            "flight_class": flightbook.flight_class,
+            # "flight_class": flightbook.flight_class,
             "wather": flightbook.wather,
             "flight_details":flightbook.flight_details
         }
@@ -916,18 +914,18 @@ class FlightBookUpdateAPIView(CreateAPIView):
         user = User.objects.get(id=request.data["user"])
         gig = Gigs.objects.get(id=request.data["gig"])
         depart_location = request.data["depart_location"]
-        depart_lat_long = request.data["depart_lat_long"]
-        depart_time = request.data["depart_time"]
-        depart_terminal = request.data["depart_terminal"]
-        depart_gate = request.data["depart_gate"]
+        # depart_lat_long = request.data["depart_lat_long"]
+        # depart_time = request.data["depart_time"]
+        # depart_terminal = request.data["depart_terminal"]
+        # depart_gate = request.data["depart_gate"]
         arrival_location = request.data["arrival_location"]
-        arrival_lat_long = request.data["arrival_lat_long"]
-        arrival_time = request.data["arrival_time"]
-        arrival_terminal = request.data["arrival_terminal"]
-        arrival_gate = request.data["arrival_gate"]
-        airlines = request.data["airlines"]
+        # arrival_lat_long = request.data["arrival_lat_long"]
+        # arrival_time = request.data["arrival_time"]
+        # arrival_terminal = request.data["arrival_terminal"]
+        # arrival_gate = request.data["arrival_gate"]
+        # airlines = request.data["airlines"]
         flight_number = request.data["flight_number"]
-        flight_class = request.data["flight_class"]
+        # flight_class = request.data["flight_class"]
         wather = request.data["wather"]
         flight_details = request.data["flight_details"]
         flight_details = json.loads(flight_details)
@@ -944,18 +942,18 @@ class FlightBookUpdateAPIView(CreateAPIView):
         flightbook.user = user
         flightbook.gig = gig
         flightbook.depart_location = depart_location
-        flightbook.depart_lat_long = depart_lat_long
-        flightbook.depart_time = depart_time
-        flightbook.depart_terminal = depart_terminal
-        flightbook.depart_gate = depart_gate
+        # flightbook.depart_lat_long = depart_lat_long
+        # flightbook.depart_time = depart_time
+        # flightbook.depart_terminal = depart_terminal
+        # flightbook.depart_gate = depart_gate
         flightbook.arrival_location = arrival_location
-        flightbook.arrival_lat_long = arrival_lat_long
-        flightbook.arrival_time = arrival_time
-        flightbook.arrival_terminal = arrival_terminal
-        flightbook.arrival_gate = arrival_gate
-        flightbook.airlines = airlines
+        # flightbook.arrival_lat_long = arrival_lat_long
+        # flightbook.arrival_time = arrival_time
+        # flightbook.arrival_terminal = arrival_terminal
+        # flightbook.arrival_gate = arrival_gate
+        # flightbook.airlines = airlines
         flightbook.flight_number = flight_number
-        flightbook.flight_class = flight_class
+        # flightbook.flight_class = flight_class
         flightbook.flight_details = flight_details
         flightbook.save()
 
@@ -964,18 +962,18 @@ class FlightBookUpdateAPIView(CreateAPIView):
             "user":  str(flightbook.user),
             "gig": str(flightbook.gig),
             "depart_location": flightbook.depart_location,
-            "depart_lat_long": flightbook.depart_lat_long,
-            "depart_time": flightbook.depart_time,
-            "depart_terminal": flightbook.depart_terminal,
-            "depart_gate": flightbook.depart_gate,
+            # "depart_lat_long": flightbook.depart_lat_long,
+            # "depart_time": flightbook.depart_time,
+            # "depart_terminal": flightbook.depart_terminal,
+            # "depart_gate": flightbook.depart_gate,
             "arrival_location": flightbook.arrival_location,
-            "arrival_lat_long": flightbook.arrival_lat_long,
-            "arrival_time": flightbook.arrival_time,
-            "arrival_terminal": flightbook.arrival_terminal,
-            "arrival_gate": flightbook.arrival_gate,
-            "airlines": flightbook.airlines,
+            # "arrival_lat_long": flightbook.arrival_lat_long,
+            # "arrival_time": flightbook.arrival_time,
+            # "arrival_terminal": flightbook.arrival_terminal,
+            # "arrival_gate": flightbook.arrival_gate,
+            # "airlines": flightbook.airlines,
             "flight_number": flightbook.flight_number,
-            "flight_class": flightbook.flight_class,
+            # "flight_class": flightbook.flight_class,
             "wather": flightbook.wather,
             "flight_details":flightbook.flight_details
         }
@@ -2210,6 +2208,10 @@ class SetTimeCreateAPIView(CreateAPIView):
         add = request.data["add"]
         add = json.loads(add)
 
+        if SetTime.objects.filter(user=user, gig=gig).exists():
+            return Response(data={"status": status.HTTP_400_BAD_REQUEST,
+                                  "message": "settime is already add on this gig", },
+                            status=status.HTTP_400_BAD_REQUEST)
         settime = SetTime.objects.create(
             user=user, gig=gig, venue=venue, depart_time=depart_time, arrival_time=arrival_time,add=add)
 
@@ -2861,7 +2863,8 @@ class allListView(ListAPIView):
                     "type": "settime",
                     "settime_id": settime.id,
                     "user": settime.user.id,
-                    "gig": settime.gig.id,
+                    "user_name": settime.user.username,
+                    "gig_id": settime.gig.id,
                     "venue": settime.venue.direction,
                     "depart_time": settime.depart_time,
                     "arrival_time": settime.arrival_time,
