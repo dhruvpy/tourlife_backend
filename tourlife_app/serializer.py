@@ -63,13 +63,14 @@ class FlightSerializer(serializers.ModelSerializer):
     gig_id= serializers.ReadOnlyField(source='gig.id')
     gig_title= serializers.ReadOnlyField(source='gig.title')
     # flight_details = serializers.ListField(child=serializers.ReadOnlyField())
-    flight_details = serializers.ListField(child=serializers.ReadOnlyField())
+    # flight_details = serializers.ListField(child=serializers.ReadOnlyField())
 
 
     class Meta:
         model=FlightBook
         fields=["id","user_id","user_name","gig_id","gig_title","depart_location","arrival_location",
-       "flight_number","wather","flight_details"]
+       "depart_lat_long","depart_time","depart_terminal","depart_gate","arrival_lat_long","arrival_time","arrival_terminal","arrival_gate","airlines","flight_class",
+        "flight_number","wather"]
 
 class CabSerializer(serializers.ModelSerializer):
     user_id= serializers.ReadOnlyField(source='user.id')
@@ -101,26 +102,26 @@ class FlightBookSerializer(serializers.ModelSerializer):
     user = serializers.IntegerField(required=True)
     gig = serializers.IntegerField(required=True)
     depart_location = serializers.CharField(required=True)
-    # depart_lat_long = serializers.CharField(required=True)
-    # depart_time = serializers.DateTimeField(required=True)
-    # depart_terminal = serializers.CharField(required=True)
-    # depart_gate = serializers.CharField(required=True)
+    depart_lat_long = serializers.CharField(required=True)
+    depart_time = serializers.DateTimeField(required=True)
+    depart_terminal = serializers.CharField(required=True)
+    depart_gate = serializers.CharField(required=True)
     arrival_location = serializers.CharField(required=True)
-    # arrival_lat_long = serializers.CharField(required=True)
-    # arrival_time = serializers.DateTimeField(required=True)
-    # arrival_terminal = serializers.CharField(required=True)
-    # arrival_gate = serializers.CharField(required=True)
-    # airlines = serializers.CharField(required=True)
+    arrival_lat_long = serializers.CharField(required=True)
+    arrival_time = serializers.DateTimeField(required=True)
+    arrival_terminal = serializers.CharField(required=True)
+    arrival_gate = serializers.CharField(required=True)
+    airlines = serializers.CharField(required=True)
     flight_number = serializers.CharField(required=True)
-    # flight_class = serializers.CharField(required=True)
+    flight_class = serializers.CharField(required=True)
     wather = serializers.CharField(required=False)
-    flight_details = serializers.ListField(child=serializers.ReadOnlyField())
+    # flight_details = serializers.ListField(child=serializers.ReadOnlyField())
 
     # status = serializers.CharField(required=False)
     class Meta:
         model=FlightBook
-        fields=["user","gig","depart_location","arrival_location",
-        "flight_number","wather","flight_details"]
+        fields=["user","gig","depart_location","arrival_location","depart_lat_long","depart_time","depart_terminal","depart_gate","arrival_lat_long","arrival_time","arrival_terminal","arrival_gate","airlines","flight_class",
+        "flight_number","wather"]
 
 class CabBookSerializer(serializers.ModelSerializer):
     user = serializers.IntegerField(required=True)
